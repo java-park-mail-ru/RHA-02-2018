@@ -10,13 +10,17 @@ import org.apache.commons.codec.binary.Base64;
 public class User {
     private String username;
     private String password;
+    private String email;
     private UUID uID;
 
-    public User(String username, String password) throws Exception {
+    public User(String username, String password, String email) throws Exception {
         this.username = username;
         this.password = Password.getSaltedHash(password);
         this.uID = UUID.randomUUID();
+        this.email = email;
     }
+
+
 
     public String getUsername() {
         return username;
@@ -34,7 +38,17 @@ public class User {
         this.password = Password.getSaltedHash(password);
     }
 
+    public String getPassword() {
+        return password;
+    }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }
 
 
