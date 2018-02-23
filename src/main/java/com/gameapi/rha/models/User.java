@@ -33,6 +33,8 @@ public class User {
     public void setPassword(String password) throws Exception {
         this.password = Password.getSaltedHash(password);
     }
+
+
 }
 
 
