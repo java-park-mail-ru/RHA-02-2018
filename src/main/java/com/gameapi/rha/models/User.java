@@ -5,6 +5,9 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.SecureRandom;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.codec.binary.Base64;
 
 public class User {
@@ -13,7 +16,12 @@ public class User {
     private String email;
     private UUID uID;
 
-    public User(String username, String password, String email) throws Exception {
+    @JsonCreator
+    public User(
+            @JsonProperty String username,
+            @JsonProperty String password,
+            @JsonProperty String email
+    ) throws Exception {
         this.username = username;
         this.password = Password.getSaltedHash(password);
         this.uID = UUID.randomUUID();
