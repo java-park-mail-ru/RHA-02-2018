@@ -1,7 +1,6 @@
 package com.gameapi.rha.controllerls;
 
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
 import org.springframework.http.HttpStatus;
@@ -9,16 +8,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
     @PostMapping(path = "/create/{name}")
-    public ResponseEntity create(@PathVariable(name = "name") String name, @RequestBody User user) throws Exception {
-
-        user.setUsername(name);
+    public ResponseEntity create(@RequestBody User user) throws Exception {
 
         if (UserService.create(user) != null) {
             return ResponseEntity.status(HttpStatus.CREATED).body(user);
@@ -43,3 +38,5 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
     }
 }
+
+
