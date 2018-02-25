@@ -34,40 +34,30 @@ public class UserController {
     @PostMapping(path="/auth")
     public ResponseEntity auth(@RequestBody User user , HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        if(UserService.auth(user.getUsername(),user.getPassword())){
+        if (UserService.auth(user.getUsername(),user.getPassword())) {
             HttpSession session = request.getSession();
             session.setAttribute("user", "Pankaj");
             //setting session to expiry in 30 mins
             session.setMaxInactiveInterval(30*60);
-            Cookie userName = new Cookie("Auth",user.getUsername());
+            Cookie userName = new Cookie("Auth", user.getUsername());
             userName.setMaxAge(30*60);
             System.out.println("<font color=red>All right.</font>");
             response.addCookie(userName);
             response.sendRedirect("/");
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(user);
-        }
-        else{
+        } else {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(user);
         }
-
     }
 
-    // это лишь только для проверки, честно, я не буду передавать данные о пользователе через GET
-//    @GetMapping(
-//            path = "/create/{username}/{email}/{password}",
-//            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-//            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
-//    ) public ResponseEntity create(
-//            @PathVariable(name = "username") String username,
-//            @PathVariable(name = "email") String email,
-//            @PathVariable(name = "password") String password
-//    ) throws Exception {
-//        if (UserService.create(username, email, password) != null)
-//            return ResponseEntity.status(HttpStatus.CREATED).body(new User(username, email, password));
-//        else
-//            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-//    }
-
+    @PostMapping(path="/info/{name}")
+    public ResponseEntity info(@PathVariable(value = "name") String username, HttpServletRequest request, HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        System.out.println(session.getMaxInactiveInterval());
+        System.out.println(session.getAttribute("Pankaj"));
+        System.out.println(request.getCookies());
+        return null;
+    }
 
 }
 
