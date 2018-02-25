@@ -24,15 +24,29 @@ public class User {
             @JsonProperty("email") String email
     ) throws Exception {
         this.username = username;
-        this.password = Password.getSaltedHash(password);
+        this.password =password;
         this.uID = UUID.randomUUID();
         this.email = email;
     }
+
+//    @JsonCreator
+//    public User(
+//            @JsonProperty("name") String username,
+//            @JsonProperty("password") String password
+//    ) throws Exception {
+//        this.username = username;
+//        this.password = password;
+//        this.uID = UUID.randomUUID();
+//    }
 
 
 
     public String getUsername() {
         return username;
+    }
+
+    public void SaltHash()throws Exception{
+        this.password=Password.getSaltedHash(this.password);
     }
 
     public void setUsername(String username) {
@@ -47,6 +61,13 @@ public class User {
         this.password = Password.getSaltedHash(password);
     }
 
+    public Boolean checkPassword(String pass) throws Exception {
+        if(Password.check( pass, this.password))
+        {
+            return true;
+        }
+        return false;
+    }
     public String getPassword() {
         return password;
     }
