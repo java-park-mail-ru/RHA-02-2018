@@ -1,3 +1,5 @@
+package com.gameapi.rha.servlets;
+
 @javax.servlet.annotation.WebServlet(name = "AuthServlet")
 public class AuthServlet extends javax.servlet.http.HttpServlet {
     protected void doPost(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) throws javax.servlet.ServletException, java.io.IOException {
