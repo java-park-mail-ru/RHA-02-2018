@@ -19,7 +19,7 @@ import java.util.Dictionary;
 
 @RestController
 @RequestMapping("/users")
-public class UserController {
+public class UserController{
 
     @PostMapping(path = "/create")
     public ResponseEntity create(@RequestBody User user) throws Exception {
@@ -36,21 +36,52 @@ public class UserController {
     @PostMapping(path="/auth")
     public ResponseEntity auth(@RequestBody User user , HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        if (UserService.auth(user.getUsername(),user.getPassword())) {
+        if(UserService.check(user.getUsername(),user.getPassword())){
             HttpSession session = request.getSession();
-            session.setAttribute("user", user.getUsername());
-            //setting session to expiry in 30 mins
-            session.setMaxInactiveInterval(30*60);
-            Cookie userName = new Cookie("Auth", user.getUsername());
-            userName.setMaxAge(30*60);
-            System.out.println("<font color=red>All right.</font>");
-            response.addCookie(userName);
+            response=UserService.sessionAuth(session,user,response);
             response.sendRedirect("/");
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(user);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(user);
         }
     }
+
+
+    @PostMapping(path="/logout")
+    public ResponseEntity logout(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        HttpSession session = request.getSession();
+        if(session.getAttribute("user")!=null){
+
+            System.out.println(session.getId());
+            session.setAttribute("user",null);
+            //setting session to expiry in 30 mins
+            System.out.println("<font color=red>All right.</font>");
+            session.invalidate();
+            response.sendRedirect("/");
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(session);
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(session);
+        }
+
+    }
+
+    // это лишь только для проверки, честно, я не буду передавать данные о пользователе через GET
+//    @GetMapping(
+//            path = "/create/{username}/{email}/{password}",
+//            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+//            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+//    ) public ResponseEntity create(
+//            @PathVariable(name = "username") String username,
+//            @PathVariable(name = "email") String email,
+//            @PathVariable(name = "password") String password
+//    ) throws Exception {
+//        if (UserService.create(username, email, password) != null)
+//            return ResponseEntity.status(HttpStatus.CREATED).body(new User(username, email, password));
+//        else
+//            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+//    }
+
 
     @PostMapping(path="/info/{name}")
     public ResponseEntity info(@PathVariable(value = "name") String username, HttpServletRequest request, HttpServletResponse response) {
@@ -60,6 +91,7 @@ public class UserController {
         System.out.println(request.getCookies());
         return null;
     }
+
 
 }
 
