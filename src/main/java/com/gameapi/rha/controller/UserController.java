@@ -19,7 +19,7 @@ import java.util.Dictionary;
 
 @RestController
 @RequestMapping("/users")
-public class UserController {
+public class UserController{
 
     @PostMapping(path = "/create")
     public ResponseEntity create(@RequestBody User user) throws Exception {
@@ -39,12 +39,11 @@ public class UserController {
             response=UserService.sessionAuth(session,user,response);
             response.sendRedirect("/");
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(user);
-        }
-        else{
+        } else {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(user);
         }
-
     }
+
 
     @PostMapping(path="/logout")
     public ResponseEntity logout(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -80,6 +79,16 @@ public class UserController {
 //        else
 //            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 //    }
+
+
+    @PostMapping(path="/info/{name}")
+    public ResponseEntity info(@PathVariable(value = "name") String username, HttpServletRequest request, HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        System.out.println(session.getMaxInactiveInterval());
+        System.out.println(session.getAttribute("Pankaj"));
+        System.out.println(request.getCookies());
+        return null;
+    }
 
 
 }

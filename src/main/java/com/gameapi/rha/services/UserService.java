@@ -31,22 +31,6 @@ public class UserService {
     }
 
 
-//    public static User auth(String username, String password)throws Exception{
-//        User ToAuth=map.get(username);
-//        if(ToAuth == null)
-//            return null;
-//        if(ToAuth.getPassword() != password)
-//            return null;
-//        HttpSession us = new HttpSession() {
-//        };
-//        us.setAttribute("user",username);
-////        response.setContentType("text/html");
-////        PrintWriter out = response.getWriter();
-////        request.setAttribute("name", "RoseIndia");
-////        RequestDispatcher rd = getServletContext().getRequestDispatcher("/servletTwo");
-////        rd.forward(request, response);
-//    }
-
     public static Boolean exists(User user) {
         return map.containsKey(user.getUsername());
     }
@@ -82,6 +66,7 @@ public class UserService {
 //            return false;
 //        }
 //    }
+
 
 
 
