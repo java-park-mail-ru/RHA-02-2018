@@ -18,8 +18,9 @@ import javax.servlet.http.HttpSession;
 import java.util.Dictionary;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/users")
-public class UserController{
+public class UserController {
 
     @PostMapping(path = "/create")
     public ResponseEntity create(@RequestBody User user) throws Exception {
@@ -38,11 +39,13 @@ public class UserController{
 
         if(UserService.check(user.getUsername(),user.getPassword())){
             HttpSession session = request.getSession();
-            response=UserService.sessionAuth(session,user,response);
+            if (UserService.sessionAuth(session, user)) {
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
+            }
             response.sendRedirect("/");
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(user);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(user);
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
         }
     }
 
@@ -50,46 +53,37 @@ public class UserController{
     @PostMapping(path="/logout")
     public ResponseEntity logout(HttpServletRequest request, HttpServletResponse response) throws Exception {
         HttpSession session = request.getSession();
-        if(session.getAttribute("user")!=null){
+        if (session.getAttribute("user")!=null) {
 
             System.out.println(session.getId());
             session.setAttribute("user",null);
             //setting session to expiry in 30 mins
-            System.out.println("<font color=red>All right.</font>");
             session.invalidate();
             response.sendRedirect("/");
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(session);
         }
-        else{
+        else {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(session);
         }
 
     }
 
-    // это лишь только для проверки, честно, я не буду передавать данные о пользователе через GET
-//    @GetMapping(
-//            path = "/create/{username}/{email}/{password}",
-//            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-//            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
-//    ) public ResponseEntity create(
-//            @PathVariable(name = "username") String username,
-//            @PathVariable(name = "email") String email,
-//            @PathVariable(name = "password") String password
-//    ) throws Exception {
-//        if (UserService.create(username, email, password) != null)
-//            return ResponseEntity.status(HttpStatus.CREATED).body(new User(username, email, password));
-//        else
-//            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-//    }
-
-
-    @PostMapping(path="/info/{name}")
-    public ResponseEntity info(@PathVariable(value = "name") String username, HttpServletRequest request, HttpServletResponse response) {
+    @PostMapping(path="/info")
+    public ResponseEntity info(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession();
-        System.out.println(session.getMaxInactiveInterval());
-        System.out.println(session.getAttribute("Pankaj"));
-        System.out.println(request.getCookies());
-        return null;
+
+        String username = (String) session.getAttribute("user");
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
+        }
+
+        User result = UserService.userInfo(username);
+        if (result == null) {
+            // Этого быть не может
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
 
