@@ -34,20 +34,33 @@ public class UserController {
     @PostMapping(path="/auth")
     public ResponseEntity auth(@RequestBody User user , HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        if(UserService.auth(user.getUsername(),user.getPassword())){
+        if(UserService.check(user.getUsername(),user.getPassword())){
             HttpSession session = request.getSession();
-            session.setAttribute("user", "Pankaj");
-            //setting session to expiry in 30 mins
-            session.setMaxInactiveInterval(30*60);
-            Cookie userName = new Cookie("Auth",user.getUsername());
-            userName.setMaxAge(30*60);
-            System.out.println("<font color=red>All right.</font>");
-            response.addCookie(userName);
+            response=UserService.sessionAuth(session,user,response);
             response.sendRedirect("/");
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(user);
         }
         else{
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(user);
+        }
+
+    }
+
+    @PostMapping(path="/logout")
+    public ResponseEntity logout(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        HttpSession session = request.getSession();
+        if(session.getAttribute("user")!=null){
+
+            System.out.println(session.getId());
+            session.setAttribute("user",null);
+            //setting session to expiry in 30 mins
+            System.out.println("<font color=red>All right.</font>");
+            session.invalidate();
+            response.sendRedirect("/");
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(session);
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(session);
         }
 
     }

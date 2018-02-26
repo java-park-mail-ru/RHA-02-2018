@@ -54,9 +54,23 @@ public class UserService {
         return map.containsKey(user);
     }
 
-    public static Boolean auth(String user,String pass) throws Exception {
+    public static Boolean check(String user,String pass) throws Exception {
         return (map.containsKey(user)&& map.get(user).checkPassword(pass));
     }
+    public static HttpServletResponse sessionAuth(HttpSession session, User user, HttpServletResponse response)
+    {
+
+        System.out.println(session.getId());
+        session.setAttribute("user", "Pankaj");
+        //setting session to expiry in 30 mins
+        session.setMaxInactiveInterval(30*60);
+        Cookie userName = new Cookie("Auth",user.getUsername());
+        userName.setMaxAge(30*60);
+        System.out.println("<font color=red>All right.</font>");
+        response.addCookie(userName);
+        return response;
+    }
+
 //    public static Boolean auth(User user) {
 //        if(map.containsKey(user.getUsername())
 ////                &&(map.get(user.getUsername()).getPassword()==user.getPassword())
