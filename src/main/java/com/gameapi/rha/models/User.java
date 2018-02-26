@@ -29,18 +29,6 @@ public class User {
         this.email = email;
     }
 
-//    @JsonCreator
-//    public User(
-//            @JsonProperty("name") String username,
-//            @JsonProperty("password") String password
-//    ) throws Exception {
-//        this.username = username;
-//        this.password = password;
-//        this.uID = UUID.randomUUID();
-//    }
-
-
-
     public String getUsername() {
         return username;
     }

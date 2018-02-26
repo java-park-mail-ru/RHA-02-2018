@@ -24,6 +24,8 @@ public class UserController {
     @PostMapping(path = "/create")
     public ResponseEntity create(@RequestBody User user) throws Exception {
 
+        System.out.println("________________");
+
         if (UserService.create(user) != null) {
             return ResponseEntity.status(HttpStatus.CREATED).body(user);
         } else {
@@ -36,7 +38,7 @@ public class UserController {
 
         if (UserService.auth(user.getUsername(),user.getPassword())) {
             HttpSession session = request.getSession();
-            session.setAttribute("user", "Pankaj");
+            session.setAttribute("user", user.getUsername());
             //setting session to expiry in 30 mins
             session.setMaxInactiveInterval(30*60);
             Cookie userName = new Cookie("Auth", user.getUsername());
