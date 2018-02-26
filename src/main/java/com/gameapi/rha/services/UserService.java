@@ -1,18 +1,12 @@
 package com.gameapi.rha.services;
 
 import com.gameapi.rha.models.User;
-//import sun.security.util.Password;
-
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
 public class UserService {
-    private static Map<String, User> map = new HashMap<String, User>();
+    private static Map<String, User> map = new HashMap<>();
 
     public static User create(User user) throws Exception {
         if (map.containsKey(user.getUsername()) )
@@ -25,9 +19,6 @@ public class UserService {
     public static Boolean exists(User user) {
         return map.containsKey(user.getUsername());
     }
-//    public static Boolean exists(String user) {
-//        return map.containsKey(user);
-//    }
 
     public static Boolean check (String user,String pass) throws Exception {
         return (map.containsKey(user) && map.get(user).checkPassword(pass));
@@ -53,6 +44,21 @@ public class UserService {
         return null;
     }
 
+    public static User changeUser(String prevUser, User newUser) throws Exception {
+
+        User prev = map.get(prevUser);
+
+        // Такого быть не должно
+        if (prev == null) {
+            return null;
+        }
+
+        prev.setEmail(newUser.getEmail());
+        prev.setPassword(newUser.getPassword());
+        prev.SaltHash();
+
+        return prev;
+    }
 
     private static Integer getUserCount() {
         return map.size();
