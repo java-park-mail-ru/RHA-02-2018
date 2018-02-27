@@ -20,7 +20,9 @@ public class UserController {
     @PostMapping(path = "/create")
     public ResponseEntity create(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        if (request.getSession().getAttribute("user") == null) {
+        System.out.println("kaka");
+
+        if (request.getSession().getAttribute("user") != null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
         }
 
