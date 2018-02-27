@@ -1,110 +1,110 @@
 package com.gameapi.rha.controller;
+
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
-//@SessionAttributes(value = "user")
 @RequestMapping("/users")
 public class UserController {
 
+    private static String SUCCESSFULLY_REGISTERED = "10";
+    private static String     SUCCESSFULLY_AUTHED = "20";
+    private static String SUCCESSFULLY_LOGGED_OUT = "30";
+    private static String    SUCCESSFULLY_CHANGED = "40";
+    private static String            ACCESS_ERROR = "50";
+    private static String       WRONG_CREDENTIALS = "60";
+    private static String     NOT_UNIQUE_USERNAME = "70";
+    private static String   ALREADY_AUTHENTICATED = "80";
+    private static String        UNEXPECTED_ERROR = "90";
+
+
     @PostMapping(path = "/create")
-    public ResponseEntity create(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ResponseEntity create(@RequestBody User user, HttpSession session) throws Exception {
 
-        System.out.println("kaka");
-
-        if (request.getSession().getAttribute("user") != null) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
-        }
+        // Аутентифицированный пользователь не может зарегистрироваться
+        if (session.getAttribute("user") != null)
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ALREADY_AUTHENTICATED);
 
         if (UserService.create(user) != null) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(user);
+            sessionAuth(session, user);
+            return ResponseEntity.status(HttpStatus.OK).body(SUCCESSFULLY_REGISTERED);
         } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(user);
+            return ResponseEntity.status(HttpStatus.OK).body(NOT_UNIQUE_USERNAME);
         }
     }
 
-    @PostMapping(path="/auth")
-    public ResponseEntity auth(@RequestBody User user , HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @PostMapping(path = "/auth")
+    public ResponseEntity auth(@RequestBody User user, HttpSession session) throws Exception {
 
         // Мы не можем дважды аутентицифироваться
-        if (request.getSession().getAttribute("user") != null) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
+        if (session.getAttribute("user") != null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ALREADY_AUTHENTICATED);
         }
 
         // Если пароль неверный
-        if(!UserService.check(user.getUsername(),user.getPassword())) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
+        if (!UserService.check(user.getUsername(), user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.OK).body(WRONG_CREDENTIALS);
         }
 
-        HttpSession session = request.getSession();
-        if (UserService.sessionAuth(session, user)) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
-        }
-        response.sendRedirect("/");
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(user);
+        sessionAuth(session, user);
 
+        return ResponseEntity.status(HttpStatus.OK).body(SUCCESSFULLY_AUTHED);
     }
 
-    @PostMapping(path="/logout")
-    public ResponseEntity logout(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @PostMapping(path = "/logout")
+    public ResponseEntity logout(HttpSession session) {
 
         // Мы не можем выйти, не войдя
-        if (request.getSession().getAttribute("user") != null) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
+        if (session.getAttribute("user") != null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ACCESS_ERROR);
         }
 
-        HttpSession session = request.getSession();
-        if (session.getAttribute("user")!=null) {
-
-            System.out.println(session.getId());
-            session.setAttribute("user",null);
-            session.invalidate();
-            response.sendRedirect("/");
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(session);
-        }
-        else {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(session);
-        }
+        session.setAttribute("user", null);
+        session.invalidate();
+        return ResponseEntity.status(HttpStatus.OK).body(SUCCESSFULLY_LOGGED_OUT);
     }
 
-    @PostMapping(path="/info")
-    public ResponseEntity info(HttpServletRequest request) {
+    @GetMapping(path = "/info")
+    public ResponseEntity info(HttpSession session) {
 
         // Если пользователь не аутертифицирован, то у него нет доступа к информации о текущей сессии
-        if (request.getSession().getAttribute("user") != null) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
+        if (session.getAttribute("user") != null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ACCESS_ERROR);
         }
 
-        User result = UserService.userInfo((String) request.getSession().getAttribute("user"));
+        User result = UserService.userInfo((String) session.getAttribute("user"));
         if (result == null) {
             // Этого быть не может
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.OK).body(UNEXPECTED_ERROR);
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     @PostMapping(path = "/change")
-    public ResponseEntity change(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ResponseEntity change(@RequestBody User user, HttpSession session) throws Exception {
 
         // Без аутентификации нет доступа к изменению данных
-        if (request.getSession().getAttribute("user") != null) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
+        if (session.getAttribute("user") != null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ACCESS_ERROR);
         }
 
-        User result = UserService.changeUser((String) request.getSession().getAttribute("user"), user);
+        UserService.changeUser((String) session.getAttribute("user"), user);
 
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
+        return ResponseEntity.status(HttpStatus.OK).body(SUCCESSFULLY_CHANGED);
+    }
+
+
+    private static void sessionAuth(HttpSession session, User user)
+    {
+        session.setAttribute("user", user.getUsername());
+        session.setMaxInactiveInterval(30*60);
     }
 }
 

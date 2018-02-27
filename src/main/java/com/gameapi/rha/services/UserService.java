@@ -4,9 +4,12 @@ import com.gameapi.rha.models.User;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class UserService {
-    private static Map<String, User> map = new HashMap<>();
+
+
+    private static ConcurrentHashMap<String, User> map = new ConcurrentHashMap<>();
 
     public static User create(User user) throws Exception {
         if (map.containsKey(user.getUsername()) )
@@ -22,22 +25,6 @@ public class UserService {
 
     public static Boolean check (String user,String pass) throws Exception {
         return (map.containsKey(user) && map.get(user).checkPassword(pass));
-    }
-
-    public static Boolean sessionAuth(HttpSession session, User user)
-    {
-        try {
-            System.out.println(session.getId());
-            session.setAttribute("user", user.getUsername());
-            session.setMaxInactiveInterval(30*60);
-            return true;
-        }
-
-        finally {
-                return false;
-        }
-
-
     }
 
     public static User userInfo(String username) {
