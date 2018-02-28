@@ -14,32 +14,32 @@ public class UserService {
         map.put(user.getUsername(), user);
         return user;
     }
-
-    public static Boolean exists(User user) {
-        return map.containsKey(user.getUsername());
-    }
+//
+//    public static Boolean exists(User user) {
+//        return map.containsKey(user.getUsername());
+//    }
 
     public static Boolean check (String username, String password) {
         return (map.containsKey(username) && map.get(username).checkPassword(password));
     }
 
     public static User userInfo(String username) {
-        return null;
+        return map.get(username);
     }
 
-    public static User changeUser(String prevUser, User newUser) throws Exception {
+    public static void changeUser(String prevUser, User newUser) throws Exception {
 
-        User prev = map.get(prevUser);
+        final User prev = map.get(prevUser);
 
         // Такого быть не должно
         if (prev == null) {
-            return null;
+            return;
         }
 
         prev.setEmail(newUser.getEmail());
         prev.setPassword(newUser.getPassword());
-        prev.SaltHash();
+        prev.saltHash();
 
-        return prev;
+//        return prev;
     }
 }
