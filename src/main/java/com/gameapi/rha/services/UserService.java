@@ -1,9 +1,6 @@
 package com.gameapi.rha.services;
 
 import com.gameapi.rha.models.User;
-import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UserService {
@@ -11,10 +8,9 @@ public class UserService {
 
     private static ConcurrentHashMap<String, User> map = new ConcurrentHashMap<>();
 
-    public static User create(User user) throws Exception {
+    public static User create(User user) {
         if (map.containsKey(user.getUsername()) )
             return null;
-        user.SaltHash();
         map.put(user.getUsername(), user);
         return user;
     }
@@ -23,8 +19,8 @@ public class UserService {
         return map.containsKey(user.getUsername());
     }
 
-    public static Boolean check (String user,String pass) throws Exception {
-        return (map.containsKey(user) && map.get(user).checkPassword(pass));
+    public static Boolean check (String username, String password) {
+        return (map.containsKey(username) && map.get(username).checkPassword(password));
     }
 
     public static User userInfo(String username) {
@@ -45,9 +41,5 @@ public class UserService {
         prev.SaltHash();
 
         return prev;
-    }
-
-    private static Integer getUserCount() {
-        return map.size();
     }
 }

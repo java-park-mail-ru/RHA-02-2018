@@ -24,7 +24,7 @@ public class User {
             @JsonProperty("email") String email
     ) throws Exception {
         this.username = username;
-        this.password =password;
+        this.password = Password.getSaltedHash(password);
         this.uID = UUID.randomUUID();
         this.email = email;
     }
@@ -49,9 +49,10 @@ public class User {
         this.password = Password.getSaltedHash(password);
     }
 
-    public Boolean checkPassword(String pass) throws Exception {
-        return Password.check(pass, this.password);
+    public Boolean checkPassword(String password) {
+        return password.equals(this.password);
     }
+
     public String getPassword() {
         return password;
     }

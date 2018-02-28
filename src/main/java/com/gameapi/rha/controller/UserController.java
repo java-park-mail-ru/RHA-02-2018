@@ -25,7 +25,7 @@ public class UserController {
 
 
     @PostMapping(path = "/create")
-    public ResponseEntity create(@RequestBody User user, HttpSession session) throws Exception {
+    public ResponseEntity create(@RequestBody User user, HttpSession session) {
 
         // Аутентифицированный пользователь не может зарегистрироваться
         if (session.getAttribute("user") != null)
@@ -40,14 +40,14 @@ public class UserController {
     }
 
     @PostMapping(path = "/auth")
-    public ResponseEntity auth(@RequestBody User user, HttpSession session) throws Exception {
+    public ResponseEntity auth(@RequestBody User user, HttpSession session) {
 
         // Мы не можем дважды аутентицифироваться
         if (session.getAttribute("user") != null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ALREADY_AUTHENTICATED);
         }
 
-        // Если пароль неверный
+        // Если неверные учетные данные
         if (!UserService.check(user.getUsername(), user.getPassword())) {
             return ResponseEntity.status(HttpStatus.OK).body(WRONG_CREDENTIALS);
         }
