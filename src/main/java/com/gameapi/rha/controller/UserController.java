@@ -13,7 +13,7 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/users")
 public class UserController {
 
-    private static String SUCCESSFULLY_REGISTERED = "10";
+    private static String  SUCCESSFULLY_REGISTERED = "10";
     private static String     SUCCESSFULLY_AUTHED = "20";
     private static String SUCCESSFULLY_LOGGED_OUT = "30";
     private static String    SUCCESSFULLY_CHANGED = "40";
@@ -78,7 +78,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ACCESS_ERROR);
         }
 
-        User result = UserService.userInfo((String) session.getAttribute("user"));
+        final User result = UserService.userInfo((String) session.getAttribute("user"));
         if (result == null) {
             // Этого быть не может
             return ResponseEntity.status(HttpStatus.OK).body(UNEXPECTED_ERROR);
