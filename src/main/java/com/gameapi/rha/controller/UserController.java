@@ -74,7 +74,7 @@ public class UserController {
     public ResponseEntity info(HttpSession session) {
 
         // Если пользователь не аутертифицирован, то у него нет доступа к информации о текущей сессии
-        if (session.getAttribute("user") != null) {
+        if (session.getAttribute("user") == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ACCESS_ERROR);
         }
 
