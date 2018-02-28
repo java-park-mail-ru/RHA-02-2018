@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 
 @RestController
-@CrossOrigin(origins = "bf-balance.herokuapp.com")
+@CrossOrigin(origins = "http://bf-balance.herokuapp.com")
 @RequestMapping("/users")
 public class UserController {
 
