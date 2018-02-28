@@ -1,5 +1,7 @@
 package com.gameapi.rha.models;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.*;
@@ -18,7 +20,7 @@ public class User {
             @JsonProperty("name") String username,
             @JsonProperty("password") String password,
             @JsonProperty("email") String email
-    ) throws Exception {
+    ) throws NoSuchAlgorithmException,InvalidKeySpecException {
         this.username = username;
         this.password = Password.getSaltedHash(password);
         this.uID = UUID.randomUUID();
@@ -29,7 +31,7 @@ public class User {
         return username;
     }
 
-    public void saltHash() throws Exception{
+    public void saltHash() throws NoSuchAlgorithmException,InvalidKeySpecException{
         this.password = Password.getSaltedHash(this.password);
     }
 
@@ -41,12 +43,12 @@ public class User {
         return uID;
     }
 
-    public void setPassword(String password) throws Exception {
+    public void setPassword(String password) throws NoSuchAlgorithmException,InvalidKeySpecException {
         this.password = Password.getSaltedHash(password);
     }
 
-    public Boolean checkPassword(String pass) {
-        return pass.equals(this.password);
+    public Boolean checkPassword(String pass) throws NoSuchAlgorithmException,InvalidKeySpecException{
+        return Password.check(pass, this.password);
     }
 
     public String getPassword() {

@@ -1,6 +1,9 @@
 package com.gameapi.rha.services;
 
 import com.gameapi.rha.models.User;
+
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UserService {
@@ -19,7 +22,7 @@ public class UserService {
 //        return map.containsKey(user.getUsername());
 //    }
 
-    public static Boolean check (String username, String password) {
+    public static Boolean check (String username, String password) throws NoSuchAlgorithmException,InvalidKeySpecException {
         return (map.containsKey(username) && map.get(username).checkPassword(password));
     }
 
@@ -27,7 +30,7 @@ public class UserService {
         return map.get(username);
     }
 
-    public static void changeUser(String prevUser, User newUser) throws Exception {
+    public static void changeUser(String prevUser, User newUser) throws NoSuchAlgorithmException,InvalidKeySpecException {
 
         final User prev = map.get(prevUser);
 
