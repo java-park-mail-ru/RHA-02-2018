@@ -33,9 +33,9 @@ public class User {
         this.password = Password.getSaltedHash(this.password);
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+//    public void setUsername(String username) {
+//        this.username = username;
+//    }
 
     public UUID getuID() {
         return uID;
@@ -45,8 +45,8 @@ public class User {
         this.password = Password.getSaltedHash(password);
     }
 
-    public Boolean checkPassword(String password) {
-        return password.equals(this.password);
+    public Boolean checkPassword(String pass) {
+        return pass.equals(this.password);
     }
 
     public String getPassword() {

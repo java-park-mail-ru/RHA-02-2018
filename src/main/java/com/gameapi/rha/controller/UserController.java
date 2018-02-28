@@ -13,7 +13,7 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/users")
 public class UserController {
 
-    private static String SUCCESSFULLY_REGISTERED = "10";
+    private static String  SUCCESSFULLY_REGISTERED = "10";
     private static String     SUCCESSFULLY_AUTHED = "20";
     private static String SUCCESSFULLY_LOGGED_OUT = "30";
     private static String    SUCCESSFULLY_CHANGED = "40";
