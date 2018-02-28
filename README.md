@@ -1,3 +1,4 @@
+![travis](https://travis-ci.org/HimmelSpark/RHA-02-2018.svg?branch=master)
 # Бэкэнд сервер для браузерной игры-стратегии "Bruteforce Balance"
 ## Деплой API <https://rha-backend.herokuapp.com>
 ## Команда RHA: 
