@@ -15,6 +15,8 @@ import java.security.spec.InvalidKeySpecException;
 @RequestMapping("/users")
 public class UserController {
 
+
+
     private static String  SUCCESSFULLY_REGISTERED = "10";
     private static String     SUCCESSFULLY_AUTHED = "20";
     private static String SUCCESSFULLY_LOGGED_OUT = "30";
@@ -33,7 +35,7 @@ public class UserController {
         if (session.getAttribute("user") != null)
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ALREADY_AUTHENTICATED);
 
-        if (UserService.create(user) != null) {
+        if (UserService.putInMap(user) != null) {
             sessionAuth(session, user);
             return ResponseEntity.status(HttpStatus.OK).body(SUCCESSFULLY_REGISTERED);
         } else {

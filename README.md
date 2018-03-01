@@ -8,10 +8,10 @@
 ### Все данные в теле запроса должны быть а формате application/json
 ### Пользовательские данные пересылаются по следующему шаблону
 ```json
-obj {
-  name: "vasya",
-  email: "pupkin@mail.ru",
-  password: "qwertyui"
+{
+  "name": "vasya",
+  "password": "qwertyui",
+  "email": "pupkin@mail.ru"
 }
 ```
 #### Список команд, предоставляемых API:    
