@@ -20,9 +20,11 @@ public class User {
             @JsonProperty("name") String username,
             @JsonProperty("password") String password,
             @JsonProperty("email") String email
-    ) {
+    ) throws Exception {
         this.username = username;
         this.password = Password.getSaltedHash(password);
+        if (this.password == null)
+            throw new Exception("Unexpected Error");
         this.uID = UUID.randomUUID();
         this.email = email;
     }
@@ -35,7 +37,7 @@ public class User {
         return uID;
     }
 
-    public void setPassword(String password) throws NoSuchAlgorithmException,InvalidKeySpecException {
+    public void setPassword(String password) {
         this.password = Password.getSaltedHash(password);
     }
 
