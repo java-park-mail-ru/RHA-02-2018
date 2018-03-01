@@ -30,7 +30,7 @@ public class User {
     public String getUsername() {
         return username;
     }
-    
+
     public UUID getuID() {
         return uID;
     }
