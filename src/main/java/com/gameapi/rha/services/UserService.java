@@ -11,7 +11,7 @@ public class UserService {
 
     private static ConcurrentHashMap<String, User> map = new ConcurrentHashMap<>();
 
-    public static User create(User user) {
+    public static User putInMap(User user) {
         if (map.containsKey(user.getUsername()) )
             return null;
         map.put(user.getUsername(), user);
