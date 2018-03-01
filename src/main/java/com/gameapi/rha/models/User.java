@@ -35,7 +35,7 @@ public class User {
         return uID;
     }
 
-    public void setPassword(String password) throws NoSuchAlgorithmException,InvalidKeySpecException {
+    public void setPassword(String password) {
         this.password = Password.getSaltedHash(password);
     }
 
