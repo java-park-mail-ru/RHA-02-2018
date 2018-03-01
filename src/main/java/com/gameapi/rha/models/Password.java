@@ -19,15 +19,19 @@ class Password {
     /** Computes a salted PBKDF2 hash of given plaintext password
      suitable for storing in a database.
      Empty passwords are not supported. */
-    public static String getSaltedHash(String password) throws NoSuchAlgorithmException,InvalidKeySpecException {
-        final byte[] salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(SALT_LEN);
-        // store the salt with the password
-        return Base64.encodeBase64String(salt) + '$' + hash(password, salt);
+    public static String getSaltedHash(String password) {
+        try {
+            final byte[] salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(SALT_LEN);
+            // store the salt with the password
+            return Base64.encodeBase64String(salt) + '$' + hash(password, salt);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex){
+            return null;
+        }
     }
 
     /** Checks whether given plaintext password corresponds
      to a stored salted hash of the password. */
-    public static boolean check(String password, String stored) throws NoSuchAlgorithmException,InvalidKeySpecException{
+    public static boolean check(String password, String stored) throws NoSuchAlgorithmException,InvalidKeySpecException {
         final String[] saltAndPass = stored.split("\\$");
         if (saltAndPass.length != 2) {
             throw new IllegalStateException(
@@ -39,7 +43,7 @@ class Password {
 
     // using PBKDF2 from Sun, an alternative is https://github.com/wg/scrypt
     // cf. http://www.unlimitednovelty.com/2012/03/dont-use-bcrypt.html
-    private static String hash(String password, byte[] salt) throws IllegalArgumentException, NoSuchAlgorithmException,InvalidKeySpecException  {
+    private static String hash(String password, byte[] salt) throws IllegalArgumentException, NoSuchAlgorithmException,InvalidKeySpecException {
         if (password == null || password.isEmpty())
             throw new IllegalArgumentException("Empty passwords are not supported.");
         final SecretKeyFactory f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");

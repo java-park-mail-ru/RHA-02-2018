@@ -20,7 +20,7 @@ public class User {
             @JsonProperty("name") String username,
             @JsonProperty("password") String password,
             @JsonProperty("email") String email
-    ) throws NoSuchAlgorithmException,InvalidKeySpecException {
+    ) {
         this.username = username;
         this.password = Password.getSaltedHash(password);
         this.uID = UUID.randomUUID();
