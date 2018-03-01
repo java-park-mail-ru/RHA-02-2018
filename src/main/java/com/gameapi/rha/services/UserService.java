@@ -41,8 +41,6 @@ public class UserService {
 
         prev.setEmail(newUser.getEmail());
         prev.setPassword(newUser.getPassword());
-        prev.saltHash();
-
 //        return prev;
     }
 }
