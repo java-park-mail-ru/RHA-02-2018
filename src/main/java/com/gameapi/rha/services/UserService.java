@@ -8,18 +8,14 @@ public class UserService {
 
     private static ConcurrentHashMap<String, User> map = new ConcurrentHashMap<>();
 
-    public static User create(User user) {
+    public static User putInMap(User user) {
         if (map.containsKey(user.getUsername()) )
             return null;
         map.put(user.getUsername(), user);
         return user;
     }
-//
-//    public static Boolean exists(User user) {
-//        return map.containsKey(user.getUsername());
-//    }
 
-    public static Boolean check (String username, String password) {
+    public static Boolean check (String username, String password)  {
         return (map.containsKey(username) && map.get(username).checkPassword(password));
     }
 
@@ -27,7 +23,7 @@ public class UserService {
         return map.get(username);
     }
 
-    public static void changeUser(String prevUser, User newUser) throws Exception {
+    public static void changeUser(String prevUser, User newUser){
 
         final User prev = map.get(prevUser);
 
@@ -35,11 +31,7 @@ public class UserService {
         if (prev == null) {
             return;
         }
-
         prev.setEmail(newUser.getEmail());
         prev.setPassword(newUser.getPassword());
-        prev.saltHash();
-
-//        return prev;
     }
 }
