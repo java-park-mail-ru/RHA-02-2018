@@ -30,7 +30,7 @@ public class UserService {
         return map.get(username);
     }
 
-    public static void changeUser(String prevUser, User newUser) throws NoSuchAlgorithmException,InvalidKeySpecException {
+    public static void changeUser(String prevUser, User newUser){
 
         final User prev = map.get(prevUser);
 

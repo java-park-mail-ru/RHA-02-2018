@@ -26,7 +26,7 @@ public class UserController {
         NOT_UNIQUE_USERNAME,
         ALREADY_AUTHENTICATED,
         UNEXPECTED_ERROR
-    };
+    }
 
     @PostMapping(path = "/create")
     public ResponseEntity create(@RequestBody User user, HttpSession session) {
@@ -93,7 +93,7 @@ public class UserController {
     }
 
     @PostMapping(path = "/change")
-    public ResponseEntity change(@RequestBody User user, HttpSession session) throws NoSuchAlgorithmException,InvalidKeySpecException {
+    public ResponseEntity change(@RequestBody User user, HttpSession session) {
 
         // Без аутентификации нет доступа к изменению данных
         if (session.getAttribute("user") != null) {
