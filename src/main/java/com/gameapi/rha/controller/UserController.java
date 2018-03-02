@@ -10,11 +10,11 @@ import javax.servlet.http.HttpSession;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
+
 @RestController
 @CrossOrigin(origins = "http://bf-balance.herokuapp.com")
 @RequestMapping("/users")
 public class UserController {
-
     private static String  SUCCESSFULLY_REGISTERED = "10";
     private static String     SUCCESSFULLY_AUTHED = "20";
     private static String SUCCESSFULLY_LOGGED_OUT = "30";
@@ -30,8 +30,9 @@ public class UserController {
     public ResponseEntity create(@RequestBody User user, HttpSession session) {
 
         // Аутентифицированный пользователь не может зарегистрироваться
-        if (session.getAttribute("user") != null)
+        if (session.getAttribute("user") != null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ALREADY_AUTHENTICATED);
+        }
 
         if (UserService.create(user) != null) {
             sessionAuth(session, user);
@@ -68,6 +69,8 @@ public class UserController {
         }
 
         session.setAttribute("user", null);
+
+        //завершаем сеанс, отвязываем связанные с ним объекты
         session.invalidate();
         return ResponseEntity.status(HttpStatus.OK).body(SUCCESSFULLY_LOGGED_OUT);
     }
