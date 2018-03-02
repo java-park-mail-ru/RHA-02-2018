@@ -66,7 +66,7 @@ public class UserController {
     public ResponseEntity logout(HttpSession session) {
 
         // Мы не можем выйти, не войдя
-        if (session.getAttribute("user") != null) {
+        if (session.getAttribute("user") == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(UserStatus.ACCESS_ERROR);
         }
 
