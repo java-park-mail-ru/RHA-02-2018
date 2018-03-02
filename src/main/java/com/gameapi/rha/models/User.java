@@ -1,9 +1,6 @@
 package com.gameapi.rha.models;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.*;
 
 
@@ -41,7 +38,7 @@ public class User {
         this.password = Password.getSaltedHash(password);
     }
 
-    public Boolean checkPassword(String pass) throws NoSuchAlgorithmException,InvalidKeySpecException{
+    public Boolean checkPassword(String pass) {
         return Password.check(pass, this.password);
     }
 

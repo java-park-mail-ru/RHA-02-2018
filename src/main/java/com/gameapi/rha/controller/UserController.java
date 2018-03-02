@@ -8,8 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 
 @RestController
 @CrossOrigin(origins = "http://bf-balance.herokuapp.com")
@@ -45,7 +43,7 @@ public class UserController {
     }
 
     @PostMapping(path = "/auth")
-    public ResponseEntity auth(@RequestBody User user, HttpSession session)throws NoSuchAlgorithmException,InvalidKeySpecException {
+    public ResponseEntity auth(@RequestBody User user, HttpSession session) {
 
         // Мы не можем дважды аутентицифироваться
         if (session.getAttribute("user") != null) {
