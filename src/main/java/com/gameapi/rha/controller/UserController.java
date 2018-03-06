@@ -40,6 +40,7 @@ public class UserController {
 
 
         if (UserService.putInMap(user) != null) {
+            user.saltHash();
             sessionAuth(session, user);
             return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_REGISTERED));
         } else {
@@ -99,7 +100,7 @@ public class UserController {
     public ResponseEntity change(@RequestBody User user, HttpSession session) {
 
         // Без аутентификации нет доступа к изменению данных
-        if (session.getAttribute("user") != null) {
+        if (session.getAttribute("user") == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
         }
 
