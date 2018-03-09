@@ -20,7 +20,7 @@ import javax.servlet.http.Cookie;
 import java.io.IOException;
 
 @RestController
-@CrossOrigin(origins = "http://bf-balance.herokuapp.com")
+@CrossOrigin(origins = {"http://bf-balance.herokuapp.com", "http://localhost:3000"}, allowCredentials = "true")
 @RequestMapping("/users")
 public class UserController {
 
@@ -39,7 +39,7 @@ public class UserController {
     }
 
     @PostMapping(path = "/create", consumes = "application/json", produces = "application/json")
-    public ResponseEntity create(@RequestBody User user, HttpSession session) throws JsonProcessingException {
+    public ResponseEntity create(@RequestBody User user, HttpSession session, HttpServletResponse response) throws JsonProcessingException {
 
         // Аутентифицированный пользователь не может зарегистрироваться
         if (session.getAttribute("user") != null)
@@ -49,6 +49,9 @@ public class UserController {
         if (UserService.putInMap(user) != null) {
             user.saltHash();
             sessionAuth(session, user);
+            Cookie userCook = new Cookie("user", user.getUsername());
+            userCook.setMaxAge(30*60);
+            response.addCookie(userCook);
             return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_REGISTERED));
         } else {
             return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.NOT_UNIQUE_USERNAME));
