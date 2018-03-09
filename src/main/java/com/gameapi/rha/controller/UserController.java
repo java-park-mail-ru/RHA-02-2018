@@ -146,7 +146,7 @@ public class UserController {
         }
         session.setAttribute("user", null);
         session.invalidate();
-        return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_AUTHED,UserService.RatingTable));
+        return ResponseEntity.status(HttpStatus.OK).body(new Message(UserService.RatingTable));
     }
 
 
