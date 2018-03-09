@@ -138,8 +138,7 @@ public class UserController {
 
     @PostMapping(path = "/rating")
     public ResponseEntity rating(HttpServletRequest request, HttpSession session) {
-        Map<String,Integer> RatingTable = new HashMap<>();
-        RatingTable= UserService.ratingBuilder();
+
 
         // Мы не можем выйти, не войдя
         if (session.getAttribute("user") == null) {
@@ -147,7 +146,7 @@ public class UserController {
         }
         session.setAttribute("user", null);
         session.invalidate();
-        return ResponseEntity.status(HttpStatus.OK).body(new Message(RatingTable));
+        return ResponseEntity.status(HttpStatus.OK).body(new Message(UserService.RatingTable));
     }
 
 
