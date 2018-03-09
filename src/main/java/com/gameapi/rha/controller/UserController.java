@@ -6,8 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gameapi.rha.models.Message;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
-//import jdk.incubator.http.HttpResponse;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
@@ -138,16 +136,13 @@ public class UserController {
 
     @PostMapping(path = "/rating")
     public ResponseEntity rating(HttpServletRequest request, HttpSession session) {
-        Map<String,Integer> RatingTable = new HashMap<>();
-        RatingTable = UserService.ratingBuilder();
-
         // Мы не можем выйти, не войдя
         if (session.getAttribute("user") == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
         }
         session.setAttribute("user", null);
         session.invalidate();
-        return ResponseEntity.status(HttpStatus.OK).body(new Message(RatingTable));
+        return ResponseEntity.status(HttpStatus.OK).body(new Message(UserService.RatingTable));
     }
 
 

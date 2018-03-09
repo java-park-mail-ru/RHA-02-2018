@@ -10,7 +10,7 @@ public class UserService {
 
 
     private static ConcurrentHashMap<String, User> map = new ConcurrentHashMap<>();
-
+    public static Map<String,Integer> RatingTable = new HashMap<>();
     public static User putInMap(User user) {
         if (map.containsKey(user.getUsername()) )
             return null;
@@ -26,14 +26,12 @@ public class UserService {
         return map.get(username);
     }
 
-    public static Map<String,Integer> ratingBuilder()
+    public static void ratingBuilder()
     {
-        Map<String,Integer> ret = new HashMap<>();
         for(Map.Entry<String,User> user:map.entrySet())
         {
-            ret.put(user.getKey(),user.getValue().getRating());
+            RatingTable.put(user.getKey(),user.getValue().getRating());
         }
-        return ret;
     };
 
     public static void changeUser(String prevUser, User newUser){
