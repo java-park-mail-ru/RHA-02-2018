@@ -50,6 +50,7 @@ public class UserController {
             user.saltHash();
             sessionAuth(session, user);
             Cookie userCook = new Cookie("user", user.getUsername());
+            userCook.setHttpOnly(true);
             userCook.setDomain("localhost:3000");
             userCook.setPath("/");
             userCook.setMaxAge(30*60);
@@ -76,6 +77,7 @@ public class UserController {
         sessionAuth(session, user);
         Cookie userCook = new Cookie("user", user.getUsername());
         userCook.setDomain("localhost:3000");
+        userCook.setHttpOnly(true);
         userCook.setPath("/");
         userCook.setMaxAge(30*60);
         response.addCookie(userCook);
