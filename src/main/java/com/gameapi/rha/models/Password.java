@@ -32,6 +32,8 @@ class Password {
     /** Checks whether given plaintext password corresponds
      to a stored salted hash of the password. */
     public static boolean check(String password, String stored) {
+        System.out.println("1: " + password);
+        System.out.println("2: " + stored);
         final String[] saltAndPass = stored.split("\\$");
         if (saltAndPass.length != 2) {
             throw new IllegalStateException(

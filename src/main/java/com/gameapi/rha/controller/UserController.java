@@ -53,7 +53,7 @@ public class UserController {
 
         // Если неверные учетные данные
         if (!UserService.check(user.getUsername(), user.getPassword())) {
-            return ResponseEntity.status(HttpStatus.OK).body(UserStatus.WRONG_CREDENTIALS);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(UserStatus.WRONG_CREDENTIALS);
         }
 
         sessionAuth(session, user);
