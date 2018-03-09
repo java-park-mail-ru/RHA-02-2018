@@ -51,7 +51,7 @@ public class UserController {
             sessionAuth(session, user);
             Cookie userCook = new Cookie("user", user.getUsername());
             userCook.setHttpOnly(true);
-            userCook.setDomain("localhost:3000");
+            userCook.setDomain("localhost");
             userCook.setPath("/");
             userCook.setMaxAge(30*60);
             response.addCookie(userCook);
@@ -76,7 +76,7 @@ public class UserController {
 
         sessionAuth(session, user);
         Cookie userCook = new Cookie("user", user.getUsername());
-        userCook.setDomain("localhost:3000");
+        userCook.setDomain("localhost");
         userCook.setHttpOnly(true);
         userCook.setPath("/");
         userCook.setMaxAge(30*60);
@@ -146,7 +146,7 @@ public class UserController {
         }
         session.setAttribute("user", null);
         session.invalidate();
-        return ResponseEntity.status(HttpStatus.OK).body(new Message(UserService.RatingTable));
+        return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_AUTHED,UserService.RatingTable));
     }
 
 
