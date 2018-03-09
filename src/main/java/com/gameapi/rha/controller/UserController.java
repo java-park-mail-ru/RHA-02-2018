@@ -6,11 +6,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gameapi.rha.models.Message;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
+//import jdk.incubator.http.HttpResponse;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Cookie;
+import java.io.IOException;
 
 @RestController
 @CrossOrigin(origins = "http://bf-balance.herokuapp.com")
@@ -49,8 +54,8 @@ public class UserController {
     }
 
     @PostMapping(path = "/auth")
-    public ResponseEntity auth(@RequestBody User user, HttpSession session) {
-
+    public ResponseEntity auth(@RequestBody User user, HttpSession session, HttpServletResponse response)  {
+        ResponseEntity respond;
         // Мы не можем дважды аутентицифироваться
         if (session.getAttribute("user") != null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ALREADY_AUTHENTICATED));
@@ -62,7 +67,14 @@ public class UserController {
         }
 
         sessionAuth(session, user);
-
+        Cookie userCook = new Cookie("user", user.getUsername());
+        userCook.setMaxAge(30*60);
+        response.addCookie(userCook);
+        try {
+        response.sendRedirect("/info");
+    } catch (IOException ex){
+        return null;
+    }
         return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_AUTHED));
     }
 
