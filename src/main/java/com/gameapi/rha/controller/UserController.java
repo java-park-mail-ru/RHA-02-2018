@@ -76,7 +76,7 @@ public class UserController {
 
         sessionAuth(session, user);
         Cookie userCook = new Cookie("user", user.getUsername());
-        userCook.setDomain("http://localhost:3000");
+        userCook.setDomain("localhost");
         userCook.setMaxAge(30*60);
         response.addCookie(userCook);
         try {
@@ -139,7 +139,7 @@ public class UserController {
     @PostMapping(path = "/rating")
     public ResponseEntity rating(HttpServletRequest request, HttpSession session) {
         Map<String,Integer> RatingTable = new HashMap<>();
-        RatingTable= UserService.ratingBuilder();
+        RatingTable = UserService.ratingBuilder();
 
         // Мы не можем выйти, не войдя
         if (session.getAttribute("user") == null) {
