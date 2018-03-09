@@ -18,7 +18,7 @@ import javax.servlet.http.Cookie;
 import java.io.IOException;
 
 @RestController
-@CrossOrigin(origins = "http://bf-balance.herokuapp.com")
+@CrossOrigin(origins = {"*", "http://bf-balance.herokuapp.com", "localhost:3000"})
 @RequestMapping("/users")
 public class UserController {
 
