@@ -50,7 +50,7 @@ public class UserController {
             user.saltHash();
             sessionAuth(session, user);
             Cookie userCook = new Cookie("user", user.getUsername());
-            userCook.setDomain("http://localhost:3000");
+            userCook.setDomain("localhost");
             userCook.setMaxAge(30*60);
             response.addCookie(userCook);
             return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_REGISTERED));
