@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Cookie;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = {"http://bf-balance.herokuapp.com", "http://localhost:3000"}, allowCredentials = "true")
@@ -129,6 +131,21 @@ public class UserController {
         UserService.changeUser((String) session.getAttribute("user"), user);
 
         return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_CHANGED));
+    }
+
+
+    @PostMapping(path = "/rating")
+    public ResponseEntity rating(HttpServletRequest request, HttpSession session) {
+        Map<String,Integer> RatingTable = new HashMap<>();
+        RatingTable= UserService.ratingBuilder();
+
+        // Мы не можем выйти, не войдя
+        if (session.getAttribute("user") == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
+        }
+        session.setAttribute("user", null);
+        session.invalidate();
+        return ResponseEntity.status(HttpStatus.OK).body(new Message(RatingTable));
     }
 
 

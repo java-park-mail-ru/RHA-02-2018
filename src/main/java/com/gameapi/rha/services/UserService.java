@@ -1,6 +1,9 @@
 package com.gameapi.rha.services;
 
 import com.gameapi.rha.models.User;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UserService {
@@ -22,6 +25,16 @@ public class UserService {
     public static User userInfo(String username) {
         return map.get(username);
     }
+
+    public static Map<String,Integer> ratingBuilder()
+    {
+        Map<String,Integer> ret = new HashMap<>();
+        for(Map.Entry<String,User> user:map.entrySet())
+        {
+            ret.put(user.getKey(),user.getValue().getRating());
+        }
+        return ret;
+    };
 
     public static void changeUser(String prevUser, User newUser){
 
