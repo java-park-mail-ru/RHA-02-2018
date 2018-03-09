@@ -17,11 +17,9 @@ public class User {
             @JsonProperty("name") String username,
             @JsonProperty("password") String password,
             @JsonProperty("email") String email
-    ) throws Exception {
+    ) {
         this.username = username;
-        this.password = Password.getSaltedHash(password);
-        if (this.password == null)
-            throw new Exception("Unexpected Error");
+        this.password = password;
         this.uID = UUID.randomUUID();
         this.email = email;
     }
@@ -40,6 +38,10 @@ public class User {
 
     public Boolean checkPassword(String pass) {
         return Password.check(pass, this.password);
+    }
+
+    public void saltHash() {
+        this.password = Password.getSaltedHash(this.password);
     }
 
     public String getPassword() {

@@ -1,6 +1,9 @@
 package com.gameapi.rha.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gameapi.rha.models.Message;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
 import org.springframework.http.HttpStatus;
@@ -14,6 +17,8 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/users")
 public class UserController {
 
+    static ObjectMapper mapper = new ObjectMapper();
+
     private enum UserStatus {
         SUCCESSFULLY_REGISTERED,
         SUCCESSFULLY_AUTHED,
@@ -26,20 +31,21 @@ public class UserController {
         UNEXPECTED_ERROR
     }
 
-    @PostMapping(path = "/create")
-    public ResponseEntity create(@RequestBody User user, HttpSession session) {
+    @PostMapping(path = "/create", consumes = "application/json", produces = "application/json")
+    public ResponseEntity create(@RequestBody User user, HttpSession session) throws JsonProcessingException {
 
 
         // Аутентифицированный пользователь не может зарегистрироваться
         if (session.getAttribute("user") != null)
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(UserStatus.ALREADY_AUTHENTICATED);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ALREADY_AUTHENTICATED));
 
 
         if (UserService.putInMap(user) != null) {
+            user.saltHash();
             sessionAuth(session, user);
-            return ResponseEntity.status(HttpStatus.OK).body(UserStatus.SUCCESSFULLY_REGISTERED);
+            return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_REGISTERED));
         } else {
-            return ResponseEntity.status(HttpStatus.OK).body(UserStatus.NOT_UNIQUE_USERNAME);
+            return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.NOT_UNIQUE_USERNAME));
         }
     }
 
@@ -48,17 +54,17 @@ public class UserController {
 
         // Мы не можем дважды аутентицифироваться
         if (session.getAttribute("user") != null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(UserStatus.ALREADY_AUTHENTICATED);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ALREADY_AUTHENTICATED));
         }
 
         // Если неверные учетные данные
         if (!UserService.check(user.getUsername(), user.getPassword())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(UserStatus.WRONG_CREDENTIALS);
+            return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.WRONG_CREDENTIALS));
         }
 
         sessionAuth(session, user);
 
-        return ResponseEntity.status(HttpStatus.OK).body(UserStatus.SUCCESSFULLY_AUTHED);
+        return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_AUTHED));
     }
 
     @PostMapping(path = "/logout")
@@ -66,12 +72,12 @@ public class UserController {
 
         // Мы не можем выйти, не войдя
         if (session.getAttribute("user") == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(UserStatus.ACCESS_ERROR);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
         }
 
         session.setAttribute("user", null);
         session.invalidate();
-        return ResponseEntity.status(HttpStatus.OK).body(UserStatus.SUCCESSFULLY_LOGGED_OUT);
+        return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_LOGGED_OUT));
     }
 
     @GetMapping(path = "/info")
@@ -79,29 +85,29 @@ public class UserController {
 
         // Если пользователь не аутертифицирован, то у него нет доступа к информации о текущей сессии
         if (session.getAttribute("user") == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UserStatus.ACCESS_ERROR);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new Message(UserStatus.ACCESS_ERROR));
         }
 
         final User result = UserService.userInfo((String) session.getAttribute("user"));
         if (result == null) {
             // Этого быть не может
-            return ResponseEntity.status(HttpStatus.OK).body(UserStatus.UNEXPECTED_ERROR);
+            return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.UNEXPECTED_ERROR));
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(result);
+        return ResponseEntity.status(HttpStatus.OK).body(new Message(result));
     }
 
     @PostMapping(path = "/change")
     public ResponseEntity change(@RequestBody User user, HttpSession session) {
 
         // Без аутентификации нет доступа к изменению данных
-        if (session.getAttribute("user") != null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(UserStatus.ACCESS_ERROR);
+        if (session.getAttribute("user") == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
         }
 
         UserService.changeUser((String) session.getAttribute("user"), user);
 
-        return ResponseEntity.status(HttpStatus.OK).body(UserStatus.SUCCESSFULLY_CHANGED);
+        return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_CHANGED));
     }
 
 
@@ -111,6 +117,3 @@ public class UserController {
         session.setMaxInactiveInterval(30*60);
     }
 }
-
-
-
