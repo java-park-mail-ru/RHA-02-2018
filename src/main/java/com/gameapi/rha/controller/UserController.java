@@ -143,14 +143,12 @@ public class UserController {
     }
 
 
-    @PostMapping(path = "/rating")
+    @GetMapping(path = "/rating")
     public ResponseEntity rating(HttpServletRequest request, HttpSession session) {
-        // Мы не можем выйти, не войдя
         if (session.getAttribute("user") == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
         }
-        session.setAttribute("user", null);
-        session.invalidate();
+        UserService.ratingBuilder();
         return ResponseEntity.status(HttpStatus.OK).body(new Message(UserService.RatingTable));
     }
 
