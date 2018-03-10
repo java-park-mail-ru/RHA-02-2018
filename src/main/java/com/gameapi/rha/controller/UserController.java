@@ -54,8 +54,8 @@ public class UserController {
             user.saltHash();
             sessionAuth(session, user);
             Cookie userCook = new Cookie("user", user.getUsername());
-            userCook.setHttpOnly(true);
-            userCook.setDomain("localhost");
+            userCook.setHttpOnly(false);
+            //userCook.setDomain("localhost");
             userCook.setPath("/");
             userCook.setMaxAge(30*60);
             response.addCookie(userCook);
@@ -65,7 +65,7 @@ public class UserController {
         }
     }
 
-    @PostMapping(path = "/auth")
+    @PostMapping(path = "/auth", consumes = "application/json", produces = "application/json")
     public ResponseEntity auth(@RequestBody User user, HttpSession session, HttpServletResponse response)  {
         ResponseEntity respond;
         // Мы не можем дважды аутентицифироваться
@@ -80,21 +80,16 @@ public class UserController {
 
         sessionAuth(session, user);
         Cookie userCook = new Cookie("user", user.getUsername());
-        userCook.setDomain("localhost");
-        userCook.setHttpOnly(true);
+        //userCook.setDomain("localhost");
+        userCook.setHttpOnly(false);
         userCook.setPath("/");
         userCook.setMaxAge(30*60);
         response.addCookie(userCook);
-        try {
-        response.sendRedirect("/info");
-    } catch (IOException ex){
-        return null;
-    }
         return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_AUTHED));
     }
 
     @PostMapping(path = "/logout")
-    public ResponseEntity logout(HttpServletRequest request, HttpSession session) {
+    public ResponseEntity logout(HttpServletRequest request, HttpSession session, HttpServletResponse response) {
 
         // Мы не можем выйти, не войдя
         if (session.getAttribute("user") == null) {
@@ -103,7 +98,11 @@ public class UserController {
         Cookie[] cookies = request.getCookies();
         if(cookies != null) {
             for (Cookie cookie : cookies) {
+                cookie.setPath("/");
+                cookie.setHttpOnly(false);
                 cookie.setMaxAge(0);
+                response.addCookie(cookie);
+
             }
         }
         session.setAttribute("user", null);
