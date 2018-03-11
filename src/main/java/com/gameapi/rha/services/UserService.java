@@ -42,7 +42,7 @@ public class UserService {
         if (prev == null) {
             return;
         }
-        prev.setEmail(newUser.getEmail());
-        prev.setPassword(newUser.getPassword());
+        map.get(prevUser).setEmail(newUser.getEmail());
+        map.get(prevUser).setPassword(newUser.getPassword());
     }
 }

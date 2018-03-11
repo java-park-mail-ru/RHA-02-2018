@@ -149,7 +149,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
         }
         UserService.ratingBuilder();
-        return ResponseEntity.status(HttpStatus.OK).body(new Message(UserService.RatingTable));
+        return ResponseEntity.status(HttpStatus.OK).body(new Message(UserService.RatingTable.entrySet()));
     }
 
 
