@@ -12,25 +12,25 @@ public class UserService {
     private static ConcurrentHashMap<String, User> map = new ConcurrentHashMap<>();
     public static Map<String,Integer> RatingTable = new HashMap<>();
     public static User putInMap(User user) {
-        if (map.containsKey(user.getUsername()) )
+        if (map.containsKey(user.getEmail()) )
             return null;
-        map.put(user.getUsername(), user);
+        map.put(user.getEmail(), user);
         return user;
     }
 
-    public static Boolean check (String username, String password)  {
-        return (map.containsKey(username) && map.get(username).checkPassword(password));
+    public static Boolean check (String email, String password)  {
+        return (map.containsKey(email) && map.get(email).checkPassword(password));
     }
 
-    public static User userInfo(String username) {
-        return map.get(username);
+    public static User userInfo(String email) {
+        return map.get(email);
     }
 
     public static void ratingBuilder()
     {
         for(Map.Entry<String,User> user:map.entrySet())
         {
-            RatingTable.put(user.getKey(),user.getValue().getRating());
+            RatingTable.put(user.getValue().getUsername(),user.getValue().getRating());
         }
     };
 
