@@ -70,12 +70,12 @@ public class UserController {
         }
 
         // Если неверные учетные данные
-        if (!UserService.check(user.getUsername(), user.getPassword())) {
+        if (!UserService.check(user.getEmail(), user.getPassword())) {
             return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.WRONG_CREDENTIALS));
         }
 
         sessionAuth(session, user);
-        Cookie userCook = new Cookie("user", user.getUsername());
+        Cookie userCook = new Cookie("user", user.getEmail());
         //userCook.setDomain("localhost");
         userCook.setHttpOnly(false);
         userCook.setPath("/");
@@ -151,7 +151,7 @@ public class UserController {
 
     private static void sessionAuth(HttpSession session, User user)
     {
-        session.setAttribute("user", user.getUsername());
+        session.setAttribute("user", user.getEmail());
         session.setMaxInactiveInterval(30*60);
     }
 }
