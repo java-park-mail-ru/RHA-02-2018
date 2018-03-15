@@ -15,10 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Cookie;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 
 @RestController
 @CrossOrigin(origins = {"http://bf-balance.herokuapp.com", "http://localhost:3000"}, allowCredentials = "true")
@@ -149,7 +145,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
         }
         UserService.ratingBuilder();
-        return ResponseEntity.status(HttpStatus.OK).body(new Message(UserService.RatingTable));
+        return ResponseEntity.status(HttpStatus.OK).body(new Message(UserService.RatingTable.entrySet()));
     }
 
 
