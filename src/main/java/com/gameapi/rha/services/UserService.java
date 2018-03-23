@@ -2,35 +2,39 @@ package com.gameapi.rha.services;
 
 import com.gameapi.rha.models.User;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UserService {
 
 
     private static ConcurrentHashMap<String, User> map = new ConcurrentHashMap<>();
-
+    public static Map<String,Integer> RatingTable = new HashMap<>();
     public static User putInMap(User user) {
-        if (map.containsKey(user.getUsername()) )
+        if (map.containsKey(user.getEmail()) )
             return null;
-        map.put(user.getUsername(), user);
+        map.put(user.getEmail(), user);
         return user;
     }
-//
-//    public static Boolean exists(User user) {
-//        return map.containsKey(user.getUsername());
-//    }
 
-    public static Boolean check (String username, String password) throws NoSuchAlgorithmException,InvalidKeySpecException {
-        return (map.containsKey(username) && map.get(username).checkPassword(password));
+    public static Boolean check (String email, String password)  {
+        return (map.containsKey(email) && map.get(email).checkPassword(password));
     }
 
-    public static User userInfo(String username) {
-        return map.get(username);
+    public static User userInfo(String email) {
+        return map.get(email);
     }
 
-    public static void changeUser(String prevUser, User newUser) throws NoSuchAlgorithmException,InvalidKeySpecException {
+    public static void ratingBuilder()
+    {
+        for(Map.Entry<String,User> user:map.entrySet())
+        {
+            RatingTable.put(user.getValue().getUsername(),user.getValue().getRating());
+        }
+    };
+
+    public static void changeUser(String prevUser, User newUser){
 
         final User prev = map.get(prevUser);
 
@@ -38,9 +42,7 @@ public class UserService {
         if (prev == null) {
             return;
         }
-
-        prev.setEmail(newUser.getEmail());
-        prev.setPassword(newUser.getPassword());
-//        return prev;
+        map.get(prevUser).setEmail(newUser.getEmail());
+        map.get(prevUser).setPassword(newUser.getPassword());
     }
 }
