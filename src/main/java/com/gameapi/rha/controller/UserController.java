@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @CrossOrigin(origins = {"http://bf-balance.herokuapp.com", "http://localhost:3000"}, allowCredentials = "true")
@@ -101,6 +101,7 @@ public class UserController {
       return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.WRONG_CREDENTIALS));
     }
 
+
     sessionAuth(session, user);
     Cookie userCook = new Cookie("user", user.getEmail());
     //userCook.setDomain("localhost");
@@ -117,36 +118,50 @@ public class UserController {
     // Мы не можем выйти, не войдя
     if (session.getAttribute("user") == null) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
-    }
-    Cookie[] cookies = request.getCookies();
-    if(cookies != null) {
-      for (Cookie cookie : cookies) {
-        cookie.setPath("/");
-        cookie.setHttpOnly(false);
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
 
+
+      Cookie[] cookies = request.getCookies();
+      if (cookies != null) {
+        for (Cookie cookie : cookies) {
+          cookie.setPath("/");
+          cookie.setHttpOnly(false);
+          cookie.setMaxAge(0);
+          response.addCookie(cookie);
+
+        }
       }
+      session.setAttribute("user", null);
+
+      //завершаем сеанс, отвязываем связанные с ним объекты
+      session.invalidate();
+      return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_LOGGED_OUT));
     }
-    session.setAttribute("user", null);
-
-    //завершаем сеанс, отвязываем связанные с ним объекты
-    session.invalidate();
-    return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_LOGGED_OUT));
   }
-
-  @PostMapping(path="/rating")
-  public ResponseEntity rating(@JsonProperty("page") Integer page, HttpServletRequest request, HttpSession session, HttpServletResponse response) {
+  @GetMapping(path="/rating/{page}")
+  public ResponseEntity rating(@PathVariable("page") Integer page, HttpServletRequest request, HttpSession session, HttpServletResponse response) {
+    page--;
     Map<String,Integer> resp=new HashMap<>();
     // Мы не можем получить статистику, не войдя
     if (session.getAttribute("user") == null) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
     }
     resp=UserService.rating(page);
-
     //завершаем сеанс, отвязываем связанные с ним объекты
     return ResponseEntity.status(HttpStatus.OK).body(resp);
   }
+
+//  @PostMapping(path="/rating")
+//  public ResponseEntity rating(@JsonProperty("page") Integer page, HttpServletRequest request, HttpSession session, HttpServletResponse response) {
+//    Map<String,Integer> resp=new HashMap<>();
+//    // Мы не можем получить статистику, не войдя
+//    if (session.getAttribute("user") == null) {
+//      return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
+//    }
+//    resp=UserService.rating(page);
+//
+//    //завершаем сеанс, отвязываем связанные с ним объекты
+//    return ResponseEntity.status(HttpStatus.OK).body(resp);
+//  }
 
   @GetMapping(path = "/info")
   public ResponseEntity info(HttpSession session) {
