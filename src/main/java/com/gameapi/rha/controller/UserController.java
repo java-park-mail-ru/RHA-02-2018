@@ -2,7 +2,6 @@ package com.gameapi.rha.controller;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gameapi.rha.models.Message;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
@@ -20,9 +19,6 @@ import javax.servlet.http.Cookie;
 @CrossOrigin(origins = {"http://bf-balance.herokuapp.com", "http://localhost:3000"}, allowCredentials = "true")
 @RequestMapping("/users")
 public class UserController {
-
-
-    static ObjectMapper mapper = new ObjectMapper();
 
     private enum UserStatus {
         SUCCESSFULLY_REGISTERED,
