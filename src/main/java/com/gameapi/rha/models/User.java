@@ -3,11 +3,11 @@ package com.gameapi.rha.models;
 
 import java.util.UUID;
 import com.fasterxml.jackson.annotation.*;
-import org.springframework.lang.Nullable;
+//import org.springframework.lang.Nullable;
 
 
 public class User {
-    @Nullable
+//    @Nullable
     private String username;
     private String password;
     private String email;
