@@ -111,8 +111,9 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_LOGGED_OUT));
     }
 
-    @PostMapping(path="/rating")
-    public ResponseEntity rating(@JsonProperty("page") Integer page, HttpServletRequest request, HttpSession session, HttpServletResponse response) {
+    @GetMapping(path="/rating/{page}")
+    public ResponseEntity rating(@PathVariable("page") Integer page, HttpServletRequest request, HttpSession session, HttpServletResponse response) {
+        page--;
         Map<String,Integer> resp=new HashMap<>();
         // Мы не можем получить статистику, не войдя
         if (session.getAttribute("user") == null) {
