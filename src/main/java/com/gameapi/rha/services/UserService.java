@@ -45,22 +45,25 @@ public final class UserService {
   */
   public static Map<String,Integer> rating(Integer page) {
     final Iterator itr = map.entrySet().iterator();
+
     if (page == null) {
       page = 0;
     }
+    Integer elements = 2;
+    page=page * elements;
     while (page-- > 0 && itr.hasNext()) {
       itr.next();
     }
     final Map<String,Integer> result = new HashMap<>();
 
-    Integer elements = 2;
+
     while (elements-- > 0 && itr.hasNext()) {
       Map.Entry<String,User> entry = (Map.Entry<String, User>) itr.next();
       result.put(entry.getValue().getUsername(), entry.getValue().getRating());
     }
+    result.put("pages",map.size());
     return result;
   }
-
 
   public static Boolean check(String email, String password)  {
     return (map.containsKey(email) && map.get(email).checkPassword(password));

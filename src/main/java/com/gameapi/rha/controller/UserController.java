@@ -118,24 +118,22 @@ public class UserController {
     // Мы не можем выйти, не войдя
     if (session.getAttribute("user") == null) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
-
-
-      Cookie[] cookies = request.getCookies();
-      if (cookies != null) {
-        for (Cookie cookie : cookies) {
-          cookie.setPath("/");
-          cookie.setHttpOnly(false);
-          cookie.setMaxAge(0);
-          response.addCookie(cookie);
-
-        }
-      }
-      session.setAttribute("user", null);
-
-      //завершаем сеанс, отвязываем связанные с ним объекты
-      session.invalidate();
-      return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_LOGGED_OUT));
     }
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      for (Cookie cookie : cookies) {
+        cookie.setPath("/");
+        cookie.setHttpOnly(false);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+      }
+    }
+    session.setAttribute("user", null);
+
+    //завершаем сеанс, отвязываем связанные с ним объекты
+    session.invalidate();
+    return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_LOGGED_OUT));
+
   }
   @GetMapping(path="/rating/{page}")
   public ResponseEntity rating(@PathVariable("page") Integer page, HttpServletRequest request, HttpSession session, HttpServletResponse response) {
@@ -149,7 +147,6 @@ public class UserController {
     //завершаем сеанс, отвязываем связанные с ним объекты
     return ResponseEntity.status(HttpStatus.OK).body(resp);
   }
-
 //  @PostMapping(path="/rating")
 //  public ResponseEntity rating(@JsonProperty("page") Integer page, HttpServletRequest request, HttpSession session, HttpServletResponse response) {
 //    Map<String,Integer> resp=new HashMap<>();
