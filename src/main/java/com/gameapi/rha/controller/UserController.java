@@ -1,6 +1,7 @@
 package com.gameapi.rha.controller;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gameapi.rha.models.Message;
@@ -15,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Cookie;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = {"http://bf-balance.herokuapp.com", "http://localhost:3000"}, allowCredentials = "true")
@@ -106,6 +109,19 @@ public class UserController {
         //завершаем сеанс, отвязываем связанные с ним объекты
         session.invalidate();
         return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_LOGGED_OUT));
+    }
+
+    @PostMapping(path="/rating")
+    public ResponseEntity rating(@JsonProperty("page") Integer page, HttpServletRequest request, HttpSession session, HttpServletResponse response) {
+        Map<String,Integer> resp=new HashMap<>();
+        // Мы не можем получить статистику, не войдя
+        if (session.getAttribute("user") == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
+        }
+        resp=UserService.Rating(page);
+
+        //завершаем сеанс, отвязываем связанные с ним объекты
+        return ResponseEntity.status(HttpStatus.OK).body(resp);
     }
 
     @GetMapping(path = "/info")
