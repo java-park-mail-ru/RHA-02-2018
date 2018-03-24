@@ -50,7 +50,7 @@ public final class UserService {
       page = 0;
     }
     Integer elements = 2;
-    page=page * elements;
+    page = page * elements;
     while (page-- > 0 && itr.hasNext()) {
       itr.next();
     }
