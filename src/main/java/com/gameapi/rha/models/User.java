@@ -1,15 +1,17 @@
 package com.gameapi.rha.models;
 
+
 import java.util.UUID;
 import com.fasterxml.jackson.annotation.*;
-
-
+import org.springframework.lang.Nullable;
 
 
 public class User {
+    @Nullable
     private String username;
     private String password;
     private String email;
+    private Integer rating;
     private UUID uID;
 
     @JsonCreator
@@ -22,11 +24,16 @@ public class User {
         this.password = password;
         this.uID = UUID.randomUUID();
         this.email = email;
+        this.rating=0;
     }
 
     public String getUsername() {
         return username;
     }
+
+    public Integer getRating() { return rating;}
+
+    public void setRating(Integer rate) { rating=rate;}
 
     public UUID getuID() {
         return uID;
