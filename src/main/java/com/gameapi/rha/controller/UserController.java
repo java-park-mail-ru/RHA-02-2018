@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@CrossOrigin(origins = {"http://bf-balance.herokuapp.com", "http://localhost:3000"}, allowCredentials = "true")
+@CrossOrigin(origins = {"https://rha-staging-deploy.herokuapp.com", "http://bf-balance.herokuapp.com", "http://localhost:3000"}, allowCredentials = "true")
 @RequestMapping("/users")
 public class UserController {
 
