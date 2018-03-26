@@ -1,10 +1,9 @@
 package com.gameapi.rha.services;
 
+import com.gameapi.rha.models.Rating;
 import com.gameapi.rha.models.User;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -43,25 +42,29 @@ public final class UserService {
   * @param  page  Is used to tell the pagenum.
   * @return rating result
   */
-  public static Map<String,Integer> rating(Integer page) {
+  public static List<Rating> rating(Integer page) {
     final Iterator itr = map.entrySet().iterator();
 
     if (page == null) {
       page = 0;
     }
-    Integer elements = 2;
+    Integer elements = 5;
     page = page * elements;
     while (page-- > 0 && itr.hasNext()) {
       itr.next();
     }
-    final Map<String,Integer> result = new HashMap<>();
-
+//    final Map<String,Integer> result = new HashMap<>();
+  final List<Rating> result = new ArrayList<>();
     boolean isEmptyPage = true;
 
     while (elements-- > 0 && itr.hasNext()) {
       isEmptyPage = false;
       Map.Entry<String,User> entry = (Map.Entry<String, User>) itr.next();
-      result.put(entry.getValue().getUsername(), entry.getValue().getRating());
+//      result.put(entry.getValue().getUsername(), entry.getValue().getRating());
+      result.add(new Rating(
+              entry.getValue().getUsername(),
+              entry.getValue().getRating()
+      ));
     }
     if (isEmptyPage) {
       return null;
