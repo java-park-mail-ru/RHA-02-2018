@@ -6,6 +6,17 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+//import com.gameapi.rha.models.User;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.dao.DataAccessException;
+//import org.springframework.jdbc.core.JdbcTemplate;
+//import org.springframework.jdbc.core.RowMapper;
+//import org.springframework.stereotype.Service;
+//import org.springframework.transaction.annotation.Transactional;
+//
+//import java.sql.SQLException;
+//import java.sql.ResultSet;
+
 
 /**
  * UserService is a class to operate with params from UserController.
@@ -26,6 +37,16 @@ public final class UserService {
   * rating table.
   */
   public static Map<String, Integer> RatingTable = new HashMap<>();
+
+  /**
+   * Insertion into DB with SQL.
+   * @param user is user to create
+   * @return
+   */
+  public static User createUser(User user) {
+    return user;
+  }
+
 
   /**
   *Insertion into DB.

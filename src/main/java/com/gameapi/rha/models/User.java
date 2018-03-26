@@ -3,7 +3,6 @@ package com.gameapi.rha.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.UUID;
 
 import org.springframework.lang.Nullable;
 
@@ -14,7 +13,6 @@ public class User {
   private String password;
   private String email;
   private Integer rating;
-  private UUID uID;
 
   /**
    * Default constructor for user.
@@ -30,7 +28,6 @@ public class User {
   ) {
     this.username = username;
     this.password = password;
-    this.uID = UUID.randomUUID();
     this.email = email;
     this.rating = 0;
   }
@@ -47,9 +44,6 @@ public class User {
     rating = rate;
   }
 
-  public UUID getuID() {
-    return uID;
-  }
 
   public void setPassword(String password) {
     this.password = Password.getSaltedHash(password);

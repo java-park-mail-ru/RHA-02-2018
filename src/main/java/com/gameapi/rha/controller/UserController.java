@@ -38,7 +38,7 @@ public class UserController {
 
   /**
    * Enum of status messages for response.
-   * Elements from this enum are used for response
+   * Elements from this enum are used for response.
    */
   @SuppressWarnings("CheckStyle")
   private enum UserStatus {
@@ -59,30 +59,22 @@ public class UserController {
    * @param session session to input user
    * @param response response to answer
    * @return returns response
-   * @throws JsonProcessingException if error with json
    */
   @PostMapping(path = "/create", consumes = "application/json", produces = "application/json")
   public ResponseEntity create(HttpSession session,
-                               @RequestBody User user, HttpServletResponse response)
-          throws JsonProcessingException {
-
+                               @RequestBody User user, HttpServletResponse response) {
     // Аутентифицированный пользователь не может зарегистрироваться
 
     if (session.getAttribute("user") != null) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-              new Message(UserStatus.ALREADY_AUTHENTICATED));
+              new Message(UserStatus.ALREADY_AUTHENTICATED,user.getUsername()));
     }
+
     if (UserService.putInMap(user) != null) {
       user.saltHash();
       sessionAuth(session, user);
-      Cookie userCook = new Cookie("user", user.getUsername());
-      userCook.setHttpOnly(false);
-      //userCook.setDomain("localhost");
-      userCook.setPath("/");
-      userCook.setMaxAge(30 * 60);
-      response.addCookie(userCook);
       return ResponseEntity.status(HttpStatus.OK).body(
-              new Message(UserStatus.SUCCESSFULLY_REGISTERED));
+              new Message(UserStatus.SUCCESSFULLY_REGISTERED,user.getUsername()));
     } else {
       return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.NOT_UNIQUE_USERNAME));
     }
@@ -109,14 +101,7 @@ public class UserController {
       return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.WRONG_CREDENTIALS));
     }
 
-
     sessionAuth(session, user);
-    Cookie userCook = new Cookie("user", user.getEmail());
-    //userCook.setDomain("localhost");
-    userCook.setHttpOnly(false);
-    userCook.setPath("/");
-    userCook.setMaxAge(30 * 60);
-    response.addCookie(userCook);
     return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_AUTHED));
   }
 
@@ -134,15 +119,6 @@ public class UserController {
     // Мы не можем выйти, не войдя
     if (session.getAttribute("user") == null) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
-    }
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        cookie.setPath("/");
-        cookie.setHttpOnly(false);
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
-      }
     }
     session.setAttribute("user", null);
 
@@ -177,21 +153,6 @@ public class UserController {
   }
 
 
-  //  @PostMapping(path="/rating")
-  //  public ResponseEntity rating(@JsonProperty("page") Integer page,
-  // HttpServletRequest request, HttpSession session, HttpServletResponse response) {
-  //    Map<String,Integer> resp=new HashMap<>();
-  //    // Мы не можем получить статистику, не войдя
-  //    if (session.getAttribute("user") == null) {
-  //      return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-  // new Message(UserStatus.ACCESS_ERROR));
-  //    }
-  //    resp=UserService.rating(page);
-  //
-  //    //завершаем сеанс, отвязываем связанные с ним объекты
-  //    return ResponseEntity.status(HttpStatus.OK).body(resp);
-  //  }
-
 
   /**
    * Function to get information about session and user.
@@ -211,6 +172,7 @@ public class UserController {
       // Этого быть не может
       return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.UNEXPECTED_ERROR));
     }
+    result.setPassword(null);
 
     return ResponseEntity.status(HttpStatus.OK).body(new Message(result));
   }
@@ -233,19 +195,6 @@ public class UserController {
 
     return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_CHANGED));
   }
-
-
-  //  @GetMapping(path = "/rating")
-  //  public ResponseEntity rating(HttpServletRequest request, HttpSession session) {
-  //    if (session.getAttribute("user") == null) {
-  //      return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-  // new Message(UserStatus.ACCESS_ERROR));
-  //    }
-  //    UserService.ratingBuilder();
-  //    return ResponseEntity.status(HttpStatus.OK).body(
-  // new Message(UserService.RatingTable.entrySet()));
-  //  }
-
 
   private static void sessionAuth(HttpSession session, User user) {
     session.setAttribute("user", user.getEmail());
