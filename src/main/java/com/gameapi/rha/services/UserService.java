@@ -77,12 +77,16 @@ public final class UserService {
     }
     final Map<String,Integer> result = new HashMap<>();
 
+    boolean isEmptyPage = true;
 
     while (elements-- > 0 && itr.hasNext()) {
+      isEmptyPage = false;
       Map.Entry<String,User> entry = (Map.Entry<String, User>) itr.next();
       result.put(entry.getValue().getUsername(), entry.getValue().getRating());
     }
-    result.put("pages",map.size());
+    if (isEmptyPage) {
+      return null;
+    }
     return result;
   }
 

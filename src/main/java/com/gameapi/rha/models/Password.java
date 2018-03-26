@@ -31,6 +31,7 @@ class Password {
     }
   }
 
+
   /** Checks whether given plaintext password corresponds
   to a stored salted hash of the password. */
   public static boolean check(String password, String stored) {

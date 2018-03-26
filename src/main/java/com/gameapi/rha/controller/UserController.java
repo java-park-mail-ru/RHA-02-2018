@@ -8,6 +8,7 @@ import com.gameapi.rha.models.Message;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,7 +51,8 @@ public class UserController {
     WRONG_CREDENTIALS,
     NOT_UNIQUE_USERNAME,
     ALREADY_AUTHENTICATED,
-    UNEXPECTED_ERROR
+    UNEXPECTED_ERROR,
+    NOT_FOUND
   }
 
   /**
@@ -142,13 +144,18 @@ public class UserController {
                                HttpServletRequest request, HttpSession session,
                                HttpServletResponse response) {
     page--;
-    Map<String,Integer> resp = new HashMap<>();
+    Map<String,Integer> resp;
     // Мы не можем получить статистику, не войдя
     if (session.getAttribute("user") == null) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
     }
     resp = UserService.rating(page);
-    //завершаем сеанс, отвязываем связанные с ним объекты
+
+    //Если страница пустая, то возвращаем 404
+    if (resp == null) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Message(UserStatus.NOT_FOUND));
+    }
+
     return ResponseEntity.status(HttpStatus.OK).body(resp);
   }
 

@@ -4,11 +4,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
-import org.springframework.lang.Nullable;
+
+//import org.springframework.lang.Nullable;
 
 
 public class User {
-  @Nullable
+  //@Nullable
   private String username;
   private String password;
   private String email;
