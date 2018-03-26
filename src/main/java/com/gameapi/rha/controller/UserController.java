@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -72,12 +73,13 @@ public class UserController {
               new Message(UserStatus.ALREADY_AUTHENTICATED,user.getUsername()));
     }
 
-    if (UserService.putInMap(user) != null) {
+    try {
+      UserService.createUser(user);
       user.saltHash();
       sessionAuth(session, user);
       return ResponseEntity.status(HttpStatus.OK).body(
               new Message(UserStatus.SUCCESSFULLY_REGISTERED,user.getUsername()));
-    } else {
+    } catch (DataAccessException except) {
       return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.NOT_UNIQUE_USERNAME));
     }
   }

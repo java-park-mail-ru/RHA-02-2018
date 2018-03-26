@@ -7,22 +7,26 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 //import com.gameapi.rha.models.User;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.dao.DataAccessException;
-//import org.springframework.jdbc.core.JdbcTemplate;
-//import org.springframework.jdbc.core.RowMapper;
-//import org.springframework.stereotype.Service;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//import java.sql.SQLException;
-//import java.sql.ResultSet;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.SQLException;
+import java.sql.ResultSet;
 
 
 /**
  * UserService is a class to operate with params from UserController.
  */
-public final class UserService {
+@Service
+@Transactional
+public class UserService {
 
+  private static JdbcTemplate jdbc;
   /**
   * UserService default constructor specialized.
   */
@@ -44,6 +48,7 @@ public final class UserService {
    * @return
    */
   public static User createUser(User user) {
+    jdbc.update((PreparedStatementCreator) user);
     return user;
   }
 
