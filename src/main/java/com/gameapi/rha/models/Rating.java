@@ -4,24 +4,24 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Rating {
-    private String username;
+    private String email;
     private Integer score;
 
     @JsonCreator
     public Rating(
-        @JsonProperty("username") String username,
+        @JsonProperty("email") String email,
         @JsonProperty("score") Integer score
     ) {
-        this.username = username;
+        this.email = email;
         this.score = score;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public Integer getScore() {

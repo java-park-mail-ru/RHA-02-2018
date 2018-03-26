@@ -62,7 +62,7 @@ public final class UserService {
       Map.Entry<String,User> entry = (Map.Entry<String, User>) itr.next();
 //      result.put(entry.getValue().getUsername(), entry.getValue().getRating());
       result.add(new Rating(
-              entry.getValue().getUsername(),
+              entry.getValue().getEmail(),
               entry.getValue().getRating()
       ));
     }
