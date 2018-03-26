@@ -6,11 +6,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.gameapi.rha.models.Message;
+import com.gameapi.rha.models.Rating;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.Cookie;
@@ -168,7 +170,8 @@ public class UserController {
                                HttpServletRequest request, HttpSession session,
                                HttpServletResponse response) {
     page--;
-    Map<String,Integer> resp;
+//    Map<String,Integer> resp;
+    List<Rating> resp;
     // Мы не можем получить статистику, не войдя
     if (session.getAttribute("user") == null) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
