@@ -10,6 +10,7 @@ import com.gameapi.rha.services.UserService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.Cookie;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -63,6 +65,7 @@ public class UserController {
    * @param response response to answer
    * @return returns response
    */
+
   @PostMapping(path = "/create", consumes = "application/json", produces = "application/json")
   public ResponseEntity create(HttpSession session,
                                @RequestBody User user, HttpServletResponse response) {
@@ -73,15 +76,16 @@ public class UserController {
               new Message(UserStatus.ALREADY_AUTHENTICATED,user.getUsername()));
     }
 
+    user.saltHash();
     try {
       UserService.createUser(user);
-      user.saltHash();
-      sessionAuth(session, user);
-      return ResponseEntity.status(HttpStatus.OK).body(
-              new Message(UserStatus.SUCCESSFULLY_REGISTERED,user.getUsername()));
-    } catch (DataAccessException except) {
+    } catch (Exception except) {
       return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.NOT_UNIQUE_USERNAME));
     }
+    sessionAuth(session, user);
+    return ResponseEntity.status(HttpStatus.OK).body(
+            new Message(UserStatus.SUCCESSFULLY_REGISTERED,user.getUsername()));
+
   }
 
   /**
@@ -146,16 +150,17 @@ public class UserController {
                                HttpServletRequest request, HttpSession session,
                                HttpServletResponse response) {
     page--;
-    Map<String,Integer> resp;
+    List<Map<String,Integer>> resp;
     // Мы не можем получить статистику, не войдя
     if (session.getAttribute("user") == null) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
     }
-    resp = UserService.rating(page);
-
-    //Если страница пустая, то возвращаем 404
-    if (resp == null) {
+    try {
+      resp = UserService.rating(page,session.getAttribute("user").toString());
+    } catch (IncorrectResultSizeDataAccessException exc) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Message(UserStatus.NOT_FOUND));
+    } catch (DataAccessException exc) {
+      return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new Message("Что-то на сервере."));
     }
 
     return ResponseEntity.status(HttpStatus.OK).body(resp);
@@ -175,12 +180,16 @@ public class UserController {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
               new Message(UserStatus.ACCESS_ERROR));
     }
-
-    final User result = UserService.userInfo((String) session.getAttribute("user"));
-    if (result == null) {
+    final User result;
+    try {
+       result = UserService.userInfo((String) session.getAttribute("user"));
+    }catch (IncorrectResultSizeDataAccessException exc) {
       // Этого быть не может
-      return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.UNEXPECTED_ERROR));
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Message(UserStatus.UNEXPECTED_ERROR));
+    }catch (DataAccessException exc) {
+      return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new Message("Что-то на сервере."));
     }
+
     result.setPassword(null);
 
     return ResponseEntity.status(HttpStatus.OK).body(new Message(result));
@@ -206,7 +215,7 @@ public class UserController {
   }
 
   private static void sessionAuth(HttpSession session, User user) {
-    session.setAttribute("user", user.getEmail());
+    session.setAttribute("user", user.getUsername());
     session.setMaxInactiveInterval(30 * 60);
   }
 }

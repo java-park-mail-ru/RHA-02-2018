@@ -2,28 +2,22 @@ package com.gameapi.rha.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.beans.factory.annotation.Value;
-
-import javax.persistence.*;
 
 
-//import org.springframework.lang.Nullable;
 
-@Entity
-@Table(name = "users")
+
 public class User {
   //@Nullable
-  @Id
-  @Column(name = "id")
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long id;
-  @Column(name = "username")
+  //  @Id
+  //  @Column(name = "id",unique = true)
+  //  @GeneratedValue(strategy = GenerationType.AUTO)
+  //  @Column(name = "username",unique = true)
   private String username;
-  @Column(name = "password")
+  //  @Column(name = "password")
   private String password;
-  @Column(name = "email")
+  //  @Column(name = "email",unique = true)
   private String email;
-  @Column(name = "rating")
+  //  @Column(name = "rating")
   private Integer rating;
 
   /**
@@ -36,12 +30,17 @@ public class User {
   public User(
       @JsonProperty("name") String username,
       @JsonProperty("password") String password,
-      @JsonProperty("email") String email
+      @JsonProperty("email") String email,
+      @JsonProperty("rating") Integer rating
   ) {
     this.username = username;
     this.password = password;
     this.email = email;
-    this.rating = 0;
+    if(rating != null) {
+      this.rating = rating;
+     } else {
+      this.rating = 0;
+    }
   }
 
   public String getUsername() {

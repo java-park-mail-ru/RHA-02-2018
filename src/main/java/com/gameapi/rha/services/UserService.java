@@ -2,22 +2,17 @@ package com.gameapi.rha.services;
 
 import com.gameapi.rha.models.User;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 //import com.gameapi.rha.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.sql.SQLException;
 import java.sql.ResultSet;
-
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * UserService is a class to operate with params from UserController.
@@ -27,16 +22,17 @@ import java.sql.ResultSet;
 public class UserService {
 
   private static JdbcTemplate jdbc;
+  private static RatingMapper RATING_MAPPER = new RatingMapper();
+  private static UserMapper USER_MAPPER = new UserMapper();
   /**
   * UserService default constructor specialized.
   */
-  private UserService() { }
 
-  /**
-  *Main, but temporary database.
-  */
-  private static ConcurrentHashMap<String, User> map =
-         new ConcurrentHashMap<>();
+  @Autowired
+  public UserService(JdbcTemplate jdbc) {
+    this.jdbc = jdbc;
+  }
+
   /**
   * rating table.
   */
@@ -45,72 +41,47 @@ public class UserService {
   /**
    * Insertion into DB with SQL.
    * @param user is user to create
-   * @return
+   * @return user, if all right
    */
-  public static User createUser(User user) {
-    jdbc.update((PreparedStatementCreator) user);
-    return user;
+
+  public static void createUser(User user) {
+    String SQL = "INSERT INTO \"users\" (username,rating,email,password) VALUES (? ,? ,? ,?);";
+    jdbc.update(SQL,user.getUsername(),user.getRating(),user.getEmail(),user.getPassword());
   }
 
-
-  /**
-  *Insertion into DB.
-  */
-  public static User putInMap(User user) {
-    if (map.containsKey(user.getEmail())) {
-      return null;
-    }
-    map.put(user.getEmail(), user);
-    return user;
-  }
+  //авторизация по мылу ииии по нику
 
   /**
   * function rating returns rating by it's page.
   * @param  page  Is used to tell the pagenum.
   * @return rating result
   */
-  public static Map<String,Integer> rating(Integer page) {
-    final Iterator itr = map.entrySet().iterator();
+  public static List<Map<String,Integer>> rating(Integer page, String user) {
+    List<Map<String,Integer>> res = new LinkedList<>();
+    String SQL = "(SELECT username,rating FROM \"users\""
+            + "ORDER BY rating "
+            + "OFFSET ? Rows LIMIT ?)"
+            + "UNION (SELECT username,rating WHERE username=?);";
 
-    if (page == null) {
-      page = 0;
-    }
-    Integer elements = 2;
-    page = page * elements;
-    while (page-- > 0 && itr.hasNext()) {
-      itr.next();
-    }
-    final Map<String,Integer> result = new HashMap<>();
-
-    boolean isEmptyPage = true;
-
-    while (elements-- > 0 && itr.hasNext()) {
-      isEmptyPage = false;
-      Map.Entry<String,User> entry = (Map.Entry<String, User>) itr.next();
-      result.put(entry.getValue().getUsername(), entry.getValue().getRating());
-    }
-    if (isEmptyPage) {
-      return null;
-    }
-    return result;
+    res = jdbc.query(SQL,RATING_MAPPER,page * 2, 2, user);
+    SQL="SELECT count(*) FROM users;";
+    Map<String, Integer> map=new HashMap<>();
+    map.put("pages", jdbc.queryForObject(SQL, Integer.class));
+    res.add(map);
+    return(res);
   }
 
   public static Boolean check(String email, String password)  {
-    return (map.containsKey(email) && map.get(email).checkPassword(password));
+    String SQL = "SELECT * FROM \"users\" WHERE email=?;";
+    User authed = jdbc.queryForObject(SQL,USER_MAPPER,email);
+    return (authed.checkPassword(password));
   }
 
   public static User userInfo(String email) {
-    return map.get(email);
+    String SQL = "SELECT * FROM \"users\" WHERE email=?;";
+    return jdbc.queryForObject(SQL,USER_MAPPER,email);
   }
 
-  /**
-  *ratingBuilder is used for Getting rating table full.
-  */
-  public static void ratingBuilder() {
-    for (Map.Entry<String,User> user:map.entrySet()) {
-      RatingTable.put(user.getValue().getUsername(),user.getValue().getRating());
-    }
-  }
 
   /**
    * Change user is function to change current user in session.
@@ -119,13 +90,38 @@ public class UserService {
    */
   public static void changeUser(String prevUser, User newUser) {
 
-    final User prev = map.get(prevUser);
-
-    // Такого быть не должно
-    if (prev == null) {
-      return;
+    List<Object> lst = new LinkedList<>();
+    String SQL = "UPDATE \"users\" SET";
+    if (newUser.getEmail() != null) {
+      SQL += " email = ?, ";
+      lst.add(newUser.getEmail());
     }
-    map.get(prevUser).setEmail(newUser.getEmail());
-    map.get(prevUser).setPassword(newUser.getPassword());
+    if (newUser.getPassword() != null) {
+      SQL += "password = ?, ";
+      lst.add(newUser.getPassword());
+    }
+    if(newUser.getRating() != null) {
+      SQL += "rating = ?, ";
+      lst.add(newUser.getPassword());
+    }
+    SQL += " WHERE email=?;";
+    jdbc.update(SQL,lst,prevUser);
+  }
+
+
+
+
+  public static final class RatingMapper implements RowMapper<Map<String,Integer>> {
+    public Map<String,Integer> mapRow(ResultSet rs, int rowNum) throws SQLException {
+      final Map<String,Integer> th = new HashMap<>();
+      th.put(rs.getString("username"),rs.getInt("rating"));
+      return th;
+    }
+  }
+  public static final class UserMapper implements RowMapper<User> {
+    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+      final User th=new User(rs.getString("username"),rs.getString("password"),rs.getString("email"),rs.getInt("rating"));
+      return th;
+    }
   }
 }
