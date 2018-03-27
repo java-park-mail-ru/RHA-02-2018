@@ -71,10 +71,14 @@ public class UserService {
     return(res);
   }
 
-  public static Boolean check(String email, String password)  {
+  public static User check(String email, String password)  {
     String SQL = "SELECT * FROM \"users\" WHERE email=?;";
     User authed = jdbc.queryForObject(SQL,USER_MAPPER,email);
-    return (authed.checkPassword(password));
+    if(authed.checkPassword(password)) {
+      return authed;
+    } else {
+      return null;
+    }
   }
 
   public static User userInfo(String email) {
