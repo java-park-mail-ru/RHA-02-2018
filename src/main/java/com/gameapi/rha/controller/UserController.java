@@ -205,7 +205,7 @@ public class UserController {
       // Этого быть не может
       return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.UNEXPECTED_ERROR));
     }
-    result.setPassword(null);
+//    result.setPassword(null); //TODO: не работает, надо придумать, как не возвращать пароль!
     return ResponseEntity.status(HttpStatus.OK).body(new Message(result));
   }
 
