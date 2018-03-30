@@ -53,14 +53,12 @@ public final class UserService {
     while (page-- > 0 && itr.hasNext()) {
       itr.next();
     }
-//    final Map<String,Integer> result = new HashMap<>();
   final List<Rating> result = new ArrayList<>();
     boolean isEmptyPage = true;
 
     while (elements-- > 0 && itr.hasNext()) {
       isEmptyPage = false;
       Map.Entry<String,User> entry = (Map.Entry<String, User>) itr.next();
-//      result.put(entry.getValue().getUsername(), entry.getValue().getRating());
       result.add(new Rating(
               entry.getValue().getEmail(),
               entry.getValue().getRating()
@@ -98,7 +96,6 @@ public final class UserService {
 
     final User prev = map.get(prevUser);
 
-    // Такого быть не должно
     if (prev == null) {
       return;
     }

@@ -11,9 +11,10 @@ import org.apache.commons.codec.binary.Base64;
 
 
 class Password {
-  // The higher the number of iterations the more
-  // expensive computing the hash is for us and
-  // also for an attacker.
+  /**  The higher the number of iterations the more
+   expensive computing the hash is for us and
+   also for an attacker.
+   */
   private static final int ITERATIONS = 20 * 1000;
   private static final int SALT_LEN = 32;
   private static final int DESIRED_KEY_LEN = 256;
@@ -24,7 +25,6 @@ class Password {
   public static String getSaltedHash(String password) {
     try {
       final byte[] salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(SALT_LEN);
-      // store the salt with the password
       return Base64.encodeBase64String(salt) + '$' + hash(password, salt);
     } catch (NoSuchAlgorithmException ex) {
       return null;
@@ -45,8 +45,6 @@ class Password {
     return hashOfInput != null && hashOfInput.equals(saltAndPass[1]);
   }
 
-  // using PBKDF2 from Sun, an alternative is https://github.com/wg/scrypt
-  // cf. http://www.unlimitednovelty.com/2012/03/dont-use-bcrypt.html
   private static String hash(String password, byte[] salt) {
     if (password == null || password.isEmpty()) {
       throw new IllegalArgumentException("Empty passwords are not supported.");

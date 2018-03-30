@@ -70,8 +70,6 @@ public class UserController {
                                @RequestBody User user, HttpServletResponse response)
           throws JsonProcessingException {
 
-    // Аутентифицированный пользователь не может зарегистрироваться
-
     if (session.getAttribute("user") != null) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
               new Message(UserStatus.ALREADY_AUTHENTICATED));
@@ -82,7 +80,6 @@ public class UserController {
       sessionAuth(session, user);
       Cookie userCook = new Cookie("user", user.getUsername());
       userCook.setHttpOnly(false);
-      //userCook.setDomain("localhost");
       userCook.setPath("/");
       userCook.setMaxAge(30 * 60);
       response.addCookie(userCook);
@@ -104,19 +101,16 @@ public class UserController {
   public ResponseEntity auth(@RequestBody User user,
                              HttpSession session, HttpServletResponse response)  {
     ResponseEntity respond;
-    // Мы не можем дважды аутентицифироваться
     if (session.getAttribute("user") != null) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
               new Message(UserStatus.ALREADY_AUTHENTICATED));
     }
-    // Если неверные учетные данные
     if (!UserService.check(user.getEmail(), user.getPassword())) {
       return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.WRONG_CREDENTIALS));
     }
 
     sessionAuth(session, user);
     Cookie userCook = new Cookie("user", user.getEmail());
-    //userCook.setDomain("localhost");
     userCook.setHttpOnly(false);
     userCook.setPath("/");
     userCook.setMaxAge(30 * 60);
@@ -135,7 +129,6 @@ public class UserController {
   public ResponseEntity logout(HttpServletRequest request,
                                HttpSession session, HttpServletResponse response) {
 
-    // Мы не можем выйти, не войдя
     if (session.getAttribute("user") == null) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
     }
@@ -149,8 +142,6 @@ public class UserController {
       }
     }
     session.setAttribute("user", null);
-
-    //завершаем сеанс, отвязываем связанные с ним объекты
     session.invalidate();
     return ResponseEntity.status(HttpStatus.OK).body(
             new Message(UserStatus.SUCCESSFULLY_LOGGED_OUT));
@@ -170,15 +161,12 @@ public class UserController {
                                HttpServletRequest request, HttpSession session,
                                HttpServletResponse response) {
     page--;
-//    Map<String,Integer> resp;
     List<Rating> resp;
-    // Мы не можем получить статистику, не войдя
     if (session.getAttribute("user") == null) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
     }
     resp = UserService.rating(page);
 
-    //Если страница пустая, то возвращаем 404
     if (resp == null) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Message(UserStatus.NOT_FOUND));
     }
@@ -194,7 +182,6 @@ public class UserController {
    */
   @GetMapping(path = "/info")
   public ResponseEntity info(HttpSession session) {
-    // Если пользователь не аутертифицирован, то у него нет доступа к информации о текущей сессии
     if (session.getAttribute("user") == null) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
               new Message(UserStatus.ACCESS_ERROR));
@@ -202,10 +189,8 @@ public class UserController {
 
     final User result = UserService.userInfo((String) session.getAttribute("user"));
     if (result == null) {
-      // Этого быть не может
       return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.UNEXPECTED_ERROR));
     }
-//    result.setPassword(null); //TODO: не работает, надо придумать, как не возвращать пароль!
     return ResponseEntity.status(HttpStatus.OK).body(new Message(result));
   }
 
@@ -218,7 +203,6 @@ public class UserController {
   @PostMapping(path = "/change")
   public ResponseEntity change(@RequestBody User user, HttpSession session) {
 
-    // Без аутентификации нет доступа к изменению данных
     if (session.getAttribute("user") == null) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
     }

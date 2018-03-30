@@ -6,8 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.UUID;
 
 
-//import org.springframework.lang.Nullable;
-
 
 public class User {
   //@Nullable
