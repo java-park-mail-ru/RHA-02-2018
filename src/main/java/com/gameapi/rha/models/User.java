@@ -7,17 +7,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 public class User {
-  //@Nullable
-  //  @Id
-  //  @Column(name = "id",unique = true)
-  //  @GeneratedValue(strategy = GenerationType.AUTO)
-  //  @Column(name = "username",unique = true)
   private String username;
-  //  @Column(name = "password")
   private String password;
-  //  @Column(name = "email",unique = true)
   private String email;
-  //  @Column(name = "rating")
   private Integer rating;
 
   /**
@@ -36,9 +28,9 @@ public class User {
     this.username = username;
     this.password = password;
     this.email = email;
-    if(rating != null) {
+    if (rating != null) {
       this.rating = rating;
-     } else {
+    } else {
       this.rating = 0;
     }
   }

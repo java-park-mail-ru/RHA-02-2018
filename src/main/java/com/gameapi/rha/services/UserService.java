@@ -2,17 +2,26 @@ package com.gameapi.rha.services;
 
 import com.gameapi.rha.models.User;
 
-import java.util.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 //import com.gameapi.rha.models.User;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.lang.NonNullApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.sql.SQLException;
-import java.sql.ResultSet;
-import java.util.LinkedList;
-import java.util.List;
+
+
+
 
 /**
  * UserService is a class to operate with params from UserController.
@@ -41,7 +50,6 @@ public class UserService {
   /**
    * Insertion into DB with SQL.
    * @param user is user to create
-   * @return user, if all right
    */
 
   public static void createUser(User user) {
@@ -57,33 +65,32 @@ public class UserService {
   * @return rating result
   */
   public static List<Map<String,Integer>> rating(Integer page, String user) {
-    List<Map<String,Integer>> res = new LinkedList<>();
     String SQL = "(SELECT username,rating FROM \"users\""
             + "ORDER BY rating "
             + "OFFSET ? Rows LIMIT ?)"
-            + "UNION (SELECT username,rating WHERE username=?);";
+            + "UNION (SELECT username,rating FROM \"users\" WHERE username=?::citext);";
 
-    res = jdbc.query(SQL,RATING_MAPPER,page * 2, 2, user);
-    SQL="SELECT count(*) FROM users;";
-    Map<String, Integer> map=new HashMap<>();
+    List<Map<String, Integer>> res = jdbc.query(SQL, RATING_MAPPER, page * 2, 2, user);
+    SQL = "SELECT count(*) FROM users;";
+    final Map<String, Integer> map = new HashMap<>();
     map.put("pages", jdbc.queryForObject(SQL, Integer.class));
     res.add(map);
-    return(res);
+    return (res);
   }
 
-  public static User check(String email, String password)  {
-    String SQL = "SELECT * FROM \"users\" WHERE email=?;";
-    User authed = jdbc.queryForObject(SQL,USER_MAPPER,email);
-    if(authed.checkPassword(password)) {
+  public static @Nullable User check(String email, String password)  {
+    final String SQL = "SELECT * FROM \"users\" WHERE email=?;";
+    final User authed = jdbc.queryForObject(SQL,USER_MAPPER,email);
+    if (authed.checkPassword(password)) {
       return authed;
     } else {
       return null;
     }
   }
 
-  public static User userInfo(String email) {
-    String SQL = "SELECT * FROM \"users\" WHERE email=?;";
-    return jdbc.queryForObject(SQL,USER_MAPPER,email);
+  public static User userInfo(String nick) {
+    String SQL = "SELECT * FROM \"users\" WHERE username=?;";
+    return jdbc.queryForObject(SQL,USER_MAPPER,nick);
   }
 
 
@@ -94,7 +101,7 @@ public class UserService {
    */
   public static void changeUser(String prevUser, User newUser) {
 
-    List<Object> lst = new LinkedList<>();
+    final List<Object> lst = new LinkedList<>();
     String SQL = "UPDATE \"users\" SET";
     if (newUser.getEmail() != null) {
       SQL += " email = ?, ";
@@ -104,7 +111,7 @@ public class UserService {
       SQL += "password = ?, ";
       lst.add(newUser.getPassword());
     }
-    if(newUser.getRating() != null) {
+    if (newUser.getRating() != null) {
       SQL += "rating = ?, ";
       lst.add(newUser.getPassword());
     }
@@ -116,16 +123,22 @@ public class UserService {
 
 
   public static final class RatingMapper implements RowMapper<Map<String,Integer>> {
-    public Map<String,Integer> mapRow(ResultSet rs, int rowNum) throws SQLException {
+    @Override
+    public @NotNull Map<String,Integer> mapRow(ResultSet rs, int rowNum) throws SQLException {
       final Map<String,Integer> th = new HashMap<>();
       th.put(rs.getString("username"),rs.getInt("rating"));
       return th;
     }
   }
+
+
   public static final class UserMapper implements RowMapper<User> {
-    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-      final User th=new User(rs.getString("username"),rs.getString("password"),rs.getString("email"),rs.getInt("rating"));
-      return th;
+    @Override
+    public @NotNull User mapRow(ResultSet rs, int rowNum) throws SQLException {
+      return new User(rs.getString("username"),
+              rs.getString("password"),rs.getString("email"),
+              rs.getInt("rating"));
     }
+
   }
 }

@@ -1,22 +1,20 @@
 package com.gameapi.rha.controller;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.gameapi.rha.models.Message;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
 
-
 import java.util.List;
 import java.util.Map;
-
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -79,8 +77,10 @@ public class UserController {
     user.saltHash();
     try {
       UserService.createUser(user);
-    } catch (Exception except) {
-      return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.NOT_UNIQUE_USERNAME));
+    } catch (DuplicateKeyException except) {
+      return ResponseEntity.status(HttpStatus.CONFLICT).body(new Message(UserStatus.NOT_UNIQUE_USERNAME));
+    } catch (NullPointerException except) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message(UserStatus.WRONG_CREDENTIALS));
     }
     sessionAuth(session, user);
     return ResponseEntity.status(HttpStatus.OK).body(
@@ -105,7 +105,7 @@ public class UserController {
               new Message(UserStatus.ALREADY_AUTHENTICATED));
     }
     // Если неверные учетные данные
-    user=UserService.check(user.getEmail(), user.getPassword());
+    user = UserService.check(user.getEmail(), user.getPassword());
     if (user == null) {
       return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.WRONG_CREDENTIALS));
     }
@@ -149,7 +149,11 @@ public class UserController {
   public ResponseEntity rating(@PathVariable("page") Integer page,
                                HttpServletRequest request, HttpSession session,
                                HttpServletResponse response) {
+    if (page == null) {
+      page = 1;
+    }
     page--;
+
     List<Map<String,Integer>> resp;
     // Мы не можем получить статистику, не войдя
     if (session.getAttribute("user") == null) {
@@ -160,7 +164,8 @@ public class UserController {
     } catch (IncorrectResultSizeDataAccessException exc) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Message(UserStatus.NOT_FOUND));
     } catch (DataAccessException exc) {
-      return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new Message("Что-то на сервере."));
+      return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+              new Message("Что-то на сервере."));
     }
 
     return ResponseEntity.status(HttpStatus.OK).body(resp);
@@ -182,15 +187,17 @@ public class UserController {
     }
     final User result;
     try {
-       result = UserService.userInfo((String) session.getAttribute("user"));
-    }catch (IncorrectResultSizeDataAccessException exc) {
+      result = UserService.userInfo((String) session.getAttribute("user"));
+    } catch (IncorrectResultSizeDataAccessException exc) {
       // Этого быть не может
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Message(UserStatus.UNEXPECTED_ERROR));
-    }catch (DataAccessException exc) {
-      return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new Message("Что-то на сервере."));
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+              new Message(UserStatus.UNEXPECTED_ERROR));
+    } catch (DataAccessException exc) {
+      return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+              new Message("Что-то на сервере."));
     }
 
-    result.setPassword(null);
+    result.setPassword("You are not gonna steal data this way, you little piece of shit.");
 
     return ResponseEntity.status(HttpStatus.OK).body(new Message(result));
   }
