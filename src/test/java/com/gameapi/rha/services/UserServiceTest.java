@@ -27,32 +27,32 @@ class UserServiceTest {
 
 
 
-    @Test(expected = NullPointerException.class)
-    void createNullUser() {
-        UserService.createUser( null );
-    }
-
-    @Test(expected = NullPointerException.class)
-    void createShittyUser() {
-        UserService.createUser( new User("user","pass",null,null) );
-    }
-
-    @Test
-    void createSimpleUser() {
-        UserService.createUser( user );
-    }
-
-    @Test(expexted = DuplicateKeyException.class)
-    void createDuplicateUser() {
-        UserService.createUser( user );
-        UserService.createUser( user );
-    }
-
-
-    @Test(expected = NullPointerException.class)
-    void getNoRating() {
-        UserService.createUser( new User("user","pass",null,null) );
-    }
+//    @Test(expected = NullPointerException.class)
+//    void createNullUser() {
+//        UserService.createUser( null );
+//    }
+//
+//    @Test(expected = NullPointerException.class)
+//    void createShittyUser() {
+//        UserService.createUser( new User("user","pass",null,null) );
+//    }
+//
+//    @Test
+//    void createSimpleUser() {
+//        UserService.createUser( user );
+//    }
+//
+//    @Test(expexted = DuplicateKeyException.class)
+//    void createDuplicateUser() {
+//        UserService.createUser( user );
+//        UserService.createUser( user );
+//    }
+//
+//
+//    @Test(expected = NullPointerException.class)
+//    void getNoRating() {
+//        UserService.createUser( new User("user","pass",null,null) );
+//    }
 
 
     @org.junit.jupiter.api.Test

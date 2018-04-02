@@ -1,5 +1,6 @@
 package com.gameapi.rha.controller;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.gameapi.rha.models.Message;
@@ -215,8 +216,8 @@ public class UserController {
     if (session.getAttribute("user") == null) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
     }
-
-    UserService.changeUser((String) session.getAttribute("user"), user);
+    user.setUsername(session.getAttribute("user").toString());
+    UserService.changeUser(user);
 
     return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_CHANGED));
   }
@@ -225,4 +226,37 @@ public class UserController {
     session.setAttribute("user", user.getUsername());
     session.setMaxInactiveInterval(30 * 60);
   }
+
+
+  @PostMapping(path = "/chpwd", consumes = "application/json", produces = "application/json")
+  public ResponseEntity changePass(@RequestBody Map<String, String> json,
+                             HttpSession session, HttpServletResponse response)  {
+    ResponseEntity respond;
+    String old = json.get("oldp");
+    String newp = json.get("newp");
+    // Мы не можем дважды аутентицифироваться
+    if (session.getAttribute("user") == null) {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+               new Message(UserStatus.NOT_FOUND));
+    }
+    // Если неверные учетные данные
+    User user;
+    try {
+         user = UserService.userInfo(session.getAttribute("user").toString());
+    } catch (DataAccessException Except) {
+        session.invalidate();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                new Message(UserStatus.WRONG_CREDENTIALS));
+    }
+    if (old == null || !user.checkPassword(old) || newp == null) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                new Message(UserStatus.WRONG_CREDENTIALS));
+    }
+    user.setPassword(newp);
+
+    UserService.changeUser(user);
+    return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_AUTHED));
+  }
+
+
 }

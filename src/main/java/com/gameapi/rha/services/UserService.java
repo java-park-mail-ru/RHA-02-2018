@@ -5,10 +5,7 @@ import com.gameapi.rha.models.User;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 //import com.gameapi.rha.models.User;
 import org.jetbrains.annotations.NotNull;
@@ -96,27 +93,28 @@ public class UserService {
 
   /**
    * Change user is function to change current user in session.
-   * @param prevUser is previous user
-   * @param newUser is new user
+   * @param user is new user to change
    */
-  public static void changeUser(String prevUser, User newUser) {
+  public static void changeUser( User user) {
 
-    final List<Object> lst = new LinkedList<>();
+    final List<Object> lst = new ArrayList<>();
     String SQL = "UPDATE \"users\" SET";
-    if (newUser.getEmail() != null) {
+
+    if (user.getEmail() != null) {
       SQL += " email = ?, ";
-      lst.add(newUser.getEmail());
+      lst.add(user.getEmail());
     }
-    if (newUser.getPassword() != null) {
+    if (user.getPassword() != null) {
       SQL += "password = ?, ";
-      lst.add(newUser.getPassword());
+      lst.add(user.getPassword());
     }
-    if (newUser.getRating() != null) {
-      SQL += "rating = ?, ";
-      lst.add(newUser.getPassword());
+    if (user.getRating() != null) {
+      SQL += "rating = ? ";
+      lst.add(user.getRating());
     }
-    SQL += " WHERE email=?;";
-    jdbc.update(SQL,lst,prevUser);
+    SQL += " WHERE username=?;";
+    lst.add(user.getUsername());
+    jdbc.update(SQL,lst.toArray());
   }
 
 
