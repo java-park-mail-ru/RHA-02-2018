@@ -9,29 +9,35 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
-import static org.mockito.Mockito.*;
-import javax.websocket.Session;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.testng.AssertJUnit.assertEquals;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@ActiveProfiles(value = { "integrationtest" })
+@Transactional
 @ExtendWith(SpringExtension.class)
-class UserControllerTest {
+public class UserControllerTest {
+
+//    @MockBean
+//    private JdbcTemplate jdbc;
+
     @MockBean
-    private UserService someService;
+    private UserService userService;
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -44,17 +50,13 @@ class UserControllerTest {
     private  User user2=new User("Kolchak","BlackBaron",
             "Samoderzhec@WiteGuard.net",1905);
 
-    private  User user3=new User("Nostradamus","",
+    private  User user3=new User("Nostradamus",null,
             "IPredictThisWontWork@Astral.net",2012);
 
-    private  User user4=new User("","somep",
+    private  User user4=new User(null,"somep",
             "ThisWontwork@Either.nope",null);
 
-    @Rule
-    public ExpectedException expected = ExpectedException.none();
-
-    @BeforeClass
-    public static void setHttpHeaders() {
+    UserControllerTest() {
         final List<String> origin = Collections.singletonList("http://localhost:5000");
         REQUEST_HEADERS.put(HttpHeaders.ORIGIN, origin);
         final List<String> contentType = Collections.singletonList("application/json");
@@ -64,77 +66,89 @@ class UserControllerTest {
 
 
     @Test
-    @DisplayName("User creation")
-    void create() {
-        final HttpEntity<User> requestEntity = new HttpEntity<>(user1, REQUEST_HEADERS);
-
+    @DisplayName("User with no password creation")
+    void createP() {
+        final HttpEntity<User> requestEntity = new HttpEntity<>(user3, REQUEST_HEADERS);
         final ResponseEntity<String> response = restTemplate.postForEntity("/users/create", requestEntity, String.class);
-
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     @Test
-    @DisplayName("Wrong user creation")
+    @DisplayName("User with no username creation")
     void createW() {
+        final HttpEntity<User> requestEntity = new HttpEntity<>(user4, REQUEST_HEADERS);
+        final ResponseEntity<String> response = restTemplate.postForEntity("/users/create", requestEntity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+
     }
 
-    @Test
-    @DisplayName("User auth")
-    void auth() {
-    }
+
 
     @Test
     @DisplayName("Wrong user auth")
     void authW() {
+        final HttpEntity<User> requestEntity = new HttpEntity<>(user3, REQUEST_HEADERS);
+        final ResponseEntity<String> response = restTemplate.postForEntity("/users/create", requestEntity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+
     }
 
-    @Test
-    @DisplayName("User logout")
-    void logout() {
-    }
 
     @Test
     @DisplayName("Wrong user logout")
     void logoutW() {
+        final HttpEntity<User> requestEntity = new HttpEntity<>(user3, REQUEST_HEADERS);
+        final ResponseEntity response = restTemplate.postForEntity("/users/logout", requestEntity, ResponseEntity.class);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
-    @Test
-    @DisplayName("Rating with pagination")
-    void rating() {
-    }
 
     @Test
-    @DisplayName("Wrong rating with pagination")
+    @DisplayName("Rating unlogged")
     void ratingW() {
+        final ResponseEntity<String> response = restTemplate.getForEntity(
+                "/users/rating/1",String.class);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+
     }
 
     @Test
-    @DisplayName("User info")
+    @DisplayName("User info unlogged")
     void info() {
+        final ResponseEntity<String> response = restTemplate.getForEntity(
+                "/users/info",String.class);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+
     }
 
-    @Test
-    @DisplayName("Wrong user info")
-    void infoW() {
-    }
 
     @Test
-    @DisplayName("User change")
+    @DisplayName("User change unlogged")
     void change() {
+        final HttpEntity<User> requestEntity = new HttpEntity<>(user3, REQUEST_HEADERS);
+
+        final ResponseEntity<String> response = restTemplate.postForEntity(
+                "/users/change",requestEntity,String.class);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+
     }
 
-    @Test
-    @DisplayName("Wrong user change")
-    void changeW() {
-    }
 
     @Test
     @DisplayName("User password change")
     void changePass() {
+        final HttpEntity<User> requestEntity = new HttpEntity<>(user3, REQUEST_HEADERS);
+        final ResponseEntity<String> response = restTemplate.postForEntity("/users/chpwd", requestEntity, String.class);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+
+
+
     }
 
-    @Test
-    @DisplayName("Wrong user password change")
-    void changePassW() {
-    }
+
 }

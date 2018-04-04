@@ -20,7 +20,7 @@ public class User {
    */
   @JsonCreator
   public User(
-      @JsonProperty("name") String username,
+      @JsonProperty("username") String username,
       @JsonProperty("password") String password,
       @JsonProperty("email") String email,
       @JsonProperty("rating") Integer rating
@@ -34,6 +34,8 @@ public class User {
       this.rating = 0;
     }
   }
+
+  public User(){}
 
   public void setUsername(String username) {
     this.username=username;

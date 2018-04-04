@@ -65,13 +65,16 @@ public class UserController {
    */
 
   @PostMapping(path = "/create", consumes = "application/json", produces = "application/json")
-  public ResponseEntity create(HttpSession session,
+  public ResponseEntity<?> create(HttpSession session,
                                @RequestBody User user) {
     // Аутентифицированный пользователь не может зарегистрироваться
 
     if (session.getAttribute("user") != null) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
               new Message(UserStatus.ALREADY_AUTHENTICATED,user.getUsername()));
+    }
+    if(user.getPassword()==null) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message(UserStatus.WRONG_CREDENTIALS));
     }
 
     user.saltHash();
@@ -106,7 +109,7 @@ public class UserController {
     // Если неверные учетные данные
     user = UserService.check(user.getEmail(), user.getPassword());
     if (user == null) {
-      return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.WRONG_CREDENTIALS));
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message(UserStatus.WRONG_CREDENTIALS));
     }
     sessionAuth(session, user);
     return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_AUTHED));
@@ -125,7 +128,7 @@ public class UserController {
 
     // Мы не можем выйти, не войдя
     if (session.getAttribute("user") == null) {
-      return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new Message(UserStatus.ACCESS_ERROR));
     }
     session.setAttribute("user", null);
 
@@ -156,7 +159,7 @@ public class UserController {
     List<Map<String,Integer>> resp;
     // Мы не можем получить статистику, не войдя
     if (session.getAttribute("user") == null) {
-      return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new Message(UserStatus.ACCESS_ERROR));
     }
     try {
       resp = UserService.rating(page,session.getAttribute("user").toString());
@@ -181,6 +184,7 @@ public class UserController {
   public ResponseEntity info(HttpSession session) {
     // Если пользователь не аутертифицирован, то у него нет доступа к информации о текущей сессии
     if (session.getAttribute("user") == null) {
+      session.invalidate();
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
               new Message(UserStatus.ACCESS_ERROR));
     }
@@ -212,7 +216,8 @@ public class UserController {
 
     // Без аутентификации нет доступа к изменению данных
     if (session.getAttribute("user") == null) {
-      return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
+      session.invalidate();
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new Message(UserStatus.ACCESS_ERROR));
     }
     user.setUsername(session.getAttribute("user").toString());
     UserService.changeUser(user);
@@ -228,15 +233,16 @@ public class UserController {
 
   @PostMapping(path = "/chpwd", consumes = "application/json", produces = "application/json")
   public ResponseEntity changePass(@RequestBody Map<String, String> json,
-                             HttpSession session, HttpServletResponse response)  {
-    ResponseEntity respond;
-    String old = json.get("oldp");
-    String newp = json.get("newp");
+                             HttpSession session)  {
+
     // Мы не можем дважды аутентицифироваться
     if (session.getAttribute("user") == null) {
-    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+      session.invalidate();
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                new Message(UserStatus.NOT_FOUND));
     }
+    String old = json.get("oldp");
+    String newp = json.get("newp");
     // Если неверные учетные данные
     User user;
     try {
