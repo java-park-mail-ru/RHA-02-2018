@@ -3,17 +3,14 @@ package com.gameapi.rha.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.UUID;
 
 
 
 public class User {
-  //@Nullable
   private String username;
   private String password;
   private String email;
   private Integer rating;
-  private UUID uID;
 
   /**
    * Default constructor for user.
@@ -23,15 +20,25 @@ public class User {
    */
   @JsonCreator
   public User(
-      @JsonProperty("name") String username,
+      @JsonProperty("username") String username,
       @JsonProperty("password") String password,
-      @JsonProperty("email") String email
+      @JsonProperty("email") String email,
+      @JsonProperty("rating") Integer rating
   ) {
     this.username = username;
     this.password = password;
-    this.uID = UUID.randomUUID();
     this.email = email;
-    this.rating = 0;
+    if (rating != null) {
+      this.rating = rating;
+    } else {
+      this.rating = 0;
+    }
+  }
+
+  public User(){}
+
+  public void setUsername(String username) {
+    this.username=username;
   }
 
   public String getUsername() {
@@ -46,9 +53,6 @@ public class User {
     rating = rate;
   }
 
-  public UUID getuID() {
-    return uID;
-  }
 
   public void setPassword(String password) {
     this.password = Password.getSaltedHash(password);

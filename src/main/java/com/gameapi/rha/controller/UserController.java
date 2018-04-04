@@ -1,8 +1,6 @@
 package com.gameapi.rha.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.gameapi.rha.models.Message;
@@ -10,18 +8,20 @@ import com.gameapi.rha.models.Rating;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.session.jdbc.config.annotation.web.http.EnableJdbcHttpSession;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @CrossOrigin(origins = {"https://rha-staging-deploy.herokuapp.com", "http://bf-balance.herokuapp.com", "http://localhost:3000"}, allowCredentials = "true")
 @RequestMapping("/users")
+@EnableJdbcHttpSession
 public class UserController {
 
   static ObjectMapper mapper = new ObjectMapper();
@@ -41,7 +42,7 @@ public class UserController {
 
   /**
    * Enum of status messages for response.
-   * Elements from this enum are used for response
+   * Elements from this enum are used for response.
    */
   @SuppressWarnings("CheckStyle")
   private enum UserStatus {
@@ -61,60 +62,58 @@ public class UserController {
    * User creation function.
    * @param user user to create
    * @param session session to input user
-   * @param response response to answer
    * @return returns response
-   * @throws JsonProcessingException if error with json
    */
+
   @PostMapping(path = "/create", consumes = "application/json", produces = "application/json")
-  public ResponseEntity create(HttpSession session,
-                               @RequestBody User user, HttpServletResponse response)
-          throws JsonProcessingException {
+  public ResponseEntity<?> create(HttpSession session,
+                               @RequestBody User user) {
+    // Аутентифицированный пользователь не может зарегистрироваться
 
     if (session.getAttribute("user") != null) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-              new Message(UserStatus.ALREADY_AUTHENTICATED));
+              new Message(UserStatus.ALREADY_AUTHENTICATED,user.getUsername()));
+    }
+    if(user.getPassword()==null) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message(UserStatus.WRONG_CREDENTIALS));
+    }
 
+    user.saltHash();
+    try {
+      UserService.createUser(user);
+    } catch (DuplicateKeyException except) {
+      return ResponseEntity.status(HttpStatus.CONFLICT).body(new Message(UserStatus.NOT_UNIQUE_USERNAME));
+    } catch (NullPointerException except) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message(UserStatus.WRONG_CREDENTIALS));
     }
-    if (UserService.putInMap(user) != null) {
-      user.saltHash();
-      sessionAuth(session, user);
-      Cookie userCook = new Cookie("user", user.getUsername());
-      userCook.setHttpOnly(false);
-      userCook.setPath("/");
-      userCook.setMaxAge(30 * 60);
-      response.addCookie(userCook);
-      return ResponseEntity.status(HttpStatus.OK).body(
-              new Message(UserStatus.SUCCESSFULLY_REGISTERED));
-    } else {
-      return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.NOT_UNIQUE_USERNAME));
-    }
+    sessionAuth(session, user);
+    return ResponseEntity.status(HttpStatus.CREATED).body(
+            new Message(UserStatus.SUCCESSFULLY_REGISTERED,user.getUsername()));
+
   }
 
   /**
    * Function to authorise user.
    * @param user its user to authorise
    * @param session his session to change
-   * @param response our response to user
    * @return response
    */
   @PostMapping(path = "/auth", consumes = "application/json", produces = "application/json")
   public ResponseEntity auth(@RequestBody User user,
-                             HttpSession session, HttpServletResponse response)  {
+                             HttpSession session)  {
     ResponseEntity respond;
     if (session.getAttribute("user") != null) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
               new Message(UserStatus.ALREADY_AUTHENTICATED));
     }
-    if (!UserService.check(user.getEmail(), user.getPassword())) {
-      return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.WRONG_CREDENTIALS));
-    }
 
+    // Если неверные учетные данные
+    user = UserService.check(user.getEmail(), user.getPassword());
+    if (user == null) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message(UserStatus.WRONG_CREDENTIALS));
+
+    }
     sessionAuth(session, user);
-    Cookie userCook = new Cookie("user", user.getEmail());
-    userCook.setHttpOnly(false);
-    userCook.setPath("/");
-    userCook.setMaxAge(30 * 60);
-    response.addCookie(userCook);
     return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_AUTHED));
   }
 
@@ -130,16 +129,7 @@ public class UserController {
                                HttpSession session, HttpServletResponse response) {
 
     if (session.getAttribute("user") == null) {
-      return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
-    }
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        cookie.setPath("/");
-        cookie.setHttpOnly(false);
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
-      }
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new Message(UserStatus.ACCESS_ERROR));
     }
     session.setAttribute("user", null);
     session.invalidate();
@@ -160,19 +150,32 @@ public class UserController {
   public ResponseEntity rating(@PathVariable("page") Integer page,
                                HttpServletRequest request, HttpSession session,
                                HttpServletResponse response) {
-    page--;
-    List<Rating> resp;
-    if (session.getAttribute("user") == null) {
-      return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
+    if (page == null) {
+      page = 1;
     }
-    resp = UserService.rating(page);
+    page--;
 
-    if (resp == null) {
+
+    List<Map<String,Integer>> resp;
+    // Мы не можем получить статистику, не войдя
+
+    if (session.getAttribute("user") == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new Message(UserStatus.ACCESS_ERROR));
+    }
+
+    try {
+      resp = UserService.rating(page,session.getAttribute("user").toString());
+    } catch (IncorrectResultSizeDataAccessException exc) {
+
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Message(UserStatus.NOT_FOUND));
+    } catch (DataAccessException exc) {
+      return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+              new Message("Что-то на сервере."));
     }
 
     return ResponseEntity.status(HttpStatus.OK).body(resp);
   }
+
 
 
   /**
@@ -183,14 +186,25 @@ public class UserController {
   @GetMapping(path = "/info")
   public ResponseEntity info(HttpSession session) {
     if (session.getAttribute("user") == null) {
+      session.invalidate();
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
               new Message(UserStatus.ACCESS_ERROR));
     }
 
-    final User result = UserService.userInfo((String) session.getAttribute("user"));
-    if (result == null) {
-      return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.UNEXPECTED_ERROR));
+    final User result;
+    try {
+      result = UserService.userInfo((String) session.getAttribute("user"));
+    } catch (IncorrectResultSizeDataAccessException exc) {
+      // Этого быть не может
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+              new Message(UserStatus.UNEXPECTED_ERROR));
+    } catch (DataAccessException exc) {
+      return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+              new Message("Что-то на сервере."));
     }
+
+    result.setPassword("You are not gonna steal data this way, you little piece of shit.");
+
     return ResponseEntity.status(HttpStatus.OK).body(new Message(result));
   }
 
@@ -204,16 +218,52 @@ public class UserController {
   public ResponseEntity change(@RequestBody User user, HttpSession session) {
 
     if (session.getAttribute("user") == null) {
-      return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
+      session.invalidate();
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new Message(UserStatus.ACCESS_ERROR));
     }
-
-    UserService.changeUser((String) session.getAttribute("user"), user);
+    user.setUsername(session.getAttribute("user").toString());
+    UserService.changeUser(user);
 
     return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_CHANGED));
   }
 
   private static void sessionAuth(HttpSession session, User user) {
-    session.setAttribute("user", user.getEmail());
+    session.setAttribute("user", user.getUsername());
     session.setMaxInactiveInterval(30 * 60);
   }
+
+
+  @PostMapping(path = "/chpwd", consumes = "application/json", produces = "application/json")
+  public ResponseEntity changePass(@RequestBody Map<String, String> json,
+                             HttpSession session)  {
+
+    // Мы не можем дважды аутентицифироваться
+    if (session.getAttribute("user") == null) {
+      session.invalidate();
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+               new Message(UserStatus.NOT_FOUND));
+    }
+    String old = json.get("oldp");
+    String newp = json.get("newp");
+    // Если неверные учетные данные
+    User user;
+    try {
+         user = UserService.userInfo(session.getAttribute("user").toString());
+    } catch (DataAccessException Except) {
+        session.invalidate();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                new Message(UserStatus.WRONG_CREDENTIALS));
+    }
+    if (old == null || !user.checkPassword(old) || newp == null) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                new Message(UserStatus.WRONG_CREDENTIALS));
+    }
+    user.setPassword(newp);
+
+    UserService.changeUser(user);
+    return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_AUTHED));
+
+  }
+
+
 }
