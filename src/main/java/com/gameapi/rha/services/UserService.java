@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * UserService is a class to operate with params from UserController.
  */
-\
+
 @Service
 @Transactional
 public class UserService {
@@ -161,8 +161,6 @@ public class UserService {
               rs.getString("password"),rs.getString("email"),
               rs.getInt("rating"));
     }
-
-   return null;
 
   }
 }
