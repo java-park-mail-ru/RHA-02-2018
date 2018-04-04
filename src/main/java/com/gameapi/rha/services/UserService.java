@@ -23,9 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 
+
 /**
  * UserService is a class to operate with params from UserController.
  */
+\
 @Service
 @Transactional
 public class UserService {
@@ -48,6 +50,7 @@ public class UserService {
   public static Map<String, Integer> RatingTable = new HashMap<>();
 
   /**
+
    * Insertion into DB with SQL.
    * @param user is user to create
    */
@@ -60,11 +63,13 @@ public class UserService {
 
   //авторизация по мылу ииии по нику
 
+
   /**
   * function rating returns rating by it's page.
   * @param  page  Is used to tell the pagenum.
   * @return rating result
   */
+
 
   public static List<Map<String,Integer>> rating(Integer page, String user) {
     String SQL = "(SELECT username,rating FROM \"users\""
@@ -156,6 +161,8 @@ public class UserService {
               rs.getString("password"),rs.getString("email"),
               rs.getInt("rating"));
     }
+
+   return null;
 
   }
 }

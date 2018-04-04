@@ -6,11 +6,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 
+
 public class User {
+
   private String username;
   private String password;
   private String email;
   private Integer rating;
+
 
   /**
    * Default constructor for user.
@@ -20,6 +23,7 @@ public class User {
    */
   @JsonCreator
   public User(
+
       @JsonProperty("username") String username,
       @JsonProperty("password") String password,
       @JsonProperty("email") String email,
@@ -39,6 +43,7 @@ public class User {
 
   public void setUsername(String username) {
     this.username=username;
+
   }
 
   public String getUsername() {

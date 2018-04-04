@@ -1,6 +1,7 @@
 package com.gameapi.rha.controller;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.gameapi.rha.models.Message;
@@ -9,12 +10,15 @@ import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
 
 
+
 import java.util.List;
 import java.util.Map;
+
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
@@ -35,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = {"https://rha-staging-deploy.herokuapp.com", "http://bf-balance.herokuapp.com", "http://localhost:3000"}, allowCredentials = "true")
 @RequestMapping("/users")
 @EnableJdbcHttpSession
+
 public class UserController {
 
   static ObjectMapper mapper = new ObjectMapper();
@@ -42,7 +47,9 @@ public class UserController {
 
   /**
    * Enum of status messages for response.
+
    * Elements from this enum are used for response.
+
    */
   @SuppressWarnings("CheckStyle")
   private enum UserStatus {
@@ -62,6 +69,7 @@ public class UserController {
    * User creation function.
    * @param user user to create
    * @param session session to input user
+
    * @return returns response
    */
 
@@ -90,22 +98,26 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.CREATED).body(
             new Message(UserStatus.SUCCESSFULLY_REGISTERED,user.getUsername()));
 
+
   }
 
   /**
    * Function to authorise user.
    * @param user its user to authorise
    * @param session his session to change
+
    * @return response
    */
   @PostMapping(path = "/auth", consumes = "application/json", produces = "application/json")
   public ResponseEntity auth(@RequestBody User user,
                              HttpSession session)  {
+
     ResponseEntity respond;
     if (session.getAttribute("user") != null) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
               new Message(UserStatus.ALREADY_AUTHENTICATED));
     }
+
 
     // Если неверные учетные данные
     user = UserService.check(user.getEmail(), user.getPassword());
@@ -114,6 +126,7 @@ public class UserController {
 
     }
     sessionAuth(session, user);
+
     return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_AUTHED));
   }
 
@@ -129,7 +142,9 @@ public class UserController {
                                HttpSession session, HttpServletResponse response) {
 
     if (session.getAttribute("user") == null) {
+
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new Message(UserStatus.ACCESS_ERROR));
+
     }
     session.setAttribute("user", null);
     session.invalidate();
@@ -150,6 +165,7 @@ public class UserController {
   public ResponseEntity rating(@PathVariable("page") Integer page,
                                HttpServletRequest request, HttpSession session,
                                HttpServletResponse response) {
+
     if (page == null) {
       page = 1;
     }
@@ -171,6 +187,7 @@ public class UserController {
     } catch (DataAccessException exc) {
       return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
               new Message("Что-то на сервере."));
+
     }
 
     return ResponseEntity.status(HttpStatus.OK).body(resp);
@@ -186,7 +203,9 @@ public class UserController {
   @GetMapping(path = "/info")
   public ResponseEntity info(HttpSession session) {
     if (session.getAttribute("user") == null) {
+
       session.invalidate();
+
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
               new Message(UserStatus.ACCESS_ERROR));
     }
@@ -205,6 +224,7 @@ public class UserController {
 
     result.setPassword("You are not gonna steal data this way, you little piece of shit.");
 
+
     return ResponseEntity.status(HttpStatus.OK).body(new Message(result));
   }
 
@@ -218,16 +238,19 @@ public class UserController {
   public ResponseEntity change(@RequestBody User user, HttpSession session) {
 
     if (session.getAttribute("user") == null) {
+
       session.invalidate();
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new Message(UserStatus.ACCESS_ERROR));
     }
     user.setUsername(session.getAttribute("user").toString());
     UserService.changeUser(user);
 
+
     return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_CHANGED));
   }
 
   private static void sessionAuth(HttpSession session, User user) {
+
     session.setAttribute("user", user.getUsername());
     session.setMaxInactiveInterval(30 * 60);
   }
@@ -264,6 +287,7 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_AUTHED));
 
   }
+
 
 
 }
