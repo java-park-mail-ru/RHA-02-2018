@@ -61,13 +61,12 @@ public class UserController {
    * User creation function.
    * @param user user to create
    * @param session session to input user
-   * @param response response to answer
    * @return returns response
    */
 
   @PostMapping(path = "/create", consumes = "application/json", produces = "application/json")
   public ResponseEntity create(HttpSession session,
-                               @RequestBody User user, HttpServletResponse response) {
+                               @RequestBody User user) {
     // Аутентифицированный пользователь не может зарегистрироваться
 
     if (session.getAttribute("user") != null) {
@@ -84,7 +83,7 @@ public class UserController {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message(UserStatus.WRONG_CREDENTIALS));
     }
     sessionAuth(session, user);
-    return ResponseEntity.status(HttpStatus.OK).body(
+    return ResponseEntity.status(HttpStatus.CREATED).body(
             new Message(UserStatus.SUCCESSFULLY_REGISTERED,user.getUsername()));
 
   }
@@ -93,12 +92,11 @@ public class UserController {
    * Function to authorise user.
    * @param user its user to authorise
    * @param session his session to change
-   * @param response our response to user
    * @return response
    */
   @PostMapping(path = "/auth", consumes = "application/json", produces = "application/json")
   public ResponseEntity auth(@RequestBody User user,
-                             HttpSession session, HttpServletResponse response)  {
+                             HttpSession session)  {
     ResponseEntity respond;
     // Мы не можем дважды аутентицифироваться
     if (session.getAttribute("user") != null) {

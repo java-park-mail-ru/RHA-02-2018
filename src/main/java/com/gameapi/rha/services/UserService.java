@@ -49,9 +49,10 @@ public class UserService {
    * @param user is user to create
    */
 
-  public static void createUser(User user) {
+  public static User createUser(User user) {
     String SQL = "INSERT INTO \"users\" (username,rating,email,password) VALUES (? ,? ,? ,?);";
     jdbc.update(SQL,user.getUsername(),user.getRating(),user.getEmail(),user.getPassword());
+    return user;
   }
 
   //авторизация по мылу ииии по нику
@@ -63,7 +64,7 @@ public class UserService {
   */
   public static List<Map<String,Integer>> rating(Integer page, String user) {
     String SQL = "(SELECT username,rating FROM \"users\""
-            + "ORDER BY rating "
+            + "ORDER BY rating DESC "
             + "OFFSET ? Rows LIMIT ?)"
             + "UNION (SELECT username,rating FROM \"users\" WHERE username=?::citext);";
 
@@ -74,6 +75,18 @@ public class UserService {
     res.add(map);
     return (res);
   }
+
+//  public static Map<String,Object> ratingM(Integer page, String user) {
+//    String SQL = "(SELECT username,rating FROM \"users\""
+//            + "ORDER BY rating "
+//            + "OFFSET ? Rows LIMIT ?)"
+//            + "UNION (SELECT username,rating FROM \"users\" WHERE username=?::citext);";
+//
+//    Map<String, Object> res = jdbc.queryForMap(SQL, page * 2, 2, user);
+//    SQL = "SELECT count(*) FROM users;";
+//    res.put("pages", jdbc.queryForObject(SQL, Integer.class)/2);
+//    return (res);
+//  }
 
   public static @Nullable User check(String email, String password)  {
     final String SQL = "SELECT * FROM \"users\" WHERE email=?;";
