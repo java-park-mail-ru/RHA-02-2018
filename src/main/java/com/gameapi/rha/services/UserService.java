@@ -4,24 +4,32 @@ import com.gameapi.rha.models.Rating;
 import com.gameapi.rha.models.User;
 
 
+import java.awt.*;
+import java.awt.image.RenderedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import java.util.*;
+import java.util.List;
 
 //import com.gameapi.rha.models.User;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.FileUrlResource;
+import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.lang.NonNullApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-
-
-
+import javax.imageio.ImageIO;
 
 
 /**
@@ -31,7 +39,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class UserService {
-
+  public static final String PATH_AVATARS_FOLDER = Paths.get("uploads")
+          .toAbsolutePath().toString() + '/';
   private static JdbcTemplate jdbc;
   private static RatingMapper RATING_MAPPER = new RatingMapper();
   private static UserMapper USER_MAPPER = new UserMapper();
@@ -139,8 +148,22 @@ public class UserService {
     jdbc.update(SQL,lst.toArray());
   }
 
+  public static void store(MultipartFile file, String user) throws IOException {
+   File tosave= new File(PATH_AVATARS_FOLDER+user+"a.jpg");
+    file.transferTo(tosave);
+    String SQL = "UPDATE \"users\" SET avatar=? WHERE username=(?)::citext;";
+    jdbc.update(SQL,user+"a.jpg",user);
+  }
 
-
+  public static Resource loadAvatar(String user) {
+    String image=jdbc.queryForObject(
+            "SELECT avatar FROM \"users\" " +
+                    "WHERE username = ? LIMIT 1;",
+            String.class, user
+    );
+    Resource avatar=new FileSystemResource(PATH_AVATARS_FOLDER+image);
+    return avatar;
+  }
 
 
   public static final class RatingMapper implements RowMapper<Map<String,Integer>> {

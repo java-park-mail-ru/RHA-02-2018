@@ -10,7 +10,8 @@ import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
 
 
-
+import java.awt.image.RenderedImage;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -20,19 +21,16 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 
+import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.session.jdbc.config.annotation.web.http.EnableJdbcHttpSession;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 
 
 @RestController
@@ -288,4 +286,41 @@ public class UserController {
 
 
 
-}
+
+  @PostMapping("/chava")
+  public ResponseEntity changePass(@RequestParam("image") MultipartFile file,
+                                   HttpSession session) {
+      if (session.getAttribute("user") == null) {
+          session.invalidate();
+          return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                  new Message(UserStatus.NOT_FOUND));
+      }
+      try {
+          UserService.store(file,session.getAttribute("user").toString());
+      } catch (NullPointerException ignored) {
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new Message(UserStatus.SUCCESSFULLY_AUTHED));
+      } catch (IOException except) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message(UserStatus.SUCCESSFULLY_AUTHED));
+      }
+      return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_AUTHED));
+
+  }
+
+    @GetMapping("/gava")
+    public ResponseEntity changePass(HttpSession session) {
+        if (session.getAttribute("user") == null) {
+            session.invalidate();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                    new Message(UserStatus.NOT_FOUND));
+        }
+        Resource file;
+        try {
+             file = UserService.loadAvatar(session.getAttribute("user").toString());
+        } catch (NullPointerException ignored) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new Message(UserStatus.SUCCESSFULLY_AUTHED));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(file);
+
+    }
+
+  }
