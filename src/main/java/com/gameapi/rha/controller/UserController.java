@@ -319,8 +319,12 @@ public class UserController {
         } catch (NullPointerException ignored) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new Message(UserStatus.SUCCESSFULLY_AUTHED));
         }
-        return ResponseEntity.status(HttpStatus.OK).body(file);
-
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(file.getFile());
+        } catch (IOException exc)
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(UserStatus.UNEXPECTED_ERROR);
+        }
     }
 
   }

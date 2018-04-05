@@ -71,7 +71,10 @@
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session-jdbc</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.jetbrains</groupId>
@@ -105,6 +108,10 @@
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>4.0.3</version>
+                <configuration>
+                    <user>chapay</user>
+                    <password>4rfgt5</password>
+                </configuration>
             </plugin>
         </plugins>
     </build>
