@@ -97,10 +97,10 @@ public class UserControllerTest {
     @Test
     @DisplayName("Wrong user logout")
     void logoutW() {
-        final HttpEntity<User> requestEntity = new HttpEntity<>(user3, REQUEST_HEADERS);
-        final ResponseEntity response = restTemplate.postForEntity("/users/logout", requestEntity, ResponseEntity.class);
+        final HttpEntity requestEntity = new HttpEntity<>(REQUEST_HEADERS);
+        final ResponseEntity<String> response = restTemplate.postForEntity("/users/logout", requestEntity, String.class);
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
 
@@ -133,7 +133,7 @@ public class UserControllerTest {
         final ResponseEntity<String> response = restTemplate.postForEntity(
                 "/users/change",requestEntity,String.class);
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
 
     }
 
@@ -144,7 +144,7 @@ public class UserControllerTest {
         final HttpEntity<User> requestEntity = new HttpEntity<>(user3, REQUEST_HEADERS);
         final ResponseEntity<String> response = restTemplate.postForEntity("/users/chpwd", requestEntity, String.class);
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
 
 
 

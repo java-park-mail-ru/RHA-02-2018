@@ -82,7 +82,7 @@ public class UserController {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
               new Message(UserStatus.ALREADY_AUTHENTICATED,user.getUsername()));
     }
-    if(user.getPassword()==null) {
+    if(user.getPassword() == null ) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message(UserStatus.WRONG_CREDENTIALS));
     }
 
@@ -132,18 +132,16 @@ public class UserController {
 
   /**
    * Function to logout user.
-   * @param request actually request
    * @param session session to logout
-   * @param response response, that logs out
+
    * @return logout
    */
   @PostMapping(path = "/logout")
-  public ResponseEntity logout(HttpServletRequest request,
-                               HttpSession session, HttpServletResponse response) {
+  public ResponseEntity logout(HttpSession session) {
 
     if (session.getAttribute("user") == null) {
 
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new Message(UserStatus.ACCESS_ERROR));
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
 
     }
     session.setAttribute("user", null);
@@ -240,7 +238,7 @@ public class UserController {
     if (session.getAttribute("user") == null) {
 
       session.invalidate();
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new Message(UserStatus.ACCESS_ERROR));
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
     }
     user.setUsername(session.getAttribute("user").toString());
     UserService.changeUser(user);
@@ -263,7 +261,7 @@ public class UserController {
     // Мы не можем дважды аутентицифироваться
     if (session.getAttribute("user") == null) {
       session.invalidate();
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
                new Message(UserStatus.NOT_FOUND));
     }
     String old = json.get("oldp");
