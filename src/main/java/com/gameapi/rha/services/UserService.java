@@ -68,21 +68,24 @@ public class UserService {
   */
 
 
-  public static List<Map<String,Integer>> rating(Integer page, String user) {
+  public static List<List<Map<String, Integer>>> rating(Integer page, String user) {
     String SQL = "SELECT username,rating FROM \"users\""
             + "ORDER BY rating DESC "
             + "OFFSET ? Rows LIMIT ?;";
 
-    List<Map<String, Integer>> res = jdbc.query(SQL, RATING_MAPPER, page * 2, 2);
-    if (res.isEmpty()) {
+    List<List<Map<String, Integer>>> res = new LinkedList<>();
+    res.add(jdbc.query(SQL, RATING_MAPPER, page * 2, 2));
+    if (res.get(0).isEmpty()) {
       return null;
     }
     SQL = "SELECT username,rating FROM \"users\" WHERE username=?::citext LIMIT 1;";
-    res.addAll(jdbc.query(SQL, RATING_MAPPER, user));
+    res.add(jdbc.query(SQL, RATING_MAPPER, user));
     SQL = "SELECT count(*) FROM users;";
     final Map<String, Integer> map = new HashMap<>();
     map.put("pages", jdbc.queryForObject(SQL, Integer.class));
-    res.add(map);
+    List<Map<String,Integer>> lst=new LinkedList<>();
+    lst.add(map);
+    res.add(lst);
     return (res);
   }
 

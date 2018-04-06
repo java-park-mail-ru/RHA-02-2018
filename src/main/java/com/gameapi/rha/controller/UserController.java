@@ -172,7 +172,7 @@ public class UserController {
     page--;
 
 
-    List<Map<String,Integer>> resp;
+    List<List<Map<String, Integer>>> resp;
     // Мы не можем получить статистику, не войдя
 
     if (session.getAttribute("user") == null) {
