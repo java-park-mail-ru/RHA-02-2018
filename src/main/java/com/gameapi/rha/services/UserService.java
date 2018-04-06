@@ -1,11 +1,7 @@
 package com.gameapi.rha.services;
 
-import com.gameapi.rha.models.Rating;
 import com.gameapi.rha.models.User;
 
-
-import java.awt.*;
-import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -20,16 +16,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.FileUrlResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.lang.NonNullApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
 
 
 /**
@@ -54,11 +47,6 @@ public class UserService {
   }
 
   /**
-  * rating table.
-  */
-  public static Map<String, Integer> RatingTable = new HashMap<>();
-
-  /**
 
    * Insertion into DB with SQL.
    * @param user is user to create
@@ -81,12 +69,16 @@ public class UserService {
 
 
   public static List<Map<String,Integer>> rating(Integer page, String user) {
-    String SQL = "(SELECT username,rating FROM \"users\""
+    String SQL = "SELECT username,rating FROM \"users\""
             + "ORDER BY rating DESC "
-            + "OFFSET ? Rows LIMIT ?)"
-            + "UNION (SELECT username,rating FROM \"users\" WHERE username=?::citext);";
+            + "OFFSET ? Rows LIMIT ?;";
 
-    List<Map<String, Integer>> res = jdbc.query(SQL, RATING_MAPPER, page * 2, 2, user);
+    List<Map<String, Integer>> res = jdbc.query(SQL, RATING_MAPPER, page * 2, 2);
+    if (res.isEmpty()) {
+      return null;
+    }
+    SQL = "SELECT username,rating FROM \"users\" WHERE username=?::citext LIMIT 1;";
+    res.addAll(jdbc.query(SQL, RATING_MAPPER, user));
     SQL = "SELECT count(*) FROM users;";
     final Map<String, Integer> map = new HashMap<>();
     map.put("pages", jdbc.queryForObject(SQL, Integer.class));
@@ -106,6 +98,12 @@ public class UserService {
 //    return (res);
 //  }
 
+  /**
+   * Authorisation check.
+   * @param email user mail
+   * @param password password
+   * @return user
+   */
   public static @Nullable User check(String email, String password)  {
     final String SQL = "SELECT * FROM \"users\" WHERE email=?;";
     final User authed = jdbc.queryForObject(SQL,USER_MAPPER,email);
@@ -115,6 +113,7 @@ public class UserService {
       return null;
     }
   }
+
 
   public static User userInfo(String nick) {
     String SQL = "SELECT * FROM \"users\" WHERE username=?;";
@@ -126,7 +125,7 @@ public class UserService {
    * Change user is function to change current user in session.
    * @param user is new user to change
    */
-  public static void changeUser( User user) {
+  public static void changeUser (User user) {
 
     final List<Object> lst = new ArrayList<>();
     String SQL = "UPDATE \"users\" SET";
@@ -148,13 +147,25 @@ public class UserService {
     jdbc.update(SQL,lst.toArray());
   }
 
+  /**
+   * Function to save image on PC and db
+   * @param file image to save
+   * @param user user to avatar
+   * @throws IOException if there is error(Handled in controller)
+   */
   public static void store(MultipartFile file, String user) throws IOException {
-   File tosave= new File(PATH_AVATARS_FOLDER+user+"a.jpg");
+   File tosave = new File(PATH_AVATARS_FOLDER + user + "a.jpg");
     file.transferTo(tosave);
     String SQL = "UPDATE \"users\" SET avatar=? WHERE username=(?)::citext;";
     jdbc.update(SQL,user+"a.jpg",user);
   }
 
+
+  /**
+   * load
+   * @param user
+   * @return
+   */
   public static Resource loadAvatar(String user) {
     String image=jdbc.queryForObject(
             "SELECT avatar FROM \"users\" " +

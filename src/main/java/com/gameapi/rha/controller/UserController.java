@@ -1,28 +1,22 @@
 package com.gameapi.rha.controller;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.gameapi.rha.models.Message;
-import com.gameapi.rha.models.Rating;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
 
-
-import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -80,17 +74,20 @@ public class UserController {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
               new Message(UserStatus.ALREADY_AUTHENTICATED,user.getUsername()));
     }
-    if(user.getPassword() == null ) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message(UserStatus.WRONG_CREDENTIALS));
+    if (user.getPassword() == null || user.getEmail() == null || user.getUsername()==null) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+              new Message(UserStatus.WRONG_CREDENTIALS));
     }
 
     user.saltHash();
     try {
       UserService.createUser(user);
     } catch (DuplicateKeyException except) {
-      return ResponseEntity.status(HttpStatus.CONFLICT).body(new Message(UserStatus.NOT_UNIQUE_USERNAME));
+      return ResponseEntity.status(HttpStatus.CONFLICT).body(
+              new Message(UserStatus.NOT_UNIQUE_USERNAME));
     } catch (NullPointerException except) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message(UserStatus.WRONG_CREDENTIALS));
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+              new Message(UserStatus.WRONG_CREDENTIALS));
     }
     sessionAuth(session, user);
     return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -118,10 +115,17 @@ public class UserController {
 
 
     // Если неверные учетные данные
-    user = UserService.check(user.getEmail(), user.getPassword());
-    if (user == null) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message(UserStatus.WRONG_CREDENTIALS));
+      try {
 
+
+          user = UserService.check(user.getEmail(), user.getPassword());
+      } catch (IncorrectResultSizeDataAccessException Exc){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+              new Message(UserStatus.WRONG_CREDENTIALS));
+
+    } catch (Exception exc) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new Message(UserStatus.UNEXPECTED_ERROR));
     }
     sessionAuth(session, user);
 
@@ -172,18 +176,26 @@ public class UserController {
     // Мы не можем получить статистику, не войдя
 
     if (session.getAttribute("user") == null) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new Message(UserStatus.ACCESS_ERROR));
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+              new Message(UserStatus.ACCESS_ERROR));
     }
 
     try {
       resp = UserService.rating(page,session.getAttribute("user").toString());
-    } catch (IncorrectResultSizeDataAccessException exc) {
-
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Message(UserStatus.NOT_FOUND));
-    } catch (DataAccessException exc) {
+    }    catch (DataAccessException exc) {
       return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
               new Message("Что-то на сервере."));
 
+    }
+
+// catch (DataIntegrityViolationException exc) {
+//        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+//                new Message("Перебрал ты страниц... Мдааа..."));
+//
+//    }
+    if (resp == null) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+               new Message("Перебрал ты страниц... Мдааа..."));
     }
 
     return ResponseEntity.status(HttpStatus.OK).body(resp);
@@ -238,6 +250,10 @@ public class UserController {
       session.invalidate();
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
     }
+    if( user.getEmail() == null) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message(UserStatus.WRONG_CREDENTIALS));
+
+    }
     user.setUsername(session.getAttribute("user").toString());
     UserService.changeUser(user);
 
@@ -251,7 +267,12 @@ public class UserController {
     session.setMaxInactiveInterval(30 * 60);
   }
 
-
+  /**
+   * Function to change password.
+   * @param json passwords(old and new)
+   * @param session (session to check)
+   * @return response
+   */
   @PostMapping(path = "/chpwd", consumes = "application/json", produces = "application/json")
   public ResponseEntity changePass(@RequestBody Map<String, String> json,
                              HttpSession session)  {
@@ -262,13 +283,13 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
                new Message(UserStatus.NOT_FOUND));
     }
-    String old = json.get("oldp");
-    String newp = json.get("newp");
+    final String old = json.get("oldp");
+    final String newp = json.get("newp");
     // Если неверные учетные данные
-    User user;
+    final User user;
     try {
          user = UserService.userInfo(session.getAttribute("user").toString());
-    } catch (DataAccessException Except) {
+    } catch (DataAccessException except) {
         session.invalidate();
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
                 new Message(UserStatus.WRONG_CREDENTIALS));
@@ -280,15 +301,19 @@ public class UserController {
     user.setPassword(newp);
 
     UserService.changeUser(user);
-    return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_AUTHED));
+    return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_CHANGED));
 
   }
 
 
-
-
+  /**
+   * Function to change avatar.
+   * @param file file of avatar to change
+   * @param session session to use
+   * @return response
+   */
   @PostMapping("/chava")
-  public ResponseEntity changePass(@RequestParam("image") MultipartFile file,
+  public ResponseEntity changeAva(@RequestParam("image") MultipartFile file,
                                    HttpSession session) {
       if (session.getAttribute("user") == null) {
           session.invalidate();
@@ -298,32 +323,41 @@ public class UserController {
       try {
           UserService.store(file,session.getAttribute("user").toString());
       } catch (NullPointerException ignored) {
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new Message(UserStatus.SUCCESSFULLY_AUTHED));
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+                new Message(UserStatus.SUCCESSFULLY_AUTHED));
       } catch (IOException except) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message(UserStatus.SUCCESSFULLY_AUTHED));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new Message(UserStatus.SUCCESSFULLY_AUTHED));
       }
-      return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_AUTHED));
+      return ResponseEntity.status(HttpStatus.OK).body(
+              new Message(UserStatus.SUCCESSFULLY_AUTHED));
 
   }
 
+  /**
+   * Function to get avatar.
+   * @param session session to check
+   * @return response(image)
+   */
     @GetMapping("/gava")
-    public ResponseEntity changePass(HttpSession session) {
+    public ResponseEntity getAva(HttpSession session) {
         if (session.getAttribute("user") == null) {
             session.invalidate();
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
                     new Message(UserStatus.NOT_FOUND));
         }
-        Resource file;
+        final Resource file;
         try {
              file = UserService.loadAvatar(session.getAttribute("user").toString());
         } catch (NullPointerException ignored) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new Message(UserStatus.SUCCESSFULLY_AUTHED));
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+                    new Message(UserStatus.SUCCESSFULLY_AUTHED));
         }
         try {
             return ResponseEntity.status(HttpStatus.OK).body(file.getFile());
-        } catch (IOException exc)
-        {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(UserStatus.UNEXPECTED_ERROR);
+        } catch (IOException exc) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    UserStatus.UNEXPECTED_ERROR);
         }
     }
 
