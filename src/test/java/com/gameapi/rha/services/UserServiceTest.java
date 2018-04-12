@@ -49,15 +49,15 @@ class UserServiceTest {
     @Rule
     public ExpectedException expected = ExpectedException.none();
 
-//    @org.junit.jupiter.api.BeforeEach
-//    void setUp() {
-//        System.out.println("Test for UserService started.");}
-//
-//    @org.junit.jupiter.api.AfterEach
-//    void tearDown() {
-//        user1=null;
-//        System.out.println("Test for UserService Finished.");
-//    }
+    @org.junit.jupiter.api.BeforeEach
+    void setUp() {
+        System.out.println("Test for UserService started.");}
+
+    @org.junit.jupiter.api.AfterEach
+    void tearDown() {
+        user1=null;
+        System.out.println("Test for UserService Finished.");
+    }
 
     @DisplayName("Simple user creation")
     @Test
