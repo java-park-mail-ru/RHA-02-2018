@@ -7,7 +7,7 @@ addons:
 services:
 - postgresql
 before_script:
-  - psql -c "CREATE USER chapay SUPERUSER with password '4rfgt5';" -U postgres
+  - psql -c "CREATE USER chapay SUPERUSER;" -U postgres
   - psql -c " alter user chapay createdb;" -U postgres
   - psql -c "create database gamedb;" -U postgres
   - psql -c "grant all on database gamedb to chapay;" -U postgres
