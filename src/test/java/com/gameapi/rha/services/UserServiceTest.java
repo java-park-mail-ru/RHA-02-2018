@@ -124,28 +124,23 @@ class UserServiceTest {
         });
     }
 
-//    @Test
-//    @DisplayName("Simple user check")
-//    void Rightcheck() {
-//        User user=new User("Kolchak", Password.getSaltedHash("BlackBaron"),
-//                "Samoderzhec@WiteGuard.net",1905);
-//
-//        UserService.createUser( user );
-//        assertEquals(user.getUsername(),someService.check(user.getEmail(),user.getPassword()).getUsername());
-//
-//    }
+    @Test
+    @DisplayName("Simple user check")
+    void Rightcheck() {
+        User user=new User("Kolchak", User.passwordEncoder().encode("BlackBaron"),
+                "Samoderzhec@WiteGuard.net",1905);
 
-//    @Test
-//    @DisplayName("Wrong user check")
-//    void Wrongcheck() {
-//        assertThrows(EmptyResultDataAccessException.class,()->{someService.check(user1.getEmail(),user1.getPassword());});
-//        UserService.createUser( user1 );
-//        assertThrows(EmptyResultDataAccessException.class,()->{someService.check(null,user1.getPassword());});
-//        assertThrows(IllegalStateException.class,()->{someService.check(user1.getEmail(),null);});
-//        assertThrows(EmptyResultDataAccessException.class,()->{someService.check(null,null);});
-//        assertThrows(IllegalStateException.class,()->{someService.check(user1.getEmail(),"BlaBla");});
-//
-//    }
+        UserService.createUser( user );
+        assertEquals(user.getUsername(),someService.check(user.getEmail(),"BlackBaron").getUsername());
+
+    }
+
+    @Test
+    @DisplayName("Wrong user check")
+    void Wrongcheck() {
+        assertThrows(EmptyResultDataAccessException.class,()->{someService.check(user1.getEmail(),user1.getPassword());});
+        UserService.createUser( user1 );
+    }
 
     @Test
     @DisplayName("Simple user info")
@@ -171,7 +166,7 @@ class UserServiceTest {
         assertEquals(user1.getPassword(),someService.userInfo(user1.getUsername()).getPassword());
 
     }
-//
+
 //    @Test
 //    @DisplayName("Wrong user changes")
 //    void changeUserW() {

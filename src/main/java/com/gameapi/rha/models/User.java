@@ -14,7 +14,7 @@ public class User {
   private String email;
   private Integer rating;
   @Bean
-  public PasswordEncoder passwordEncoder() {
+  public static PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
 
@@ -64,7 +64,7 @@ public class User {
 
 
   public void setPassword(String password) {
-    this.password = passwordEncoder().encode(password);
+    this.password = password;
   }
 
   public Boolean checkPassword(String pass) {
