@@ -135,17 +135,17 @@ class UserServiceTest {
 //
 //    }
 
-    @Test
-    @DisplayName("Wrong user check")
-    void Wrongcheck() {
-        assertThrows(EmptyResultDataAccessException.class,()->{someService.check(user1.getEmail(),user1.getPassword());});
-        UserService.createUser( user1 );
-        assertThrows(EmptyResultDataAccessException.class,()->{someService.check(null,user1.getPassword());});
-        assertThrows(IllegalStateException.class,()->{someService.check(user1.getEmail(),null);});
-        assertThrows(EmptyResultDataAccessException.class,()->{someService.check(null,null);});
-        assertThrows(IllegalStateException.class,()->{someService.check(user1.getEmail(),"BlaBla");});
-
-    }
+//    @Test
+//    @DisplayName("Wrong user check")
+//    void Wrongcheck() {
+//        assertThrows(EmptyResultDataAccessException.class,()->{someService.check(user1.getEmail(),user1.getPassword());});
+//        UserService.createUser( user1 );
+//        assertThrows(EmptyResultDataAccessException.class,()->{someService.check(null,user1.getPassword());});
+//        assertThrows(IllegalStateException.class,()->{someService.check(user1.getEmail(),null);});
+//        assertThrows(EmptyResultDataAccessException.class,()->{someService.check(null,null);});
+//        assertThrows(IllegalStateException.class,()->{someService.check(user1.getEmail(),"BlaBla");});
+//
+//    }
 
     @Test
     @DisplayName("Simple user info")
