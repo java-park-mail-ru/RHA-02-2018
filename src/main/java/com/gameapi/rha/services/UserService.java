@@ -89,17 +89,6 @@ public class UserService {
     return (res);
   }
 
-//  public static Map<String,Object> ratingM(Integer page, String user) {
-//    String SQL = "(SELECT username,rating FROM \"users\""
-//            + "ORDER BY rating "
-//            + "OFFSET ? Rows LIMIT ?)"
-//            + "UNION (SELECT username,rating FROM \"users\" WHERE username=?::citext);";
-//
-//    Map<String, Object> res = jdbc.queryForMap(SQL, page * 2, 2, user);
-//    SQL = "SELECT count(*) FROM users;";
-//    res.put("pages", jdbc.queryForObject(SQL, Integer.class)/2);
-//    return (res);
-//  }
 
   /**
    * Authorisation check.

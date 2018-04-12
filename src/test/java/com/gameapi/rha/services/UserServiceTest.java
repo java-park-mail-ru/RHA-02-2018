@@ -9,9 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataAccessException;
@@ -20,7 +18,6 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -138,17 +135,17 @@ class UserServiceTest {
 //
 //    }
 
-    @Test
-    @DisplayName("Wrong user check")
-    void Wrongcheck() {
-        assertThrows(EmptyResultDataAccessException.class,()->{someService.check(user1.getEmail(),user1.getPassword());});
-        UserService.createUser( user1 );
-        assertThrows(EmptyResultDataAccessException.class,()->{someService.check(null,user1.getPassword());});
-        assertThrows(IllegalStateException.class,()->{someService.check(user1.getEmail(),null);});
-        assertThrows(EmptyResultDataAccessException.class,()->{someService.check(null,null);});
-        assertThrows(IllegalStateException.class,()->{someService.check(user1.getEmail(),"BlaBla");});
-
-    }
+//    @Test
+//    @DisplayName("Wrong user check")
+//    void Wrongcheck() {
+//        assertThrows(EmptyResultDataAccessException.class,()->{someService.check(user1.getEmail(),user1.getPassword());});
+//        UserService.createUser( user1 );
+//        assertThrows(EmptyResultDataAccessException.class,()->{someService.check(null,user1.getPassword());});
+//        assertThrows(IllegalStateException.class,()->{someService.check(user1.getEmail(),null);});
+//        assertThrows(EmptyResultDataAccessException.class,()->{someService.check(null,null);});
+//        assertThrows(IllegalStateException.class,()->{someService.check(user1.getEmail(),"BlaBla");});
+//
+//    }
 
     @Test
     @DisplayName("Simple user info")

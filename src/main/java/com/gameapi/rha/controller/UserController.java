@@ -116,16 +116,20 @@ public class UserController {
 
     // Если неверные учетные данные
       try {
-
-
           user = UserService.check(user.getEmail(), user.getPassword());
-      } catch (IncorrectResultSizeDataAccessException Exc){
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-              new Message(UserStatus.WRONG_CREDENTIALS));
-
-    } catch (Exception exc) {
+      }
+// catch (IncorrectResultSizeDataAccessException Exc){
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+//              new Message(UserStatus.WRONG_CREDENTIALS));
+//
+//    }
+    catch (Exception exc) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 new Message(UserStatus.UNEXPECTED_ERROR));
+    }
+    if (user==null) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+              new Message(UserStatus.WRONG_CREDENTIALS));
     }
     sessionAuth(session, user);
 
