@@ -114,7 +114,11 @@ public class UserController {
     // Если неверные учетные данные
       try {
           user = UserService.check(user.getEmail(), user.getPassword());
+      }catch (DataAccessException exc){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new Message(UserStatus.WRONG_CREDENTIALS));
       }
+
 // catch (IncorrectResultSizeDataAccessException Exc){
 //        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
 //              new Message(UserStatus.WRONG_CREDENTIALS));
