@@ -28,7 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
-@CrossOrigin(origins = {"https://rha-staging-deploy.herokuapp.com", "http://bf-balance.herokuapp.com", "http://localhost:3000"}, allowCredentials = "true")
+@CrossOrigin(origins = {"https://rha-staging-deploy.herokuapp.com", "https://bf-balance.herokuapp.com", "http://localhost:3000"}, allowCredentials = "true")
 @RequestMapping("/users")
 @EnableJdbcHttpSession
 
