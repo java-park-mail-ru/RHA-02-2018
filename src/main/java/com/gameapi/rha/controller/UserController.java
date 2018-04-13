@@ -34,9 +34,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class UserController {
 
-  static ObjectMapper mapper = new ObjectMapper();
-
-
   /**
    * Enum of status messages for response.
 
