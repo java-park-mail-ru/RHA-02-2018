@@ -74,7 +74,7 @@ public class UserService {
             + "OFFSET ? Rows LIMIT ?;";
 
     List<List<Map<String, Integer>>> res = new LinkedList<>();
-    res.add(jdbc.query(SQL, RATING_MAPPER, page * 5, 2,user));
+    res.add(jdbc.query(SQL, RATING_MAPPER, user,page * 5, 5));
     if (res.get(0).isEmpty()) {
       return null;
     }
