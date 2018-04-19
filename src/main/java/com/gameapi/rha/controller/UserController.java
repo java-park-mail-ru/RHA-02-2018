@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -40,6 +41,9 @@ public class UserController {
    * Elements from this enum are used for response.
 
    */
+  @Autowired
+  protected UserService userService;
+
   @SuppressWarnings("CheckStyle")
   private enum UserStatus {
     SUCCESSFULLY_REGISTERED,
@@ -78,7 +82,7 @@ public class UserController {
 
     user.saltHash();
     try {
-      UserService.createUser(user);
+      userService.createUser(user);
     } catch (DuplicateKeyException except) {
       return ResponseEntity.status(HttpStatus.CONFLICT).body(
               new Message(UserStatus.NOT_UNIQUE_USERNAME));
@@ -113,7 +117,7 @@ public class UserController {
 
     // Если неверные учетные данные
       try {
-          user = UserService.check(user.getEmail(), user.getPassword());
+          user = userService.check(user.getEmail(), user.getPassword());
       }catch (DataAccessException exc){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 new Message(UserStatus.WRONG_CREDENTIALS));
@@ -186,7 +190,7 @@ public class UserController {
     }
 
     try {
-      resp = UserService.rating(page,session.getAttribute("user").toString());
+      resp = userService.rating(page,session.getAttribute("user").toString());
     }    catch (DataAccessException exc) {
       return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
               new Message("Что-то на сервере."));
@@ -225,7 +229,7 @@ public class UserController {
 
     final User result;
     try {
-      result = UserService.userInfo((String) session.getAttribute("user"));
+      result = userService.userInfo((String) session.getAttribute("user"));
     } catch (IncorrectResultSizeDataAccessException exc) {
       // Этого быть не может
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
@@ -260,7 +264,7 @@ public class UserController {
 
     }
     user.setUsername(session.getAttribute("user").toString());
-    UserService.changeUser(user);
+    userService.changeUser(user);
 
 
     return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_CHANGED));
@@ -293,7 +297,7 @@ public class UserController {
     // Если неверные учетные данные
     final User user;
     try {
-         user = UserService.userInfo(session.getAttribute("user").toString());
+         user = userService.userInfo(session.getAttribute("user").toString());
     } catch (DataAccessException except) {
         session.invalidate();
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
@@ -305,7 +309,7 @@ public class UserController {
     }
     user.setPassword(newp);
 
-    UserService.changeUser(user);
+    userService.changeUser(user);
     return ResponseEntity.status(HttpStatus.OK).body(new Message(UserStatus.SUCCESSFULLY_CHANGED));
 
   }
@@ -326,7 +330,7 @@ public class UserController {
                   new Message(UserStatus.NOT_FOUND));
       }
       try {
-          UserService.store(file,session.getAttribute("user").toString());
+        userService.store(file,session.getAttribute("user").toString());
       } catch (NullPointerException ignored) {
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
                 new Message(UserStatus.SUCCESSFULLY_AUTHED));
@@ -353,7 +357,7 @@ public class UserController {
         }
         final Resource file;
         try {
-             file = UserService.loadAvatar(session.getAttribute("user").toString());
+             file = userService.loadAvatar(session.getAttribute("user").toString());
         } catch (NullPointerException ignored) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
                     new Message(UserStatus.SUCCESSFULLY_AUTHED));

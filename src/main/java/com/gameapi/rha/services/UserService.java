@@ -52,7 +52,7 @@ public class UserService {
    * @param user is user to create
    */
 
-  public static User createUser(User user) {
+  public User createUser(User user) {
     String SQL = "INSERT INTO \"users\" (username,rating,email,password) VALUES (? ,? ,? ,?);";
     jdbc.update(SQL,user.getUsername(),user.getRating(),user.getEmail(),user.getPassword());
     return user;
@@ -68,7 +68,7 @@ public class UserService {
   */
 
 
-  public static List<List<Map<String, Integer>>> rating(Integer page, String user) {
+  public List<List<Map<String, Integer>>> rating(Integer page, String user) {
     String SQL = "SELECT username,rating FROM \"users\""
             + "ORDER BY rating DESC "
             + "OFFSET ? Rows LIMIT ?;";
@@ -96,7 +96,7 @@ public class UserService {
    * @param password password
    * @return user
    */
-  public static @Nullable User check(String email, String password)  {
+  public @Nullable User check(String email, String password)  {
     final String SQL = "SELECT * FROM \"users\" WHERE email=?;";
     final User authed = jdbc.queryForObject(SQL,USER_MAPPER,email);
     if (authed.checkPassword(password)) {
@@ -107,7 +107,7 @@ public class UserService {
   }
 
 
-  public static User userInfo(String nick) {
+  public User userInfo(String nick) {
     String SQL = "SELECT * FROM \"users\" WHERE username=?;";
     return jdbc.queryForObject(SQL,USER_MAPPER,nick);
   }
@@ -117,7 +117,7 @@ public class UserService {
    * Change user is function to change current user in session.
    * @param user is new user to change
    */
-  public static void changeUser (User user) {
+  public void changeUser (User user) {
 
     final List<Object> lst = new ArrayList<>();
     String SQL = "UPDATE \"users\" SET";
@@ -145,7 +145,7 @@ public class UserService {
    * @param user user to avatar
    * @throws IOException if there is error(Handled in controller)
    */
-  public static void store(MultipartFile file, String user) throws IOException {
+  public void store(MultipartFile file, String user) throws IOException {
    File tosave = new File(PATH_AVATARS_FOLDER + user + "a.jpg");
     file.transferTo(tosave);
     String SQL = "UPDATE \"users\" SET avatar=? WHERE username=(?)::citext;";
@@ -158,13 +158,13 @@ public class UserService {
    * @param user
    * @return
    */
-  public static Resource loadAvatar(String user) {
-    String image=jdbc.queryForObject(
-            "SELECT avatar FROM \"users\" " +
-                    "WHERE username = ? LIMIT 1;",
+  public Resource loadAvatar(String user) {
+    String image = jdbc.queryForObject(
+            "SELECT avatar FROM \"users\" "
+                    + "WHERE username = ? LIMIT 1;",
             String.class, user
     );
-    Resource avatar=new FileSystemResource(PATH_AVATARS_FOLDER+image);
+    Resource avatar = new FileSystemResource(PATH_AVATARS_FOLDER+image);
     return avatar;
   }
 

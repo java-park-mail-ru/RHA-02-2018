@@ -119,8 +119,8 @@ class UserServiceTest {
     void getNoRating() {
         assertThrows(DataIntegrityViolationException.class,
                 ()->{
-            UserService.createUser( user2 );
-            UserService.rating(-5,user2.getUsername());
+                    someService.createUser( user2 );
+                    someService.rating(-5,user2.getUsername());
         });
     }
 
@@ -130,7 +130,7 @@ class UserServiceTest {
         User user=new User("Kolchak", User.passwordEncoder().encode("BlackBaron"),
                 "Samoderzhec@WiteGuard.net",1905);
 
-        UserService.createUser( user );
+        someService.createUser( user );
         assertEquals(user.getUsername(),someService.check(user.getEmail(),"BlackBaron").getUsername());
 
     }
@@ -139,7 +139,7 @@ class UserServiceTest {
     @DisplayName("Wrong user check")
     void Wrongcheck() {
         assertThrows(EmptyResultDataAccessException.class,()->{someService.check(user1.getEmail(),user1.getPassword());});
-        UserService.createUser( user1 );
+        someService.createUser( user1 );
     }
 
     @Test

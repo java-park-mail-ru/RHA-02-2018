@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,19 +24,21 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(value = { "integrationtest" })
 @ExtendWith(SpringExtension.class)
 public class UserControllerTest {
 
 //    @MockBean
 //    private JdbcTemplate jdbc;
 
-    @MockBean
+    @MockBean(name="userService")
     private UserService userService;
 
     @Autowired
@@ -56,13 +59,22 @@ public class UserControllerTest {
             "ThisWontwork@Either.nope",null);
 
     UserControllerTest() {
+
         final List<String> origin = Collections.singletonList("http://localhost:5000");
         REQUEST_HEADERS.put(HttpHeaders.ORIGIN, origin);
         final List<String> contentType = Collections.singletonList("application/json");
         REQUEST_HEADERS.put(HttpHeaders.CONTENT_TYPE, contentType);
     }
 
-
+    @Test
+    @DisplayName("User creation")
+    void create() {
+        when(userService.createUser(any(User.class))).thenReturn(user1);
+//        Mockito.when(userService.createUser(user1)).thenReturn(user1);
+        final HttpEntity<User> requestEntity = new HttpEntity<>(user1, REQUEST_HEADERS);
+        final ResponseEntity<String> response = restTemplate.postForEntity("/users/create", requestEntity, String.class);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+    }
 
     @Test
     @DisplayName("User with no password creation")
@@ -81,6 +93,16 @@ public class UserControllerTest {
 
     }
 
+
+    @Test
+    @DisplayName("User auth")
+    void auth() {
+        final HttpEntity<User> requestEntity = new HttpEntity<>(user1, REQUEST_HEADERS);
+        when(userService.check(anyString(),anyString())).thenReturn(user1);
+        final ResponseEntity<String> response = restTemplate.postForEntity("/users/auth", requestEntity, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+    }
 
 
     @Test
