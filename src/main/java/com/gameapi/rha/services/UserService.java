@@ -69,12 +69,12 @@ public class UserService {
 
 
   public List<List<Map<String, Integer>>> rating(Integer page, String user) {
-    String SQL = "SELECT username,rating FROM \"users\""
+    String SQL = "SELECT username,rating FROM \"users\" WHERE username!=? "
             + "ORDER BY rating DESC "
             + "OFFSET ? Rows LIMIT ?;";
 
     List<List<Map<String, Integer>>> res = new LinkedList<>();
-    res.add(jdbc.query(SQL, RATING_MAPPER, page * 2, 2));
+    res.add(jdbc.query(SQL, RATING_MAPPER, page * 5, 2,user));
     if (res.get(0).isEmpty()) {
       return null;
     }
@@ -82,8 +82,8 @@ public class UserService {
     res.add(jdbc.query(SQL, RATING_MAPPER, user));
     SQL = "SELECT count(*) FROM users;";
     final Map<String, Integer> map = new HashMap<>();
-    map.put("pages", jdbc.queryForObject(SQL, Integer.class));
-    List<Map<String,Integer>> lst=new LinkedList<>();
+    map.put("pages", (jdbc.queryForObject(SQL, Integer.class) - 1) / 5);
+    List<Map<String,Integer>> lst = new LinkedList<>();
     lst.add(map);
     res.add(lst);
     return (res);

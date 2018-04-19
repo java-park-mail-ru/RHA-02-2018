@@ -132,7 +132,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 new Message(UserStatus.UNEXPECTED_ERROR));
     }
-    if (user==null) {
+    if (user == null) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
               new Message(UserStatus.WRONG_CREDENTIALS));
     }
