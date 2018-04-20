@@ -1,7 +1,6 @@
 package com.gameapi.rha.services;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.gameapi.rha.models.User;
 import org.junit.Rule;
@@ -19,9 +18,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Map;
 
 
 @ExtendWith(SpringExtension.class)
@@ -62,7 +58,7 @@ class UserServiceTest {
     @DisplayName("Simple user creation")
     @Test
     void createSimpleUser() {
-        User createdUser=someService.createUser(user1);
+        final User createdUser = someService.createUser(user1);
         assertEquals(createdUser.getUsername(),user1.getUsername());
         assertEquals(createdUser.getEmail(),user1.getEmail());
         assertEquals(createdUser.getPassword(),user1.getPassword());
@@ -127,9 +123,9 @@ class UserServiceTest {
     @Test
     @DisplayName("Simple user check")
     void Rightcheck() {
-        User user=new User("Kolchak", User.passwordEncoder().encode("BlackBaron"),
+        User user=new User("Kolchak","BlackBaron",
                 "Samoderzhec@WiteGuard.net",1905);
-
+        user.saltHash();
         someService.createUser( user );
         assertEquals(user.getUsername(),someService.check(user.getEmail(),"BlackBaron").getUsername());
 

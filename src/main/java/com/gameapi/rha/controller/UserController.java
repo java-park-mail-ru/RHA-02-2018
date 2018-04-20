@@ -1,7 +1,5 @@
 package com.gameapi.rha.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.gameapi.rha.models.Message;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
@@ -17,7 +15,6 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -86,9 +83,6 @@ public class UserController {
     } catch (DuplicateKeyException except) {
       return ResponseEntity.status(HttpStatus.CONFLICT).body(
               new Message(UserStatus.NOT_UNIQUE_USERNAME));
-    } catch (NullPointerException except) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-              new Message(UserStatus.WRONG_CREDENTIALS));
     }
     sessionAuth(session, user);
     return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -118,7 +112,7 @@ public class UserController {
     // Если неверные учетные данные
       try {
           user = userService.check(user.getEmail(), user.getPassword());
-      }catch (DataAccessException exc){
+      } catch (DataAccessException exc) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 new Message(UserStatus.WRONG_CREDENTIALS));
       }
@@ -128,7 +122,7 @@ public class UserController {
 //              new Message(UserStatus.WRONG_CREDENTIALS));
 //
 //    }
-    catch (Exception exc) {
+    catch (RuntimeException exc) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 new Message(UserStatus.UNEXPECTED_ERROR));
     }
@@ -155,7 +149,6 @@ public class UserController {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
 
     }
-    session.setAttribute("user", null);
     session.invalidate();
     return ResponseEntity.status(HttpStatus.OK).body(
             new Message(UserStatus.SUCCESSFULLY_LOGGED_OUT));
@@ -193,7 +186,7 @@ public class UserController {
       resp = userService.rating(page,session.getAttribute("user").toString());
     }    catch (DataAccessException exc) {
       return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
-              new Message("Что-то на сервере."));
+              new Message(UserStatus.UNEXPECTED_ERROR,"Что-то на сервере."));
 
     }
 
@@ -204,7 +197,7 @@ public class UserController {
 //    }
     if (resp == null) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-               new Message("Перебрал ты страниц... Мдааа..."));
+               new Message(UserStatus.NOT_FOUND,"Перебрал ты страниц... Мдааа..."));
     }
 
     return ResponseEntity.status(HttpStatus.OK).body(resp);
@@ -236,7 +229,7 @@ public class UserController {
               new Message(UserStatus.UNEXPECTED_ERROR));
     } catch (DataAccessException exc) {
       return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
-              new Message("Что-то на сервере."));
+              new Message(UserStatus.UNEXPECTED_ERROR,"Что-то на сервере."));
     }
 
     result.setPassword("You are not gonna steal data this way, you little piece of shit.");
@@ -331,12 +324,9 @@ public class UserController {
       }
       try {
         userService.store(file,session.getAttribute("user").toString());
-      } catch (NullPointerException ignored) {
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
-                new Message(UserStatus.SUCCESSFULLY_AUTHED));
       } catch (IOException except) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new Message(UserStatus.SUCCESSFULLY_AUTHED));
+                new Message(UserStatus.UNEXPECTED_ERROR));
       }
       return ResponseEntity.status(HttpStatus.OK).body(
               new Message(UserStatus.SUCCESSFULLY_AUTHED));
@@ -358,9 +348,9 @@ public class UserController {
         final Resource file;
         try {
              file = userService.loadAvatar(session.getAttribute("user").toString());
-        } catch (NullPointerException ignored) {
+        } catch (DataAccessException except) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
-                    new Message(UserStatus.SUCCESSFULLY_AUTHED));
+                    new Message(UserStatus.UNEXPECTED_ERROR));
         }
         try {
             return ResponseEntity.status(HttpStatus.OK).body(file.getFile());

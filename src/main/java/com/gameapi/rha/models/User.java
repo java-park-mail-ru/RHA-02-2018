@@ -2,6 +2,7 @@ package com.gameapi.rha.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import javafx.application.Application;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,11 +14,7 @@ public class User {
   private String password;
   private String email;
   private Integer rating;
-  @Bean
-  public static PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
-
+  private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
   /**
    * Default constructor for user.
    * @param username username
@@ -45,8 +42,7 @@ public class User {
   public User(){}
 
   public void setUsername(String username) {
-    this.username=username;
-
+    this.username = username;
   }
 
 
@@ -68,11 +64,11 @@ public class User {
   }
 
   public Boolean checkPassword(String pass) {
-    return passwordEncoder().matches(pass, this.password);
+    return passwordEncoder.matches(pass, this.password);
   }
 
   public void saltHash() {
-    this.password = passwordEncoder().encode(password);
+    this.password = passwordEncoder.encode(password);
   }
 
   public String getPassword() {

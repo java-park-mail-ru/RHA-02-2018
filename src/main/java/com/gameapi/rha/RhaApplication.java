@@ -13,4 +13,12 @@ public class RhaApplication {
   public static void main(String[] args) {
     SpringApplication.run(RhaApplication.class, args);
   }
+
+
+  @Bean
+  public static PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 }
+
+
