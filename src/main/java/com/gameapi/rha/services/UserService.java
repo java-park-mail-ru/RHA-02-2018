@@ -158,13 +158,13 @@ public class UserService {
    * @param user
    * @return
    */
-  public Resource loadAvatar(String user) {
+  public File loadAvatar(String user) {
     String image = jdbc.queryForObject(
             "SELECT avatar FROM \"users\" "
                     + "WHERE username = ? LIMIT 1;",
             String.class, user
     );
-    Resource avatar = new FileSystemResource(PATH_AVATARS_FOLDER+image);
+    File avatar = new File(PATH_AVATARS_FOLDER+image);
     return avatar;
   }
 

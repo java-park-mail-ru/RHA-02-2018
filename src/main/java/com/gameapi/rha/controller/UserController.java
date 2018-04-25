@@ -4,6 +4,7 @@ import com.gameapi.rha.models.Message;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -329,7 +330,7 @@ public class UserController {
                 new Message(UserStatus.UNEXPECTED_ERROR));
       }
       return ResponseEntity.status(HttpStatus.OK).body(
-              new Message(UserStatus.SUCCESSFULLY_AUTHED));
+              new Message(UserStatus.SUCCESSFULLY_CHANGED));
 
   }
 
@@ -345,19 +346,14 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
                     new Message(UserStatus.NOT_FOUND));
         }
-        final Resource file;
+        final File file;
         try {
              file = userService.loadAvatar(session.getAttribute("user").toString());
         } catch (DataAccessException except) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
                     new Message(UserStatus.UNEXPECTED_ERROR));
         }
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(file.getFile());
-        } catch (IOException exc) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    UserStatus.UNEXPECTED_ERROR);
-        }
+      return ResponseEntity.status(HttpStatus.OK).body(file);
     }
 
   }
