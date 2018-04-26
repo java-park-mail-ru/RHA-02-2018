@@ -2,19 +2,19 @@ package com.gameapi.rha.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.UUID;
-
+import javafx.application.Application;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 public class User {
-  //@Nullable
+
   private String username;
   private String password;
   private String email;
   private Integer rating;
-  private UUID uID;
-
+  private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
   /**
    * Default constructor for user.
    * @param username username
@@ -23,16 +23,28 @@ public class User {
    */
   @JsonCreator
   public User(
-      @JsonProperty("name") String username,
+
+      @JsonProperty("username") String username,
       @JsonProperty("password") String password,
-      @JsonProperty("email") String email
+      @JsonProperty("email") String email,
+      @JsonProperty("rating") Integer rating
   ) {
     this.username = username;
     this.password = password;
-    this.uID = UUID.randomUUID();
     this.email = email;
-    this.rating = 0;
+    if (rating != null) {
+      this.rating = rating;
+    } else {
+      this.rating = 0;
+    }
   }
+
+  public User(){}
+
+  public void setUsername(String username) {
+    this.username = username;
+  }
+
 
   public String getUsername() {
     return username;
@@ -46,20 +58,17 @@ public class User {
     rating = rate;
   }
 
-  public UUID getuID() {
-    return uID;
-  }
 
   public void setPassword(String password) {
-    this.password = Password.getSaltedHash(password);
+    this.password = password;
   }
 
   public Boolean checkPassword(String pass) {
-    return Password.check(pass, this.password);
+    return passwordEncoder.matches(pass, this.password);
   }
 
   public void saltHash() {
-    this.password = Password.getSaltedHash(this.password);
+    this.password = passwordEncoder.encode(password);
   }
 
   public String getPassword() {
