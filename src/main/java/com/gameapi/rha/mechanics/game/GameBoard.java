@@ -1,4 +1,4 @@
-package com.gameapi.rha.models;
+package com.gameapi.rha.mechanics.game;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
