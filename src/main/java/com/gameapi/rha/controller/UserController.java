@@ -159,15 +159,12 @@ public class UserController {
   /**
    * This function gets paginated rating.
    * @param page page of rating to show
-   * @param request request to respone
    * @param session session to check authentification
-   * @param response response of rating
    * @return rating
    */
   @GetMapping(path = "/rating/{page}")
   public ResponseEntity rating(@PathVariable("page") Integer page,
-                               HttpServletRequest request, HttpSession session,
-                               HttpServletResponse response) {
+                                HttpSession session) {
 
     if (page == null) {
       page = 1;

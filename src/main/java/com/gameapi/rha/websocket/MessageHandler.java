@@ -11,9 +11,9 @@ public abstract class MessageHandler<T extends Message> {
     }
 
     @SuppressWarnings("OverlyBroadCatchBlock")
-    public void handleMessage(@NotNull Message message, @NotNull String forUser) throws HandleException {
+    public void handleMessage(@NotNull Message message, @NotNull String user) throws HandleException {
         try {
-            handle(clazz.cast(message), forUser);
+            handle(clazz.cast(message), user);
         } catch (ClassCastException ex) {
             throw new HandleException("Can't read incoming message of type " + message.getClass(), ex);
         }
