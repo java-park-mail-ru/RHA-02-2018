@@ -9,8 +9,7 @@ import java.util.Map;
 
 public class InitGame {
     public static final class Request extends Message {
-        private String first;
-        private String second;
+        private List<String> players;
         private List<Hex> map;
 
 
@@ -26,26 +25,14 @@ public class InitGame {
             this.map = names;
         }
 
-        @NotNull
-        public String getFirst() {
-            return first;
+
+        public List<String> getPlayers() {
+            return players;
         }
 
-        public String getSecond() {
-            return second;
+        public void setPlayers(List<String> enemies) {
+            this.players = enemies;
         }
-
-        public void setSecond(@NotNull String enemy) {
-            this.second = enemy;
-        }
-
-
-
-        public void setFirst(@NotNull String self) {
-            this.first = self;
-        }
-
-
     }
 
 }

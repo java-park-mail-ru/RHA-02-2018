@@ -2,9 +2,9 @@ package com.gameapi.rha.mechanics;
 
 import com.gameapi.rha.mechanics.game.GameUser;
 import com.gameapi.rha.mechanics.game.TacticalMap;
-import com.gameapi.rha.models.User;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class GameSession {
@@ -14,16 +14,14 @@ public class GameSession {
     private Long sessionId;
 
     @NotNull
-    private GameUser first;
-    @NotNull
-    private GameUser second;
+    private List<GameUser> players;
     @NotNull
     private TacticalMap map;
 
-    public GameSession(@NotNull GameUser first, @NotNull GameUser second) {
+    public GameSession(List<GameUser> players) {
+        this.players = players;
         this.sessionId = ID_GENERATOR.getAndIncrement();
-        this.first = first;
-        this.second = second;
+
         this.map=new TacticalMap();
     }
 
@@ -31,12 +29,8 @@ public class GameSession {
     public void terminateSession() {
     }
 
-    public GameUser getFirst() {
-        return first;
-    }
-
-    public GameUser getSecond() {
-        return second;
+    public List<GameUser> getPlayers() {
+        return players;
     }
 
     public void setFinished() {

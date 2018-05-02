@@ -24,10 +24,7 @@ import org.springframework.web.socket.CloseStatus;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.ObjectInputFilter;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 //import org.springframework.web.socket.CloseStatus;
 //
 //import javax.validation.constraints.NotNull;
@@ -90,15 +87,18 @@ public class GameSessionService {
     public void forceTerminate(@NotNull GameSession gameSession, boolean error) {
         final boolean exists = gameSessions.remove(gameSession);
         gameSession.setFinished();
-        usersMap.remove(gameSession.getFirst().getUserNickname());
-        usersMap.remove(gameSession.getSecond().getUserNickname());
+        for(GameUser player : gameSession.getPlayers()) {
+            usersMap.remove(player.getUserNickname());
+         }
         final CloseStatus status = error ? CloseStatus.SERVER_ERROR : CloseStatus.NORMAL;
         if (exists) {
-            remotePointService.cutDownConnection(gameSession.getFirst().getUserNickname(), status);
-            remotePointService.cutDownConnection(gameSession.getSecond().getUserNickname(), status);
+            for(GameUser player : gameSession.getPlayers()) {
+                remotePointService.cutDownConnection(player.getUserNickname(), status);
+            }
         }
-        clientTurnService.clearForUser(gameSession.getFirst().getUserNickname());
-        clientTurnService.clearForUser(gameSession.getSecond().getUserNickname());
+        for(GameUser player : gameSession.getPlayers()) {
+               clientTurnService.clearForUser(player.getUserNickname());
+        }
 
         LOGGER.info("Game session " + gameSession.getSessionId() + (error ? " was terminated due to error. " : " was cleaned. ")
                 + gameSession.toString());
@@ -108,13 +108,20 @@ public class GameSessionService {
 //        return gameSession.getPlayers().stream().map(GameUser::getUserId).allMatch(remotePointService::isConnected);
 //    }
 
-    public void startGame(@NotNull User first, @NotNull User second) {
-        final GameSession gameSession = new GameSession(new GameUser(first, timeService), new GameUser(second,timeService));
+    public void startGame(@NotNull List<User> players) {
+        List<GameUser> gamers= new ArrayList<>();
+        for(User player:players)
+        {
+            gamers.add(new GameUser(player,timeService));
+        }
+
+        final GameSession gameSession = new GameSession(gamers);
 //                , this, timeService
 
         gameSessions.add(gameSession);
-        usersMap.put(gameSession.getFirst().getUserNickname(), gameSession);
-        usersMap.put(gameSession.getSecond().getUserNickname(), gameSession);
+        for(GameUser gamer: gameSession.getPlayers()) {
+            usersMap.put(gamer.getUserNickname(), gameSession);
+        }
 //        gameSession.getBoard().randomSwap();
         gameInitService.initGameFor(gameSession);
 //        gameTaskScheduler.schedule(Config.SWITCH_DELAY, new SwapTask(gameSession, gameTaskScheduler, Config.SWITCH_DELAY));

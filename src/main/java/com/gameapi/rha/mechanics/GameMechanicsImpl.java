@@ -93,7 +93,7 @@ public class GameMechanicsImpl implements GameMechanics {
     }
 
     private void tryStartGames() {
-        final Set<User> matchedPlayers = new LinkedHashSet<>();
+        final List<User> matchedPlayers = new ArrayList<>();
 
         while (waiters.size() >= 2 || waiters.size() >= 1 && matchedPlayers.size() >= 1) {
             final String candidate = waiters.poll();
@@ -103,9 +103,8 @@ public class GameMechanicsImpl implements GameMechanics {
                 continue;
             }
             matchedPlayers.add(userService.userInfo(candidate));
-            if (matchedPlayers.size() == 2) {
-                final Iterator<User> iterator = matchedPlayers.iterator();
-                gameSessionService.startGame(iterator.next(), iterator.next());
+            if (matchedPlayers.size() >= 2) {
+                gameSessionService.startGame(matchedPlayers);
                 matchedPlayers.clear();
             }
         }

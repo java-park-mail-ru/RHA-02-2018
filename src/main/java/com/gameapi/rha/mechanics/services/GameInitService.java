@@ -5,7 +5,7 @@ import com.gameapi.rha.mechanics.game.GameUser;
 import com.gameapi.rha.mechanics.game.TacticalMap;
 import com.gameapi.rha.mechanics.game.Turn;
 import com.gameapi.rha.mechanics.messages.output.InitGame;
-import com.gameapi.rha.mechanics.messages.output.ServerTurn;
+import com.gameapi.rha.mechanics.messages.output.TurnInit;
 import com.gameapi.rha.websocket.RemotePointService;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -30,9 +30,8 @@ public class GameInitService {
 
     public void initGameFor(@NotNull GameSession gameSession) {
         final Collection<GameUser> players = new ArrayList<>();
-        players.add(gameSession.getFirst());
-        players.add(gameSession.getSecond());
-        for (GameUser player : players) {
+
+        for (GameUser player : gameSession.getPlayers()) {
             final InitGame.Request initMessage = createInitMessageFor(gameSession);
             //noinspection OverlyBroadCatchBlock
             try {
@@ -44,32 +43,34 @@ public class GameInitService {
                 LOGGER.error("Unnable to start a game", e);
             }
         }
+        try {
+            remotePointService.sendMessageToUser(gameSession.getPlayers().get(1).getUserNickname(), new TurnInit.Request());
+        }catch (IOException e){
+            players.forEach(playerToCutOff -> remotePointService.cutDownConnection(playerToCutOff.getUserNickname(),
+                    CloseStatus.SERVER_ERROR));
+            LOGGER.error("Unnable to start a game", e);
+        }
     }
 
     @SuppressWarnings("TooBroadScope")
     private InitGame.Request createInitMessageFor(@NotNull GameSession gameSession) {
         final InitGame.Request initGameMessage = new InitGame.Request();
 
-        final Map<String, Turn> playerTurns = new HashMap<>();
-        final Map<String, String> names = new HashMap<>();
+        final List<String> names = new ArrayList<>();
         final TacticalMap map=new TacticalMap();
 //        final Map<String, String> colors = new HashMap<>();
 
 
-//        for (GameUser player : players) {
-////            playerSnaps.put(player.getUserNickname(), player.getSnap());
-//            names.put(player.getUserNickname(), player.getUserProfile().getEmail());
-//        }
+        for (GameUser player : gameSession.getPlayers()) {
+//            playerSnaps.put(player.getUserNickname(), player.getSnap());
+            names.add(player.getUserNickname());
+        }
 
 //        colors.put(userN, Collectiononfig.SELF_COLOR);
 //        colors.put(gameSession.getEnemy(userId).getUserId(), Config.ENEMY_COLOR);
 
-        initGameMessage.setFirst(gameSession.getFirst().getUserNickname());
-        initGameMessage.setSecond(gameSession.getSecond().getUserNickname());
+        initGameMessage.setPlayers(names);
         initGameMessage.setMap(map.getMap());
-//        initGameMessage.setNames(names);
-//        initGameMessage.setColors(colors);
-//        initGameMessage.setPlayers(playerSnaps);
 
 //        initGameMessage.setBoard(gameSession.getBoard().getSnap());
         return initGameMessage;

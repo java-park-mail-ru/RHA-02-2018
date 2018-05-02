@@ -7,10 +7,6 @@ import java.util.List;
 
 public class Hex extends GameObject {
 
-    @NotNull
-    private Integer id;
-
-    @NotNull
     private Integer owner;
 
     @NotNull
@@ -23,8 +19,7 @@ public class Hex extends GameObject {
     private Integer type;
 
     @JsonCreator
-    public Hex(@NotNull Integer id, @NotNull Integer owner, @NotNull Integer units, @NotNull List<Integer> neibours, @NotNull Integer type) {
-        this.id = id;
+    public Hex( @NotNull Integer owner, @NotNull Integer units, @NotNull List<Integer> neibours, @NotNull Integer type) {
         this.owner = owner;
         this.units = units;
         this.neibours = neibours;
@@ -63,11 +58,4 @@ public class Hex extends GameObject {
         this.owner = owner;
     }
 
-    public Integer getid() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 }
