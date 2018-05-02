@@ -105,7 +105,7 @@ public class GameMechanicsImpl implements GameMechanics {
             matchedPlayers.add(userService.userInfo(candidate));
             if (matchedPlayers.size() == 2) {
                 final Iterator<User> iterator = matchedPlayers.iterator();
-//                gameSessionService.startGame(iterator.next(), iterator.next());
+                gameSessionService.startGame(iterator.next(), iterator.next());
                 matchedPlayers.clear();
             }
         }

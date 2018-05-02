@@ -1,4 +1,5 @@
 package com.gameapi.rha.mechanics.game;
 
-public class Turn {
+@SuppressWarnings("unused")
+public interface Turn<T>{
 }
