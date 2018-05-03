@@ -158,6 +158,7 @@ public class UserService {
    * @param user
    * @return
    */
+
   public File loadAvatar(String user) {
     String image = jdbc.queryForObject(
             "SELECT avatar FROM \"users\" "

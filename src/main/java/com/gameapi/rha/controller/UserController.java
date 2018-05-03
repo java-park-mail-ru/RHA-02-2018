@@ -166,6 +166,7 @@ public class UserController {
   public ResponseEntity rating(@PathVariable("page") Integer page,
                                 HttpSession session) {
 
+
     if (page == null) {
       page = 1;
     }
