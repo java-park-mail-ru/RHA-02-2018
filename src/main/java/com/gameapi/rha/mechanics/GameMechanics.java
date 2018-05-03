@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 public interface GameMechanics {
 
-    void Step(@NotNull  GameSession gameSession, @NotNull ClientStep clientStep);
+    void Step(@NotNull  String user, @NotNull ClientStep clientStep);
 
     void addUser(@NotNull String user);
 

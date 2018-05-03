@@ -81,8 +81,9 @@ public class GameMechanicsImpl implements GameMechanics {
     }
 
     @Override
-    public void Step(@NotNull GameSession gameSession, @NotNull ClientStep clientStep) {
-        tasks.add(() -> clientStepService.pushClientStep( gameSession, clientStep));
+    public void Step(@NotNull String user, @NotNull ClientStep clientStep) {
+
+        tasks.add(() -> clientStepService.pushClientStep( gameSessionService.getSessionForUser(user), clientStep));
     }
 
     @Override
