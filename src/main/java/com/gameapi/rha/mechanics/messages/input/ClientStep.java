@@ -1,6 +1,7 @@
 package com.gameapi.rha.mechanics.messages.input;
 
 import com.gameapi.rha.websocket.Message;
+import com.gameapi.rha.websocket.MessageHandler;
 
 import javax.validation.constraints.NotNull;
 

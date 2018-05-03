@@ -1,5 +1,6 @@
 package com.gameapi.rha.mechanics;
 
+import com.gameapi.rha.mechanics.messages.input.ClientStep;
 import com.gameapi.rha.mechanics.messages.input.ClientTurn;
 import com.gameapi.rha.mechanics.services.*;
 import com.gameapi.rha.models.User;
@@ -21,6 +22,9 @@ public class GameMechanicsImpl implements GameMechanics {
 
 //    @NotNull
 //    private final GameInitService gameInitService;
+
+    @NotNull
+    private final ClientStepService clientStepService;
 
 //    @NotNull
 //    private final ClientTurnService clientTurnService;
@@ -59,17 +63,17 @@ public class GameMechanicsImpl implements GameMechanics {
 //                             @NotNull GameInitService gameInitService,
 //                             @NotNull ClientTurnService serverSnapshotService,
 //                             @NotNull ClientTurnService clientTurnService,
+                             @NotNull ClientStepService clientStepService,
                              @NotNull RemotePointService remotePointService,
 //                             @NotNull ServerTurnService serverTurnService,
                              @NotNull GameSessionService gameSessionService,
                              @NotNull MechanicsTimeService timeService,
                              @NotNull GameTaskScheduler gameTaskScheduler) {
         this.userService = userService;
+        this.clientStepService = clientStepService;
 //        this.gameInitService = gameInitService;
 //        this.clientTurnService = clientTurnService;
 //        this.serverTurnService = serverTurnService;
-
-
         this.remotePointService = remotePointService;
         this.gameSessionService = gameSessionService;
         this.timeService = timeService;
@@ -77,8 +81,8 @@ public class GameMechanicsImpl implements GameMechanics {
     }
 
     @Override
-    public void Turn(@NotNull String user, @NotNull ClientTurn clientSnap) {
-//        tasks.add(() -> clientTurnService.pushClientTurn(user, clientSnap));
+    public void Step(@NotNull GameSession gameSession, @NotNull ClientStep clientStep) {
+        tasks.add(() -> clientStepService.pushClientStep( gameSession, clientStep));
     }
 
     @Override
