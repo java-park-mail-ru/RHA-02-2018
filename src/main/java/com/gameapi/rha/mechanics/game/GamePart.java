@@ -6,5 +6,4 @@ public interface GamePart {
         return true;
     }
 
-//    Snap<? extends GamePart> takeSnap();
 }

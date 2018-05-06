@@ -1,6 +1,5 @@
 package com.gameapi.rha.websocket;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
@@ -23,12 +22,12 @@ public class GameSocketHandler extends TextWebSocketHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameSocketHandler.class);
     private static final CloseStatus ACCESS_DENIED = new CloseStatus(4500, "Not logged in. Access denied");
 
-    @NotNull
-    private final UserService userService;
-    @NotNull
-    private final MessageHandlerContainer messageHandlerContainer;
-    @NotNull
-    private final RemotePointService remotePointService;
+
+    private final  @NotNull UserService userService;
+
+    private final @NotNull MessageHandlerContainer messageHandlerContainer;
+
+    private final @NotNull RemotePointService remotePointService;
 
     private final ObjectMapper objectMapper;
 
@@ -51,7 +50,7 @@ public class GameSocketHandler extends TextWebSocketHandler {
             return;
         }
         final String userN = user ;
-        remotePointService.registerUser(userN, webSocketSession);
+        remotePointService.registerUser(userN, webSocketSession) ;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.gameapi.rha.websocket;
 
-import com.gameapi.rha.models.User;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 

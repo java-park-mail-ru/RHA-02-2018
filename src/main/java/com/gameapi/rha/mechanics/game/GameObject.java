@@ -11,10 +11,10 @@ import java.util.concurrent.atomic.AtomicLong;
 public abstract class GameObject {
     private static final AtomicLong ID_GENERATOR = new AtomicLong();
 
-    @NotNull
-    private final Map<Class<?>, GamePart> parts = new HashMap<>();
-    @NotNull
-    private final Long id;
+
+    private final @NotNull Map<Class<?>, GamePart> parts = new HashMap<>();
+
+    private final @NotNull Long id;
 
     public GameObject() {
         this.id = ID_GENERATOR.getAndIncrement();
@@ -39,9 +39,9 @@ public abstract class GameObject {
         parts.put(clazz, gamePart);
     }
 
-    @NotNull
+
     @JsonProperty("id")
-    public Long getId() {
+    public @NotNull Long getId() {
         return id;
     }
 

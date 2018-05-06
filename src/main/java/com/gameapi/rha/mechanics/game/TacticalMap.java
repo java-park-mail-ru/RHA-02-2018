@@ -8,12 +8,12 @@ public class TacticalMap extends GameObject {
 
     private List<Hex> map = new ArrayList<>();
 
-    public TacticalMap(){
-        map.add(new Hex(1,2000, Arrays.asList(2,3),1));
-        map.add(new Hex(0,1000, Arrays.asList(1,3,4,5),1));
-        map.add(new Hex(0,1000, Arrays.asList(2,1,5),1));
-        map.add(new Hex(0,1000, Arrays.asList(2,5),1));
-        map.add(new Hex(2,2000, Arrays.asList(2,3,4),1));
+    public TacticalMap() {
+        map.add(new Hex(1, 2000, Arrays.asList(2, 3), 1));
+        map.add(new Hex(0, 1000, Arrays.asList(1, 3, 4, 5), 1));
+        map.add(new Hex(0, 1000, Arrays.asList(2, 1, 5), 1));
+        map.add(new Hex(0, 1000, Arrays.asList(2, 5), 1));
+        map.add(new Hex(2, 2000, Arrays.asList(2, 3, 4), 1));
 
     }
 

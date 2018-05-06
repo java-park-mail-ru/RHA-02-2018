@@ -19,7 +19,7 @@ public class Hex extends GameObject {
     private Integer type;
 
     @JsonCreator
-    public Hex( @NotNull Integer owner, @NotNull Integer units, @NotNull List<Integer> neibours, @NotNull Integer type) {
+    public Hex(@NotNull Integer owner, @NotNull Integer units, @NotNull List<Integer> neibours, @NotNull Integer type) {
         this.owner = owner;
         this.units = units;
         this.neibours = neibours;

@@ -10,19 +10,16 @@ import java.util.concurrent.atomic.AtomicLong;
 public class GameSession {
     private static final AtomicLong ID_GENERATOR = new AtomicLong(0);
     private boolean isFinished;
-    @NotNull
-    private Long sessionId;
 
-    @NotNull
-    private List<GameUser> players;
-    @NotNull
-    private TacticalMap map;
+    private @NotNull Long  sessionId;
+    private @NotNull List<GameUser> players;
+    private @NotNull TacticalMap map;
 
     public GameSession(List<GameUser> players) {
         this.players = players;
         this.sessionId = ID_GENERATOR.getAndIncrement();
 
-        this.map=new TacticalMap();
+        this.map = new TacticalMap();
     }
 
 
@@ -50,5 +47,9 @@ public class GameSession {
 
     public void setMap(TacticalMap map) {
         this.map = map;
+    }
+
+    public boolean tryFinishGame() {
+        return false;
     }
 }

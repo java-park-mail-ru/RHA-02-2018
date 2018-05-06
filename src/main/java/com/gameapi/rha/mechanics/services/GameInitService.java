@@ -3,7 +3,6 @@ package com.gameapi.rha.mechanics.services;
 import com.gameapi.rha.mechanics.GameSession;
 import com.gameapi.rha.mechanics.game.GameUser;
 import com.gameapi.rha.mechanics.game.TacticalMap;
-import com.gameapi.rha.mechanics.game.Turn;
 import com.gameapi.rha.mechanics.messages.output.InitGame;
 import com.gameapi.rha.mechanics.messages.output.TurnInit;
 import com.gameapi.rha.websocket.RemotePointService;
@@ -45,7 +44,7 @@ public class GameInitService {
         }
         try {
             remotePointService.sendMessageToUser(gameSession.getPlayers().get(1).getUserNickname(), new TurnInit.Request());
-        }catch (IOException e){
+        } catch (IOException e) {
             players.forEach(playerToCutOff -> remotePointService.cutDownConnection(playerToCutOff.getUserNickname(),
                     CloseStatus.SERVER_ERROR));
             LOGGER.error("Unnable to start a game", e);
@@ -57,22 +56,16 @@ public class GameInitService {
         final InitGame.Request initGameMessage = new InitGame.Request();
 
         final List<String> names = new ArrayList<>();
-        final TacticalMap map=new TacticalMap();
-//        final Map<String, String> colors = new HashMap<>();
+        final TacticalMap map = new TacticalMap();
 
 
         for (GameUser player : gameSession.getPlayers()) {
-//            playerSnaps.put(player.getUserNickname(), player.getSnap());
             names.add(player.getUserNickname());
         }
 
-//        colors.put(userN, Collectiononfig.SELF_COLOR);
-//        colors.put(gameSession.getEnemy(userId).getUserId(), Config.ENEMY_COLOR);
 
         initGameMessage.setPlayers(names);
         initGameMessage.setMap(map.getMap());
-
-//        initGameMessage.setBoard(gameSession.getBoard().getSnap());
         return initGameMessage;
     }
 }

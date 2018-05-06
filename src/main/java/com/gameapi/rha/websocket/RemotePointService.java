@@ -1,7 +1,6 @@
 package com.gameapi.rha.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gameapi.rha.models.User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;

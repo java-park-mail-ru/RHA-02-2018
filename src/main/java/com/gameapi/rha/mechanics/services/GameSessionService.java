@@ -1,18 +1,7 @@
 package com.gameapi.rha.mechanics.services;
-//
-//import com.gameapi.rha.mechanics.Config;
-//import com.gameapi.rha.mechanics.GameSession;
-//import com.gameapi.rha.mechanics.game.GameUser;
-//import com.gameapi.rha.mechanics.game.MechanicPart;
-//import com.gameapi.rha.mechanics.messages.outbox.FinishGame;
-//import com.gameapi.rha.models.User;
-//import com.gameapi.rha.websocket.RemotePointService;
-//import org.jetbrains.annotations.Nullable;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+
 import com.gameapi.rha.mechanics.GameSession;
 import com.gameapi.rha.mechanics.game.GameUser;
-import com.gameapi.rha.mechanics.messages.output.FinishGame;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.websocket.RemotePointService;
 import org.jetbrains.annotations.Nullable;
@@ -22,41 +11,32 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
 
 import javax.validation.constraints.NotNull;
-import java.io.IOException;
-import java.io.ObjectInputFilter;
+
 import java.util.*;
-//import org.springframework.web.socket.CloseStatus;
-//
-//import javax.validation.constraints.NotNull;
-//import java.io.IOException;
-//import java.util.HashMap;
-//import java.util.LinkedHashSet;
-//import java.util.Map;
-//import java.util.Set;
-//
+
 
 @Service
 public class GameSessionService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameSessionService.class);
-    @NotNull
-    private final Map<String, GameSession> usersMap = new HashMap<>();
-    @NotNull
-    private final Set<GameSession> gameSessions = new LinkedHashSet<>();
 
-    @NotNull
-    private final RemotePointService remotePointService;
+    private final @NotNull Map<String, GameSession> usersMap = new HashMap<>();
 
-    @NotNull
-    private final MechanicsTimeService timeService;
+    private final @NotNull Set<GameSession> gameSessions = new LinkedHashSet<>();
 
-    @NotNull
-    private final GameInitService gameInitService;
 
-    @NotNull
-    private final GameTaskScheduler gameTaskScheduler;
+    private final @NotNull RemotePointService remotePointService;
 
-    @NotNull
-    private final ClientTurnService clientTurnService;
+
+    private final @NotNull MechanicsTimeService timeService;
+
+
+    private final @NotNull GameInitService gameInitService;
+
+
+    private final @NotNull GameTaskScheduler gameTaskScheduler;
+
+
+    private final @NotNull ClientTurnService clientTurnService;
 
 
     public GameSessionService(@NotNull RemotePointService remotePointService,
@@ -75,8 +55,8 @@ public class GameSessionService {
         return gameSessions;
     }
 
-    @Nullable
-    public GameSession getSessionForUser(@NotNull String user) {
+
+    public @Nullable GameSession  getSessionForUser(@NotNull String user) {
         return usersMap.get(user);
     }
 
@@ -87,16 +67,16 @@ public class GameSessionService {
     public void forceTerminate(@NotNull GameSession gameSession, boolean error) {
         final boolean exists = gameSessions.remove(gameSession);
         gameSession.setFinished();
-        for(GameUser player : gameSession.getPlayers()) {
+        for (GameUser player : gameSession.getPlayers()) {
             usersMap.remove(player.getUserNickname());
          }
         final CloseStatus status = error ? CloseStatus.SERVER_ERROR : CloseStatus.NORMAL;
         if (exists) {
-            for(GameUser player : gameSession.getPlayers()) {
+            for (GameUser player : gameSession.getPlayers()) {
                 remotePointService.cutDownConnection(player.getUserNickname(), status);
             }
         }
-        for(GameUser player : gameSession.getPlayers()) {
+        for (GameUser player : gameSession.getPlayers()) {
                clientTurnService.clearForUser(player.getUserNickname());
         }
 
@@ -104,60 +84,55 @@ public class GameSessionService {
                 + gameSession.toString());
     }
 
-//    public boolean checkHealthState(@NotNull GameSession gameSession) {
-//        return gameSession.getPlayers().stream().map(GameUser::getUserId).allMatch(remotePointService::isConnected);
-//    }
+
 
     public void startGame(@NotNull List<User> players) {
-        List<GameUser> gamers= new ArrayList<>();
-        for(User player:players)
-        {
-            gamers.add(new GameUser(player,timeService));
+        List<GameUser> gamers = new ArrayList<>();
+        for (User player:players) {
+            gamers.add(new GameUser(player, timeService));
         }
 
         final GameSession gameSession = new GameSession(gamers);
-//                , this, timeService
+
 
         gameSessions.add(gameSession);
-        for(GameUser gamer: gameSession.getPlayers()) {
+        for (GameUser gamer: gameSession.getPlayers()) {
             usersMap.put(gamer.getUserNickname(), gameSession);
         }
-//        gameSession.getBoard().randomSwap();
         gameInitService.initGameFor(gameSession);
-//        gameTaskScheduler.schedule(Config.SWITCH_DELAY, new SwapTask(gameSession, gameTaskScheduler, Config.SWITCH_DELAY));
         LOGGER.info("Game session " + gameSession.getSessionId() + " started. " + gameSession.toString());
     }
 
     public void finishGame(@NotNull GameSession gameSession) {
         gameSession.setFinished();
-//        final FinishGame.Overcome firstOvercome;
-//        final FinishGame.Overcome secondOvercome;
-//        final int firstScore = gameSession.getFirst().claimPart(MechanicPart.class).getScore();
-//        final int secondScore = gameSession.getSecond().claimPart(MechanicPart.class).getScore();
-//        if (firstScore == secondScore) {
-//            firstOvercome = FinishGame.Overcome.DRAW;
-//            secondOvercome = FinishGame.Overcome.DRAW;
-//        } else if (firstScore > secondScore) {
-//            firstOvercome = FinishGame.Overcome.WIN;
-//            secondOvercome = FinishGame.Overcome.LOSE;
-//        } else {
-//            firstOvercome = FinishGame.Overcome.LOSE;
-//            secondOvercome = FinishGame.Overcome.WIN;
-//        }
+        //        final FinishGame.Overcome firstOvercome;
+        //        final FinishGame.Overcome secondOvercome;
+        //        final int firstScore = gameSession.getFirst().claimPart(MechanicPart.class).getScore();
+        //        final int secondScore = gameSession.getSecond().claimPart(MechanicPart.class).getScore();
+        //        if (firstScore == secondScore) {
+        //            firstOvercome = FinishGame.Overcome.DRAW;
+        //            secondOvercome = FinishGame.Overcome.DRAW;
+        //        } else if (firstScore > secondScore) {
+        //            firstOvercome = FinishGame.Overcome.WIN;
+        //            secondOvercome = FinishGame.Overcome.LOSE;
+        //        } else {
+        //            firstOvercome = FinishGame.Overcome.LOSE;
+        //            secondOvercome = FinishGame.Overcome.WIN;
+        //        }
 
-//        try {
-//            remotePointService.sendMessageToUser(gameSession.getFirst().getUsername(), new FinishGame(FinishGame.Overcome.LOSE));
-//        } catch (IOException ex) {
-//            LOGGER.warn(String.format("Failed to send FinishGame message to user %s",
-//                    gameSession.getFirst().getUsername()), ex);
-//        }
-//
-//        try {
-//            remotePointService.sendMessageToUser(gameSession.getSecond().getUsername(), new FinishGame(FinishGame.Overcome.LOSE));
-//        } catch (IOException ex) {
-//            LOGGER.warn(String.format("Failed to send FinishGame message to user %s",
-//                    gameSession.getSecond().getUsername()), ex);
-//        }
+        //        try {
+        //            remotePointService.sendMessageToUser(gameSession.getFirst().getUsername(), new FinishGame(FinishGame.Overcome.LOSE));
+        //        } catch (IOException ex) {
+        //            LOGGER.warn(String.format("Failed to send FinishGame message to user %s",
+        //                    gameSession.getFirst().getUsername()), ex);
+        //        }
+        //
+        //        try {
+        //            remotePointService.sendMessageToUser(gameSession.getSecond().getUsername(), new FinishGame(FinishGame.Overcome.LOSE));
+        //        } catch (IOException ex) {
+        //            LOGGER.warn(String.format("Failed to send FinishGame message to user %s",
+        //                    gameSession.getSecond().getUsername()), ex);
+        //        }
     }
 
     private static final class SwapTask extends GameTaskScheduler.GameSessionTask {
@@ -173,12 +148,12 @@ public class GameSessionService {
 
         @Override
         public void operate() {
-//            if (getGameSession().isFinished()) {
-//                return;
-//            }
-//            final long newDelay = Math.max(currentDelay - Config.SWITCH_DELAY, Config.SWITCH_DELAY);
-//            gameTaskScheduler.schedule(newDelay,
-//                    new SwapTask(getGameSession(), gameTaskScheduler, newDelay));
+        //            if (getGameSession().isFinished()) {
+        //                return;
+        //            }
+        //            final long newDelay = Math.max(currentDelay - Config.SWITCH_DELAY, Config.SWITCH_DELAY);
+        //            gameTaskScheduler.schedule(newDelay,
+        //                    new SwapTask(getGameSession(), gameTaskScheduler, newDelay));
         }
     }
 

@@ -6,21 +6,21 @@ import com.gameapi.rha.models.User;
 import javax.validation.constraints.NotNull;
 
 public class GameUser extends GameObject {
-    @NotNull
-    private final User userProfile;
+
+
+    private final @NotNull User userProfile;
 
     public GameUser(@NotNull User userProfile, @NotNull MechanicsTimeService timeService) {
         this.userProfile = userProfile;
-//        addPart(MechanicPart.class, new MechanicPart(timeService));
     }
 
-    @NotNull
-    public User getUserProfile() {
+
+    public @NotNull User getUserProfile() {
         return userProfile;
     }
 
-    @NotNull
-    public String getUserNickname() {
+
+    public  @NotNull String getUserNickname() {
         return userProfile.getUsername();
     }
 

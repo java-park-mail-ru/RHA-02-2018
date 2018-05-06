@@ -1,7 +1,6 @@
 package com.gameapi.rha.mechanics;
 
 import com.gameapi.rha.mechanics.messages.input.ClientStep;
-import com.gameapi.rha.mechanics.messages.input.ClientTurn;
 import com.gameapi.rha.mechanics.services.*;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
@@ -20,20 +19,20 @@ public class GameMechanicsImpl implements GameMechanics {
     @NotNull
     private final UserService userService;
 
-//    @NotNull
-//    private final GameInitService gameInitService;
+    @NotNull
+    private final GameInitService gameInitService;
 
     @NotNull
     private final ClientStepService clientStepService;
 
-//    @NotNull
-//    private final ClientTurnService clientTurnService;
+    @NotNull
+    private final ClientTurnService clientTurnService;
 
     @NotNull
     private final RemotePointService remotePointService;
 
-//    @NotNull
-//    private final ServerTurnService serverTurnService;
+    @NotNull
+    private final ServerTurnService serverTurnService;
 
     @NotNull
     private final GameSessionService gameSessionService;
@@ -43,12 +42,7 @@ public class GameMechanicsImpl implements GameMechanics {
 
     @NotNull
     private final GameTaskScheduler gameTaskScheduler;
-//
-//    @NotNull
-//    private ConcurrentLinkedQueue<Id<UserProfile>> waiters = new ConcurrentLinkedQueue<>();
-//
-//    @NotNull
-//    private final Queue<Runnable> tasks = new ConcurrentLinkedQueue<>();
+
     @NotNull
     private ConcurrentLinkedQueue<String> waiters = new ConcurrentLinkedQueue<>();
 
@@ -60,20 +54,19 @@ public class GameMechanicsImpl implements GameMechanics {
     private final Queue<Runnable> tasks = new ConcurrentLinkedQueue<>();
 
     public GameMechanicsImpl(@NotNull UserService userService,
-//                             @NotNull GameInitService gameInitService,
-//                             @NotNull ClientTurnService serverSnapshotService,
-//                             @NotNull ClientTurnService clientTurnService,
+                             @NotNull GameInitService gameInitService,
+                             @NotNull ClientTurnService clientTurnService,
                              @NotNull ClientStepService clientStepService,
                              @NotNull RemotePointService remotePointService,
-//                             @NotNull ServerTurnService serverTurnService,
+                             @NotNull ServerTurnService serverTurnService,
                              @NotNull GameSessionService gameSessionService,
                              @NotNull MechanicsTimeService timeService,
                              @NotNull GameTaskScheduler gameTaskScheduler) {
         this.userService = userService;
         this.clientStepService = clientStepService;
-//        this.gameInitService = gameInitService;
-//        this.clientTurnService = clientTurnService;
-//        this.serverTurnService = serverTurnService;
+        this.gameInitService = gameInitService;
+        this.clientTurnService = clientTurnService;
+        this.serverTurnService = serverTurnService;
         this.remotePointService = remotePointService;
         this.gameSessionService = gameSessionService;
         this.timeService = timeService;
@@ -81,16 +74,16 @@ public class GameMechanicsImpl implements GameMechanics {
     }
 
     @Override
-    public void Step(@NotNull String user, @NotNull ClientStep clientStep) {
+    public void step(@NotNull String user, @NotNull ClientStep clientStep) {
 
-        tasks.add(() -> clientStepService.pushClientStep( gameSessionService.getSessionForUser(user), clientStep));
+        tasks.add(() -> clientStepService.pushClientStep(gameSessionService.getSessionForUser(user), clientStep));
     }
 
     @Override
     public void addUser(@NotNull String user) {
-//        if (gameSessionService.isPlaying(user)) {
-//            return;
-//        }
+        if (gameSessionService.isPlaying(user)) {
+            return;
+        }
         waiters.add(user);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(String.format("User %s added to the waiting list", user));
@@ -120,6 +113,7 @@ public class GameMechanicsImpl implements GameMechanics {
         return remotePointService.isConnected(candidate)
                 && userService.userInfo(candidate) != null;
     }
+
     @Override
     public void gmStep(long frameTime) {
 
@@ -134,35 +128,31 @@ public class GameMechanicsImpl implements GameMechanics {
             }
         }
 
-//        for (GameSession session : gameSessionService.getSessions()) {
-//            clientTurnService.processSnapshotsFor(session);
-//        }
 
         gameTaskScheduler.tick();
 
         final List<GameSession> sessionsToTerminate = new ArrayList<>();
         final List<GameSession> sessionsToFinish = new ArrayList<>();
-//        for (GameSession session : gameSessionService.getSessions()) {
-//            if (session.tryFinishGame()) {
-//                sessionsToFinish.add(session);
-//                continue;
-//            }
-//
-
-            try {
-//                serverSnapshotService.sendSnapshotsFor(session, frameTime);
-            } catch (RuntimeException ex) {
-                LOGGER.error("Failed to send snapshots, terminating the session", ex);
-//                sessionsToTerminate.add(session);
+        for (GameSession session : gameSessionService.getSessions()) {
+            if (session.tryFinishGame()) {
+                sessionsToFinish.add(session);
+                continue;
             }
-//            pullTheTriggerService.pullTheTriggers(session);
-//        }
-//        sessionsToTerminate.forEach(session -> gameSessionService.forceTerminate(session, true));
-//        sessionsToFinish.forEach(session -> gameSessionService.forceTerminate(session, false));
 
-        tryStartGames();
-//        clientSnapshotsService.reset();
-        timeService.tick(frameTime);
+
+            //            try {
+            //                serverSnapshotService.sendSnapshotsFor(session, frameTime);
+            //            } catch (RuntimeException ex) {
+            //                LOGGER.error("Failed to send snapshots, terminating the session", ex);
+            //            }
+            sessionsToTerminate.forEach(sess -> gameSessionService.forceTerminate(session, true));
+            sessionsToFinish.forEach(sess -> {
+                gameSessionService.forceTerminate(session, false);
+            });
+
+            tryStartGames();
+            timeService.tick(frameTime);
+        }
     }
 
     @Override
@@ -170,154 +160,4 @@ public class GameMechanicsImpl implements GameMechanics {
 
     }
 
-//    @NotNull
-//    private final AccountService accountService;
-//
-//    @NotNull
-//    private final ClientSnapshotsService clientSnapshotsService;
-//
-//    @NotNull
-//    private final ServerSnapshotService serverSnapshotService;
-//
-//    @NotNull
-//    private final RemotePointService remotePointService;
-//
-//    @NotNull
-//    private final PullTheTriggerService pullTheTriggerService;
-//
-//    @NotNull
-//    private final GameSessionService gameSessionService;
-//
-//    @NotNull
-//    private final MechanicsTimeService timeService;
-//
-//    @NotNull
-//    private final GameTaskScheduler gameTaskScheduler;
-//
-//    @NotNull
-//    private ConcurrentLinkedQueue<Id<UserProfile>> waiters = new ConcurrentLinkedQueue<>();
-//
-//    @NotNull
-//    private final Queue<Runnable> tasks = new ConcurrentLinkedQueue<>();
-//
-//    public GameMechanicsImpl(@NotNull AccountService accountService,
-//                             @NotNull ClientSnapshotsService clientSnapshotsService,
-//                             @NotNull ServerSnapshotService serverSnapshotService,
-//                             @NotNull RemotePointService remotePointService,
-//                             @NotNull PullTheTriggerService pullTheTriggerService,
-//                             @NotNull GameSessionService gameSessionService,
-//                             @NotNull MechanicsTimeService timeService,
-//                             @NotNull GameTaskScheduler gameTaskScheduler) {
-//        this.accountService = accountService;
-//        this.clientSnapshotsService = clientSnapshotsService;
-//        this.serverSnapshotService = serverSnapshotService;
-//        this.remotePointService = remotePointService;
-//        this.pullTheTriggerService = pullTheTriggerService;
-//        this.gameSessionService = gameSessionService;
-//        this.timeService = timeService;
-//        this.gameTaskScheduler = gameTaskScheduler;
-//    }
-//
-//    @Override
-//    public void addClientSnapshot(@NotNull Id<UserProfile> userId, @NotNull ClientSnap clientSnap) {
-//        tasks.add(() -> clientSnapshotsService.pushClientSnap(userId, clientSnap));
-//    }
-//
-//    @Override
-//    public void addUser(@NotNull Id<UserProfile> userId) {
-//        if (gameSessionService.isPlaying(userId)) {
-//            return;
-//        }
-//        waiters.add(userId);
-//        if (LOGGER.isDebugEnabled()) {
-//            final UserProfile user = accountService.getUserById(userId);
-//            LOGGER.debug(String.format("User %s added to the waiting list", user.getLogin()));
-//        }
-//    }
-//
-//    private void tryStartGames() {
-//        final Set<UserProfile> matchedPlayers = new LinkedHashSet<>();
-//
-//        while (waiters.size() >= 2 || waiters.size() >= 1 && matchedPlayers.size() >= 1) {
-//            final Id<UserProfile> candidate = waiters.poll();
-//            // for sure not null, cause we the only one consumer
-//            //noinspection ConstantConditions
-//            if (!insureCandidate(candidate)) {
-//                continue;
-//            }
-//            matchedPlayers.add(accountService.getUserById(candidate));
-//            if (matchedPlayers.size() == 2) {
-//                final Iterator<UserProfile> iterator = matchedPlayers.iterator();
-//                gameSessionService.startGame(iterator.next(), iterator.next());
-//                matchedPlayers.clear();
-//            }
-//        }
-//        matchedPlayers.stream().map(UserProfile::getId).forEach(waiters::add);
-//    }
-//
-//    private boolean insureCandidate(@NotNull Id<UserProfile> candidate) {
-//        return remotePointService.isConnected(candidate)
-//                && accountService.getUserById(candidate) != null;
-//    }
-//
-//    @Override
-//    public void gmStep(long frameTime) {
-//        while (!tasks.isEmpty()) {
-//            final Runnable nextTask = tasks.poll();
-//            if (nextTask != null) {
-//                try {
-//                    nextTask.run();
-//                } catch (RuntimeException ex) {
-//                    LOGGER.error("Can't handle game task", ex);
-//                }
-//            }
-//        }
-//
-//        for (GameSession session : gameSessionService.getSessions()) {
-//            clientSnapshotsService.processSnapshotsFor(session);
-//        }
-//
-//        gameTaskScheduler.tick();
-//
-//        final List<GameSession> sessionsToTerminate = new ArrayList<>();
-//        final List<GameSession> sessionsToFinish = new ArrayList<>();
-//        for (GameSession session : gameSessionService.getSessions()) {
-//            if (session.tryFinishGame()) {
-//                sessionsToFinish.add(session);
-//                continue;
-//            }
-//
-//            if (!gameSessionService.checkHealthState(session)) {
-//                sessionsToTerminate.add(session);
-//                continue;
-//            }
-//
-//            try {
-//                serverSnapshotService.sendSnapshotsFor(session, frameTime);
-//            } catch (RuntimeException ex) {
-//                LOGGER.error("Failed to send snapshots, terminating the session", ex);
-//                sessionsToTerminate.add(session);
-//            }
-//            pullTheTriggerService.pullTheTriggers(session);
-//        }
-//        sessionsToTerminate.forEach(session -> gameSessionService.forceTerminate(session, true));
-//        sessionsToFinish.forEach(session -> gameSessionService.forceTerminate(session, false));
-//
-//        tryStartGames();
-//        clientSnapshotsService.reset();
-//        timeService.tick(frameTime);
-//    }
-//
-//    @Override
-//    public void reset() {
-//        for (GameSession session : gameSessionService.getSessions()) {
-//            gameSessionService.forceTerminate(session, true);
-//        }
-//        waiters.forEach(user -> remotePointService.cutDownConnection(user, CloseStatus.SERVER_ERROR));
-//        waiters.clear();
-//        tasks.clear();
-//        clientSnapshotsService.reset();
-//        timeService.reset();
-//        gameTaskScheduler.reset();
-//    }
 }

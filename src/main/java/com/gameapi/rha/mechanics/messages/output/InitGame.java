@@ -5,7 +5,6 @@ import com.gameapi.rha.websocket.Message;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Map;
 
 public class InitGame {
     public static final class Request extends Message {
@@ -14,10 +13,7 @@ public class InitGame {
 
 
 
-
-
-        @NotNull
-        public List<Hex> getMap() {
+        public @NotNull List<Hex> getMap() {
             return map;
         }
 
