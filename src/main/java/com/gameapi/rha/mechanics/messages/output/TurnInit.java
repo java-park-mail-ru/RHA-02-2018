@@ -10,5 +10,9 @@ public class TurnInit {
                 public Request(String user) {
                         this.user = user;
                 }
+
+                public String getUser() {
+                        return user;
+                }
         }
 }

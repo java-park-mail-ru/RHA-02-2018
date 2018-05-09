@@ -120,7 +120,7 @@ public class GameMechanicsImpl implements GameMechanics {
 
     @Override
     public void turn(@NotNull  String user, @NotNull ClientTurn clientTurn){
-
+        clientTurnService.turn(gameSessionService.getSessionForUser(user),user);
     };
 
 }

@@ -76,9 +76,9 @@ public class GameSessionService {
                 remotePointService.cutDownConnection(player.getUserNickname(), status);
             }
         }
-        for (GameUser player : gameSession.getPlayers()) {
-               clientTurnService.clearForUser(player.getUserNickname());
-        }
+//        for (GameUser player : gameSession.getPlayers()) {
+//               clientTurnService.clearForUser(player.getUserNickname());
+//        }
 
         LOGGER.info("Game session " + gameSession.getSessionId() + (error ? " was terminated due to error. " : " was cleaned. ")
                 + gameSession.toString());

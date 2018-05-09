@@ -52,4 +52,18 @@ public class GameSession {
     public boolean tryFinishGame() {
         return false;
     }
+
+    public GameUser getNext(String current) {
+        Integer i=0;
+        while (!(players.get(i).getUserNickname().equals(current)) && i<players.size())
+        {
+            i++;
+        }
+        if(i+1<players.size()) {
+            return (players.get(i+1));
+        }
+        else {
+            return (players.get(0));
+        }
+    }
 }
