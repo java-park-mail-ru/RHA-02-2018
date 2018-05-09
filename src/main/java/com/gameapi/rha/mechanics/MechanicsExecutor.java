@@ -39,39 +39,23 @@ public class MechanicsExecutor implements Runnable {
 
     @Override
     public void run() {
-        try {
-            mainCycle();
-        } finally {
-            LOGGER.warn("Mechanic executor terminated");
-        }
+//        try {
+//            mainCycle();
+//        } finally {
+//            LOGGER.warn("Mechanic executor terminated");
+//        }
     }
 
-    private void mainCycle() {
-        long lastFrameMillis = STEP_TIME;
-        while (true) {
-            try {
-                final long before = clock.millis();
-
-                gameMechanics.gmStep(lastFrameMillis);
-
-                final long after = clock.millis();
-                try {
-                    final long sleepingTime = Math.max(0, STEP_TIME - (after - before));
-                    Thread.sleep(sleepingTime);
-                } catch (InterruptedException e) {
-                    LOGGER.error("Mechanics thread was interrupted", e);
-                }
-
-                if (Thread.currentThread().isInterrupted()) {
-                    gameMechanics.reset();
-                    return;
-                }
-                final long afterSleep = clock.millis();
-                lastFrameMillis = afterSleep - before;
-            } catch (RuntimeException e) {
-                LOGGER.error("Mechanics executor was reseted due to exception", e);
-                gameMechanics.reset();
-            }
-        }
-    }
+//    private void mainCycle() {
+//        long lastFrameMillis = STEP_TIME;
+//        while (true) {
+//            try {
+//                int a=3;
+////                gameMechanics.gmStep();
+//            } catch (RuntimeException e) {
+//                LOGGER.error("Mechanics executor was reseted due to exception", e);
+//                gameMechanics.reset();
+//            }
+//        }
+//    }
 }

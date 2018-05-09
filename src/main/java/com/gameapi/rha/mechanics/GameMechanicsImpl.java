@@ -1,6 +1,7 @@
 package com.gameapi.rha.mechanics;
 
 import com.gameapi.rha.mechanics.messages.input.ClientStep;
+import com.gameapi.rha.mechanics.messages.input.ClientTurn;
 import com.gameapi.rha.mechanics.services.*;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
@@ -37,8 +38,6 @@ public class GameMechanicsImpl implements GameMechanics {
     @NotNull
     private final GameSessionService gameSessionService;
 
-    @NotNull
-    private final MechanicsTimeService timeService;
 
     @NotNull
     private final GameTaskScheduler gameTaskScheduler;
@@ -50,8 +49,8 @@ public class GameMechanicsImpl implements GameMechanics {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameMechanicsImpl.class);
 
 
-    @NotNull
-    private final Queue<Runnable> tasks = new ConcurrentLinkedQueue<>();
+//    @NotNull
+//    private final Queue<Runnable> tasks = new ConcurrentLinkedQueue<>();
 
     public GameMechanicsImpl(@NotNull UserService userService,
                              @NotNull GameInitService gameInitService,
@@ -60,7 +59,6 @@ public class GameMechanicsImpl implements GameMechanics {
                              @NotNull RemotePointService remotePointService,
                              @NotNull ServerTurnService serverTurnService,
                              @NotNull GameSessionService gameSessionService,
-                             @NotNull MechanicsTimeService timeService,
                              @NotNull GameTaskScheduler gameTaskScheduler) {
         this.userService = userService;
         this.clientStepService = clientStepService;
@@ -69,14 +67,14 @@ public class GameMechanicsImpl implements GameMechanics {
         this.serverTurnService = serverTurnService;
         this.remotePointService = remotePointService;
         this.gameSessionService = gameSessionService;
-        this.timeService = timeService;
         this.gameTaskScheduler = gameTaskScheduler;
     }
 
     @Override
     public void step(@NotNull String user, @NotNull ClientStep clientStep) {
 
-        tasks.add(() -> clientStepService.pushClientStep(gameSessionService.getSessionForUser(user), clientStep));
+//        tasks.add(() -> clientStepService.pushClientStep(gameSessionService.getSessionForUser(user), clientStep));
+        clientStepService.pushClientStep( gameSessionService.getSessionForUser(user), clientStep);
     }
 
     @Override
@@ -88,6 +86,7 @@ public class GameMechanicsImpl implements GameMechanics {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(String.format("User %s added to the waiting list", user));
         }
+        tryStartGames();
     }
 
     private void tryStartGames() {
@@ -115,49 +114,13 @@ public class GameMechanicsImpl implements GameMechanics {
     }
 
     @Override
-    public void gmStep(long frameTime) {
-
-        while (!tasks.isEmpty()) {
-            final Runnable nextTask = tasks.poll();
-            if (nextTask != null) {
-                try {
-                    nextTask.run();
-                } catch (RuntimeException ex) {
-                    LOGGER.error("Can't handle game task", ex);
-                }
-            }
-        }
-
-
-        gameTaskScheduler.tick();
-
-        final List<GameSession> sessionsToTerminate = new ArrayList<>();
-        final List<GameSession> sessionsToFinish = new ArrayList<>();
-        for (GameSession session : gameSessionService.getSessions()) {
-            if (session.tryFinishGame()) {
-                sessionsToFinish.add(session);
-                continue;
-            }
-
-
-            //            try {
-            //                serverSnapshotService.sendSnapshotsFor(session, frameTime);
-            //            } catch (RuntimeException ex) {
-            //                LOGGER.error("Failed to send snapshots, terminating the session", ex);
-            //            }
-            sessionsToTerminate.forEach(sess -> gameSessionService.forceTerminate(session, true));
-            sessionsToFinish.forEach(sess -> {
-                gameSessionService.forceTerminate(session, false);
-            });
-
-            tryStartGames();
-            timeService.tick(frameTime);
-        }
-    }
-
-    @Override
     public void reset() {
 
     }
+
+    @Override
+    public void turn(@NotNull  String user, @NotNull ClientTurn clientTurn){
+
+    };
 
 }

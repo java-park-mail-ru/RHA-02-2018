@@ -1,6 +1,7 @@
 package com.gameapi.rha.mechanics;
 
 import com.gameapi.rha.mechanics.messages.input.ClientStep;
+import com.gameapi.rha.mechanics.messages.input.ClientTurn;
 
 
 import javax.validation.constraints.NotNull;
@@ -11,7 +12,7 @@ public interface GameMechanics {
 
     void addUser(@NotNull String user);
 
-    void gmStep(long frameTime);
-
     void reset();
+
+    void turn(@NotNull  String user, @NotNull ClientTurn clientTurn);
 }

@@ -1,4 +1,6 @@
 package com.gameapi.rha.mechanics.messages.input;
 
-public class ClientTurn {
+import com.gameapi.rha.websocket.Message;
+
+public class ClientTurn extends Message {
 }

@@ -32,9 +32,11 @@ public class GameInitService {
 
         for (GameUser player : gameSession.getPlayers()) {
             final InitGame.Request initMessage = createInitMessageFor(gameSession);
+            final TurnInit.Request turnMessage = new TurnInit.Request(gameSession.getPlayers().get(1).getUserNickname());
             //noinspection OverlyBroadCatchBlock
             try {
                 remotePointService.sendMessageToUser(player.getUserNickname(), initMessage);
+                remotePointService.sendMessageToUser(player.getUserNickname(), turnMessage);
             } catch (IOException e) {
                 // TODO: Reentrance mechanism
                 players.forEach(playerToCutOff -> remotePointService.cutDownConnection(playerToCutOff.getUserNickname(),
@@ -42,13 +44,7 @@ public class GameInitService {
                 LOGGER.error("Unnable to start a game", e);
             }
         }
-        try {
-            remotePointService.sendMessageToUser(gameSession.getPlayers().get(1).getUserNickname(), new TurnInit.Request());
-        } catch (IOException e) {
-            players.forEach(playerToCutOff -> remotePointService.cutDownConnection(playerToCutOff.getUserNickname(),
-                    CloseStatus.SERVER_ERROR));
-            LOGGER.error("Unnable to start a game", e);
-        }
+
     }
 
     @SuppressWarnings("TooBroadScope")

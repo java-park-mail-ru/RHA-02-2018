@@ -30,6 +30,7 @@ public class JoinGameHandler extends MessageHandler<JoinGame.Request> {
       @Override
       public void handle(@NotNull JoinGame.Request message, @NotNull String user) {
           gameMechanics.addUser(user);
+
       }
 }
 
