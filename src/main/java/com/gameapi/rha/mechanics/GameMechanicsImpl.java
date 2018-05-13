@@ -38,6 +38,8 @@ public class GameMechanicsImpl implements GameMechanics {
     @NotNull
     private final GameSessionService gameSessionService;
 
+    @NotNull
+    private final ResourceFactory resourceFactory;
 
     @NotNull
     private final GameTaskScheduler gameTaskScheduler;
@@ -59,6 +61,7 @@ public class GameMechanicsImpl implements GameMechanics {
                              @NotNull RemotePointService remotePointService,
                              @NotNull ServerTurnService serverTurnService,
                              @NotNull GameSessionService gameSessionService,
+                             @NotNull ResourceFactory resourceFactory,
                              @NotNull GameTaskScheduler gameTaskScheduler) {
         this.userService = userService;
         this.clientStepService = clientStepService;
@@ -67,6 +70,7 @@ public class GameMechanicsImpl implements GameMechanics {
         this.serverTurnService = serverTurnService;
         this.remotePointService = remotePointService;
         this.gameSessionService = gameSessionService;
+        this.resourceFactory = resourceFactory;
         this.gameTaskScheduler = gameTaskScheduler;
     }
 

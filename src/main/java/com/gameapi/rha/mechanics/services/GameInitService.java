@@ -23,8 +23,12 @@ public class GameInitService {
     @NotNull
     private final RemotePointService remotePointService;
 
-    public GameInitService(@NotNull RemotePointService remotePointService) {
+    @NotNull
+    private final ResourceFactory resourceFactory;
+
+    public GameInitService(@NotNull RemotePointService remotePointService, @NotNull ResourceFactory resourceFactory) {
         this.remotePointService = remotePointService;
+        this.resourceFactory = resourceFactory;
     }
 
     public void initGameFor(@NotNull GameSession gameSession) {
@@ -52,7 +56,7 @@ public class GameInitService {
         final InitGame.Request initGameMessage = new InitGame.Request();
 
         final List<String> names = new ArrayList<>();
-        final TacticalMap map = new TacticalMap();
+        final TacticalMap map = new TacticalMap(resourceFactory.readMap());
 
 
         for (GameUser player : gameSession.getPlayers()) {

@@ -1,0 +1,7 @@
+[
+    {"owner":1,"units":2000,"neibours":[2,3],"type":1},
+    {"owner":0,"units":1000,"neibours":[1,3,4,5],"type":1},
+    {"owner":0,"units":1000,"neibours":[2,1,5],"type":1},
+    {"owner":0,"units":1000,"neibours":[2,5],"type":1},
+    {"owner":2,"units":2000,"neibours":[2,3,4],"type":1}
+  ]

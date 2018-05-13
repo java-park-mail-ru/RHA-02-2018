@@ -1,19 +1,22 @@
 package com.gameapi.rha.mechanics.game;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.gameapi.rha.mechanics.services.ResourceFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+
+import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class TacticalMap extends GameObject {
 
     private List<Hex> map = new ArrayList<>();
 
-    public TacticalMap() {
-        map.add(new Hex(1, 2000, Arrays.asList(2, 3), 1));
-        map.add(new Hex(0, 1000, Arrays.asList(1, 3, 4, 5), 1));
-        map.add(new Hex(0, 1000, Arrays.asList(2, 1, 5), 1));
-        map.add(new Hex(0, 1000, Arrays.asList(2, 5), 1));
-        map.add(new Hex(2, 2000, Arrays.asList(2, 3, 4), 1));
+    @JsonCreator
+    public TacticalMap(List<Hex> map) {
+        this.map = map;
 
     }
 

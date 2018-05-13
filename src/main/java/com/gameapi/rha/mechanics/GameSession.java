@@ -2,6 +2,7 @@ package com.gameapi.rha.mechanics;
 
 import com.gameapi.rha.mechanics.game.GameUser;
 import com.gameapi.rha.mechanics.game.TacticalMap;
+import com.gameapi.rha.mechanics.services.ResourceFactory;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -14,12 +15,15 @@ public class GameSession {
     private @NotNull Long  sessionId;
     private @NotNull List<GameUser> players;
     private @NotNull TacticalMap map;
+    @NotNull
+    private final ResourceFactory resourceFactory;
 
-    public GameSession(List<GameUser> players) {
+    public GameSession(List<GameUser> players, ResourceFactory resourceFactory) {
         this.players = players;
+        this.resourceFactory = resourceFactory;
         this.sessionId = ID_GENERATOR.getAndIncrement();
 
-        this.map = new TacticalMap();
+        this.map = new TacticalMap(resourceFactory.readMap());
     }
 
 

@@ -38,17 +38,21 @@ public class GameSessionService {
 
     private final @NotNull ClientTurnService clientTurnService;
 
+    @NotNull
+    private final ResourceFactory resourceFactory;
+
 
     public GameSessionService(@NotNull RemotePointService remotePointService,
                               @NotNull MechanicsTimeService timeService,
                               @NotNull GameInitService gameInitService,
                               @NotNull GameTaskScheduler gameTaskScheduler,
-                              @NotNull ClientTurnService clientTurnService) {
+                              @NotNull ClientTurnService clientTurnService, @NotNull ResourceFactory resourceFactory) {
         this.remotePointService = remotePointService;
         this.timeService = timeService;
         this.gameInitService = gameInitService;
         this.gameTaskScheduler = gameTaskScheduler;
         this.clientTurnService = clientTurnService;
+        this.resourceFactory = resourceFactory;
     }
 
     public Set<GameSession> getSessions() {
@@ -76,9 +80,6 @@ public class GameSessionService {
                 remotePointService.cutDownConnection(player.getUserNickname(), status);
             }
         }
-//        for (GameUser player : gameSession.getPlayers()) {
-//               clientTurnService.clearForUser(player.getUserNickname());
-//        }
 
         LOGGER.info("Game session " + gameSession.getSessionId() + (error ? " was terminated due to error. " : " was cleaned. ")
                 + gameSession.toString());
@@ -92,7 +93,7 @@ public class GameSessionService {
             gamers.add(new GameUser(player, timeService));
         }
 
-        final GameSession gameSession = new GameSession(gamers);
+        final GameSession gameSession = new GameSession(gamers, resourceFactory);
 
 
         gameSessions.add(gameSession);
@@ -148,12 +149,6 @@ public class GameSessionService {
 
         @Override
         public void operate() {
-        //            if (getGameSession().isFinished()) {
-        //                return;
-        //            }
-        //            final long newDelay = Math.max(currentDelay - Config.SWITCH_DELAY, Config.SWITCH_DELAY);
-        //            gameTaskScheduler.schedule(newDelay,
-        //                    new SwapTask(getGameSession(), gameTaskScheduler, newDelay));
         }
     }
 

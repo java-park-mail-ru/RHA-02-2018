@@ -1,6 +1,7 @@
 package com.gameapi.rha.mechanics.game;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -19,7 +20,8 @@ public class Hex extends GameObject {
     private Integer type;
 
     @JsonCreator
-    public Hex(@NotNull Integer owner, @NotNull Integer units, @NotNull List<Integer> neibours, @NotNull Integer type) {
+    public Hex(@JsonProperty("owner") @NotNull Integer owner, @JsonProperty("units") @NotNull Integer units,
+               @JsonProperty("neibours") @NotNull List<Integer> neibours, @JsonProperty("type") @NotNull Integer type) {
         this.owner = owner;
         this.units = units;
         this.neibours = neibours;
