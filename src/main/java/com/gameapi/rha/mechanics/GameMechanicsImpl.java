@@ -83,7 +83,10 @@ public class GameMechanicsImpl implements GameMechanics {
 
     @Override
     public void addUser(@NotNull String user) {
-        if (gameSessionService.isPlaying(user)) {
+        if (gameSessionService.isPlaying(user) || isWaiting(user)) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(String.format("User %s is playing", user));
+            }
             return;
         }
         waiters.add(user);
@@ -91,6 +94,12 @@ public class GameMechanicsImpl implements GameMechanics {
             LOGGER.debug(String.format("User %s added to the waiting list", user));
         }
         tryStartGames();
+    }
+
+
+    private boolean isWaiting(@NotNull String user)
+    {
+        return waiters.contains(user);
     }
 
     private void tryStartGames() {
