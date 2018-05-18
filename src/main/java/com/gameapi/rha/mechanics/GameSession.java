@@ -23,7 +23,7 @@ public class GameSession {
         this.resourceFactory = resourceFactory;
         this.sessionId = ID_GENERATOR.getAndIncrement();
 
-        this.map = new TacticalMap(resourceFactory.readMap());
+        this.map = new TacticalMap(resourceFactory.readMap("maps/trainingMap"));
     }
 
 

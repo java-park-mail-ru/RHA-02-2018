@@ -23,7 +23,7 @@ class ResourceFactoryTest {
 
     @Test
     void readMap() {
-        List<Hex> map= resourceFactory.readMap();
+        List<Hex> map= resourceFactory.readMap("maps/trainingMap");
         assertNotNull(map);
     }
 }

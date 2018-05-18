@@ -56,7 +56,7 @@ public class GameInitService {
         final InitGame.Request initGameMessage = new InitGame.Request();
 
         final List<String> names = new ArrayList<>();
-        final TacticalMap map = new TacticalMap(resourceFactory.readMap());
+        final TacticalMap map = new TacticalMap(resourceFactory.readMap("maps/trainingMap"));
 
 
         for (GameUser player : gameSession.getPlayers()) {
