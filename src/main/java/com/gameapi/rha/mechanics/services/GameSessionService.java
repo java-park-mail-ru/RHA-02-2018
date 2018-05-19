@@ -38,6 +38,7 @@ public class GameSessionService {
 
     private final @NotNull ClientTurnService clientTurnService;
 
+
     @NotNull
     private final ResourceFactory resourceFactory;
 
@@ -46,7 +47,9 @@ public class GameSessionService {
                               @NotNull MechanicsTimeService timeService,
                               @NotNull GameInitService gameInitService,
                               @NotNull GameTaskScheduler gameTaskScheduler,
-                              @NotNull ClientTurnService clientTurnService, @NotNull ResourceFactory resourceFactory) {
+                              @NotNull ClientTurnService clientTurnService,
+                              @NotNull GameSessionService gameSessionService,
+                              @NotNull ResourceFactory resourceFactory) {
         this.remotePointService = remotePointService;
         this.timeService = timeService;
         this.gameInitService = gameInitService;
@@ -93,7 +96,7 @@ public class GameSessionService {
             gamers.add(new GameUser(player, timeService));
         }
 
-        final GameSession gameSession = new GameSession(gamers, resourceFactory);
+        final GameSession gameSession = new GameSession(gamers, this, resourceFactory);
 
 
         gameSessions.add(gameSession);
@@ -106,34 +109,6 @@ public class GameSessionService {
 
     public void finishGame(@NotNull GameSession gameSession) {
         gameSession.setFinished();
-        //        final FinishGame.Overcome firstOvercome;
-        //        final FinishGame.Overcome secondOvercome;
-        //        final int firstScore = gameSession.getFirst().claimPart(MechanicPart.class).getScore();
-        //        final int secondScore = gameSession.getSecond().claimPart(MechanicPart.class).getScore();
-        //        if (firstScore == secondScore) {
-        //            firstOvercome = FinishGame.Overcome.DRAW;
-        //            secondOvercome = FinishGame.Overcome.DRAW;
-        //        } else if (firstScore > secondScore) {
-        //            firstOvercome = FinishGame.Overcome.WIN;
-        //            secondOvercome = FinishGame.Overcome.LOSE;
-        //        } else {
-        //            firstOvercome = FinishGame.Overcome.LOSE;
-        //            secondOvercome = FinishGame.Overcome.WIN;
-        //        }
-
-        //        try {
-        //            remotePointService.sendMessageToUser(gameSession.getFirst().getUsername(), new FinishGame(FinishGame.Overcome.LOSE));
-        //        } catch (IOException ex) {
-        //            LOGGER.warn(String.format("Failed to send FinishGame message to user %s",
-        //                    gameSession.getFirst().getUsername()), ex);
-        //        }
-        //
-        //        try {
-        //            remotePointService.sendMessageToUser(gameSession.getSecond().getUsername(), new FinishGame(FinishGame.Overcome.LOSE));
-        //        } catch (IOException ex) {
-        //            LOGGER.warn(String.format("Failed to send FinishGame message to user %s",
-        //                    gameSession.getSecond().getUsername()), ex);
-        //        }
     }
 
     private static final class SwapTask extends GameTaskScheduler.GameSessionTask {

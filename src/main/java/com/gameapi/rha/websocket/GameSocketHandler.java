@@ -49,8 +49,8 @@ public class GameSocketHandler extends TextWebSocketHandler {
             closeSessionSilently(webSocketSession, ACCESS_DENIED);
             return;
         }
-        final String userN = user ;
-        remotePointService.registerUser(userN, webSocketSession) ;
+        final String userN = user;
+        remotePointService.registerUser(userN, webSocketSession);
     }
 
     @Override

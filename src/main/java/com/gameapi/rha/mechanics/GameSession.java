@@ -1,7 +1,9 @@
 package com.gameapi.rha.mechanics;
 
 import com.gameapi.rha.mechanics.game.GameUser;
+import com.gameapi.rha.mechanics.game.Hex;
 import com.gameapi.rha.mechanics.game.TacticalMap;
+import com.gameapi.rha.mechanics.services.GameSessionService;
 import com.gameapi.rha.mechanics.services.ResourceFactory;
 
 import javax.validation.constraints.NotNull;
@@ -15,11 +17,14 @@ public class GameSession {
     private @NotNull Long  sessionId;
     private @NotNull List<GameUser> players;
     private @NotNull TacticalMap map;
-    @NotNull
-    private final ResourceFactory resourceFactory;
 
-    public GameSession(List<GameUser> players, ResourceFactory resourceFactory) {
+    private  final @NotNull GameSessionService gameSessionService;
+
+    private  final @NotNull ResourceFactory resourceFactory;
+
+    public GameSession(List<GameUser> players, GameSessionService gameSessionService, ResourceFactory resourceFactory) {
         this.players = players;
+        this.gameSessionService = gameSessionService;
         this.resourceFactory = resourceFactory;
         this.sessionId = ID_GENERATOR.getAndIncrement();
 
@@ -27,15 +32,13 @@ public class GameSession {
     }
 
 
-    public void terminateSession() {
-    }
+
 
     public List<GameUser> getPlayers() {
         return players;
     }
 
-    public void setFinished() {
-    }
+
 
     public Long getSessionId() {
         return sessionId;
@@ -54,19 +57,37 @@ public class GameSession {
     }
 
     public boolean tryFinishGame() {
-        return false;
+        Hex check = map.getMap().get(0);
+        for (Hex ever:map.getMap()
+             ) {
+            if (check.getOwner() != ever.getOwner()) {
+                return false;
+            }
+        }
+        gameSessionService.finishGame(this);
+        return true;
+    }
+
+    public boolean isFinished() {
+        return isFinished;
+    }
+
+    public void setFinished() {
+        isFinished = true;
+    }
+
+    public void terminateSession() {
+        gameSessionService.forceTerminate(this, true);
     }
 
     public GameUser getNext(String current) {
-        Integer i=0;
-        while (!(players.get(i).getUserNickname().equals(current)) && i<players.size())
-        {
+        Integer i = 0;
+        while (!(players.get(i).getUserNickname().equals(current)) && i < players.size()) {
             i++;
         }
-        if(i+1<players.size()) {
-            return (players.get(i+1));
-        }
-        else {
+        if (i + 1 < players.size()) {
+            return (players.get(i + 1));
+        } else {
             return (players.get(0));
         }
     }

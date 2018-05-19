@@ -35,8 +35,8 @@ public class UserService {
   public static final String PATH_AVATARS_FOLDER = Paths.get("uploads")
           .toAbsolutePath().toString() + '/';
   private static JdbcTemplate jdbc;
-  private static RatingMapper RATING_MAPPER = new RatingMapper();
-  private static UserMapper USER_MAPPER = new UserMapper();
+  private static final RatingMapper RATING_MAPPER = new RatingMapper();
+  private static final UserMapper USER_MAPPER = new UserMapper();
 
   /**
   * UserService default constructor specialized.
@@ -54,8 +54,8 @@ public class UserService {
    */
 
   public User createUser(User user) {
-    final String SQL = "INSERT INTO \"users\" (username,rating,email,password) VALUES (?, ?, ?, ?);";
-    jdbc.update(SQL, user.getUsername(), user.getRating(), user.getEmail(), user.getPassword());
+    final String sQl = "INSERT INTO \"users\" (username,rating,email,password) VALUES (?, ?, ?, ?);";
+    jdbc.update(sQl, user.getUsername(), user.getRating(), user.getEmail(), user.getPassword());
     return user;
   }
 
@@ -70,20 +70,20 @@ public class UserService {
 
 
   public List<List<Map<String, Integer>>> rating(Integer page, String user) {
-    String SQL = "SELECT username,rating FROM \"users\" WHERE username!=? "
+    String sql = "SELECT username,rating FROM \"users\" WHERE username!=? "
             + "ORDER BY rating DESC "
             + "OFFSET ? Rows LIMIT ?;";
 
     List<List<Map<String, Integer>>> res = new LinkedList<>();
-    res.add(jdbc.query(SQL, RATING_MAPPER, user, page * 5, 5));
+    res.add(jdbc.query(sql, RATING_MAPPER, user, page * 5, 5));
     if (res.get(0).isEmpty()) {
       return null;
     }
-    SQL = "SELECT username,rating FROM \"users\" WHERE username=?::citext LIMIT 1;";
-    res.add(jdbc.query(SQL, RATING_MAPPER, user));
-    SQL = "SELECT count(*) FROM users;";
+    sql = "SELECT username,rating FROM \"users\" WHERE username=?::citext LIMIT 1;";
+    res.add(jdbc.query(sql, RATING_MAPPER, user));
+    sql = "SELECT count(*) FROM users;";
     final Map<String, Integer> map = new HashMap<>();
-    map.put("pages", (jdbc.queryForObject(SQL, Integer.class) - 1) / 5);
+    map.put("pages", (jdbc.queryForObject(sql, Integer.class) - 1) / 5);
     List<Map<String, Integer>> lst = new LinkedList<>();
     lst.add(map);
     res.add(lst);
@@ -98,8 +98,8 @@ public class UserService {
    * @return user
    */
   public @Nullable User check(String email, String password)  {
-    final String SQL = "SELECT * FROM \"users\" WHERE email=?;";
-    final User authed = jdbc.queryForObject(SQL, USER_MAPPER, email);
+    final String sql = "SELECT * FROM \"users\" WHERE email=?;";
+    final User authed = jdbc.queryForObject(sql, USER_MAPPER, email);
     if (authed.checkPassword(password)) {
       return authed;
     } else {
@@ -109,8 +109,8 @@ public class UserService {
 
 
   public User userInfo(String nick) {
-    String SQL = "SELECT * FROM \"users\" WHERE username=?;";
-    return jdbc.queryForObject(SQL, USER_MAPPER, nick);
+    String sql = "SELECT * FROM \"users\" WHERE username=?;";
+    return jdbc.queryForObject(sql, USER_MAPPER, nick);
   }
 
 
@@ -121,23 +121,23 @@ public class UserService {
   public void changeUser(User user) {
 
     final List<Object> lst = new ArrayList<>();
-    String SQL = "UPDATE \"users\" SET";
+    String sql = "UPDATE \"users\" SET";
 
     if (user.getEmail() != null) {
-      SQL += " email = ?, ";
+      sql += " email = ?, ";
       lst.add(user.getEmail());
     }
     if (user.getPassword() != null) {
-      SQL += "password = ?, ";
+      sql += "password = ?, ";
       lst.add(user.getPassword());
     }
     if (user.getRating() != null) {
-      SQL += "rating = ? ";
+      sql += "rating = ? ";
       lst.add(user.getRating());
     }
-    SQL += " WHERE username=?;";
+    sql += " WHERE username=?;";
     lst.add(user.getUsername());
-    jdbc.update(SQL, lst.toArray());
+    jdbc.update(sql, lst.toArray());
   }
 
   /**
@@ -149,14 +149,14 @@ public class UserService {
   public void store(MultipartFile file, String user) throws IOException {
    File tosave = new File(PATH_AVATARS_FOLDER + user + "a.jpg");
     file.transferTo(tosave);
-    String SQL = "UPDATE \"users\" SET avatar=? WHERE username=(?)::citext;";
-    jdbc.update(SQL, user + "a.jpg", user);
+    String sql = "UPDATE \"users\" SET avatar=? WHERE username=(?)::citext;";
+    jdbc.update(sql, user + "a.jpg", user);
   }
 
 
   /**
    * load.
-   * @param user
+   * @param user is username
    * @return avatar
    */
 

@@ -45,14 +45,5 @@ public abstract class GameObject {
         return id;
     }
 
-//    @NotNull
-//    public List<Snap<? extends GamePart>> getPartSnaps() {
-//        return parts.values().stream()
-//                .filter(GamePart::shouldBeSnaped)
-//                .map(GamePart::takeSnap)
-//                .collect(Collectors.toList());
-//    }
 
-//    @NotNull
-//    public abstract Snap<? extends GameObject> getSnap();
 }

@@ -41,8 +41,6 @@ public class GameMechanicsImpl implements GameMechanics {
     @NotNull
     private final ResourceFactory resourceFactory;
 
-    @NotNull
-    private final GameTaskScheduler gameTaskScheduler;
 
     @NotNull
     private ConcurrentLinkedQueue<String> waiters = new ConcurrentLinkedQueue<>();
@@ -51,8 +49,6 @@ public class GameMechanicsImpl implements GameMechanics {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameMechanicsImpl.class);
 
 
-//    @NotNull
-//    private final Queue<Runnable> tasks = new ConcurrentLinkedQueue<>();
 
     public GameMechanicsImpl(@NotNull UserService userService,
                              @NotNull GameInitService gameInitService,
@@ -61,8 +57,7 @@ public class GameMechanicsImpl implements GameMechanics {
                              @NotNull RemotePointService remotePointService,
                              @NotNull ServerTurnService serverTurnService,
                              @NotNull GameSessionService gameSessionService,
-                             @NotNull ResourceFactory resourceFactory,
-                             @NotNull GameTaskScheduler gameTaskScheduler) {
+                             @NotNull ResourceFactory resourceFactory) {
         this.userService = userService;
         this.clientStepService = clientStepService;
         this.gameInitService = gameInitService;
@@ -71,14 +66,12 @@ public class GameMechanicsImpl implements GameMechanics {
         this.remotePointService = remotePointService;
         this.gameSessionService = gameSessionService;
         this.resourceFactory = resourceFactory;
-        this.gameTaskScheduler = gameTaskScheduler;
     }
 
     @Override
     public void step(@NotNull String user, @NotNull ClientStep clientStep) {
 
-//        tasks.add(() -> clientStepService.pushClientStep(gameSessionService.getSessionForUser(user), clientStep));
-        clientStepService.pushClientStep( gameSessionService.getSessionForUser(user), clientStep);
+        clientStepService.pushClientStep(gameSessionService.getSessionForUser(user), clientStep);
     }
 
     @Override
@@ -97,8 +90,7 @@ public class GameMechanicsImpl implements GameMechanics {
     }
 
 
-    private boolean isWaiting(@NotNull String user)
-    {
+    private boolean isWaiting(@NotNull String user) {
         return waiters.contains(user);
     }
 
@@ -132,8 +124,8 @@ public class GameMechanicsImpl implements GameMechanics {
     }
 
     @Override
-    public void turn(@NotNull  String user, @NotNull ClientTurn clientTurn){
-        clientTurnService.turn(gameSessionService.getSessionForUser(user),user);
-    };
+    public void turn(@NotNull  String user, @NotNull ClientTurn clientTurn) {
+        clientTurnService.turn(gameSessionService.getSessionForUser(user), user);
+    }
 
 }

@@ -6,7 +6,6 @@ import com.gameapi.rha.services.UserService;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -334,9 +333,9 @@ public class UserController {
       ByteArrayOutputStream bao = new ByteArrayOutputStream();
         final BufferedImage file;
         try {
-//          file = userService.loadAvatar("Kostyan");
+          //          file = userService.loadAvatar("Kostyan");
           file = userService.loadAvatar(session.getAttribute("user").toString());
-          ImageIO.write(file,"jpg",bao);
+          ImageIO.write(file, "jpg", bao);
         } catch (IOException exc) {
           return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
                   new Message(UserStatus.UNEXPECTED_ERROR));

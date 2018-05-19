@@ -27,11 +27,11 @@ public class ResourceFactory {
     private static class ListTypeReference extends TypeReference<List<Hex>> {
     }
 
-    public List<Hex> readMap(String mapPath){
+    public List<Hex> readMap(String mapPath) {
         try {
             return objectMapper.readValue(basePath.resolve(Paths.get(mapPath)).toRealPath().toFile(), new ListTypeReference());
         } catch (IOException e) {
-            throw new ResourceException("Failed reading json by path " + basePath+mapPath, e);
+            throw new ResourceException("Failed reading json by path " + basePath + mapPath, e);
         }
     }
 

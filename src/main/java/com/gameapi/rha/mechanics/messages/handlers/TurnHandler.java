@@ -1,7 +1,6 @@
 package com.gameapi.rha.mechanics.messages.handlers;
 
 import com.gameapi.rha.mechanics.GameMechanics;
-import com.gameapi.rha.mechanics.messages.input.ClientStep;
 import com.gameapi.rha.mechanics.messages.input.ClientTurn;
 import com.gameapi.rha.websocket.MessageHandler;
 import com.gameapi.rha.websocket.MessageHandlerContainer;
