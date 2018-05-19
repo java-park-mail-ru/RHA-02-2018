@@ -48,7 +48,6 @@ public class GameSessionService {
                               @NotNull GameInitService gameInitService,
                               @NotNull GameTaskScheduler gameTaskScheduler,
                               @NotNull ClientTurnService clientTurnService,
-                              @NotNull GameSessionService gameSessionService,
                               @NotNull ResourceFactory resourceFactory) {
         this.remotePointService = remotePointService;
         this.timeService = timeService;
