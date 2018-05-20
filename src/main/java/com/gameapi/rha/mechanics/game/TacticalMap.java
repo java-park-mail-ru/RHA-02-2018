@@ -2,7 +2,6 @@ package com.gameapi.rha.mechanics.game;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TacticalMap extends GameObject {

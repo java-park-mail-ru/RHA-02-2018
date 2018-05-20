@@ -30,9 +30,8 @@ public class ResourceFactory {
 
     public List<List<Hex>> readMap(String mapPath) {
         try {
-            File some=basePath.resolve(Paths.get(mapPath)).toRealPath().toFile();
-            if(some.exists())
-            {
+            File some = basePath.resolve(Paths.get(mapPath)).toRealPath().toFile();
+            if (some.exists()) {
                 System.out.println(some.canRead());
             }
             return objectMapper.readValue(some, new ListTypeReference());

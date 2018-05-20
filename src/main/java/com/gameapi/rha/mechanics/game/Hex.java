@@ -30,25 +30,25 @@ public class Hex extends GameObject {
                 @JsonProperty("type") @NotNull Integer type, @JsonProperty("coords") @NotNull Coords coords) {
         this.owner = owner;
         this.units = units;
-        this.coords=coords;
+        this.coords = coords;
         this.type = type;
 
-        if(coords.getY() - 1>=0) {
+        if (coords.getY() - 1 >= 0) {
             neibours.add(Arrays.asList(coords.getY() - 1, coords.getX()));
         }
-        if(coords.getX() - 1>=0) {
+        if (coords.getX() - 1 >= 0) {
             neibours.add(Arrays.asList(coords.getY(), coords.getX() - 1));
         }
         neibours.add(Arrays.asList(coords.getY(), coords.getX() + 1));
         neibours.add(Arrays.asList(coords.getY() + 1, coords.getX()));
-        if(coords.getX() % 2 == 1 && coords.getY() - 1>=0){
-            if(coords.getX() - 1>=0) {
+        if (coords.getX() % 2 == 1 && coords.getY() - 1 >= 0) {
+            if (coords.getX() - 1 >= 0) {
                 neibours.add(Arrays.asList(coords.getY() - 1, coords.getX() - 1));
             }
             neibours.add(Arrays.asList(coords.getY() - 1, coords.getX() + 1));
 
-        } else{
-            if(coords.getX() - 1>=0) {
+        } else {
+            if (coords.getX() - 1 >= 0) {
                 neibours.add(Arrays.asList(coords.getY() + 1, coords.getX() - 1));
             }
             neibours.add(Arrays.asList(coords.getY() + 1, coords.getX() + 1));

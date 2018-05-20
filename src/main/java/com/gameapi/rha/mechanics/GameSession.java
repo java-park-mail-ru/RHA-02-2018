@@ -60,15 +60,12 @@ public class GameSession {
         Hex check = map.getMap().get(0).get(0);
         for (List<Hex> ever:map.getMap()
              ) {
-            for (Hex foR:ever
-                 ) {
-
-
+            for (Hex foR:ever) {
             if (check.getOwner() != foR.getOwner()) {
                 return false;
             }
-
-        }}
+        }
+        }
         gameSessionService.finishGame(this);
         return true;
     }

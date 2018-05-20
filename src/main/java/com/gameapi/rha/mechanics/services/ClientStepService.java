@@ -87,11 +87,11 @@ public class ClientStepService {
 
             }
         }
-        gameSession.getMap().getMap().get(clientStep.getTo().get(0)).
-                set(clientStep.getTo().get(1), toHex);
+        gameSession.getMap().getMap().get(clientStep.getTo().get(0))
+                .set(clientStep.getTo().get(1), toHex);
         changes.add(toHex);
-        gameSession.getMap().getMap().get(clientStep.getFrom().get(0)).
-                set(clientStep.getFrom().get(1), toHex);
+        gameSession.getMap().getMap().get(clientStep.getFrom().get(0))
+                .set(clientStep.getFrom().get(1), toHex);
         changes.add(fromHex);
         for (GameUser player : gameSession.getPlayers()) {
             final ServerStep stepMessage = createServerStepMessage(gameSession, changes);
