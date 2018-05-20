@@ -84,10 +84,10 @@ public class UserService {
     sql = "SELECT count(*) FROM users;";
     final Map<String, Integer> map = new HashMap<>();
     int pages = jdbc.queryForObject(sql, Integer.class) - 1;
-    if(pages % 5 == 0) {
-      map.put("pages",pages / 5);
+    if (pages % 5 == 0) {
+      map.put("pages", pages / 5);
     } else {
-      map.put("pages",pages / 5 + 1);
+      map.put("pages", pages / 5 + 1);
     }
     List<Map<String, Integer>> lst = new LinkedList<>();
     lst.add(map);
