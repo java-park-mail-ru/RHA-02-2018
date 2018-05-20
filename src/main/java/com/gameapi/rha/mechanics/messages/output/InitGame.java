@@ -9,15 +9,15 @@ import java.util.List;
 public class InitGame {
     public static final class Request extends Message {
         private List<String> players;
-        private List<Hex> map;
+        private List<List<Hex>> map;
 
 
 
-        public @NotNull List<Hex> getMap() {
+        public @NotNull List<List<Hex>> getMap() {
             return map;
         }
 
-        public void setMap(@NotNull List<Hex> names) {
+        public void setMap(@NotNull List<List<Hex>>  names) {
             this.map = names;
         }
 

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gameapi.rha.mechanics.game.Hex;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,16 +21,21 @@ public class ResourceFactory {
     public ResourceFactory(ObjectMapper objectMapper) {
 
         this.objectMapper = objectMapper;
-        this.basePath = Paths.get("src/main/resources/");
+        this.basePath = Paths.get("src/main/resources");
     }
 
 
-    private static class ListTypeReference extends TypeReference<List<Hex>> {
+    private static class ListTypeReference extends TypeReference<List<List<Hex>>> {
     }
 
-    public List<Hex> readMap(String mapPath) {
+    public List<List<Hex>> readMap(String mapPath) {
         try {
-            return objectMapper.readValue(basePath.resolve(Paths.get(mapPath)).toRealPath().toFile(), new ListTypeReference());
+            File some=basePath.resolve(Paths.get(mapPath)).toRealPath().toFile();
+            if(some.exists())
+            {
+                System.out.println(some.canRead());
+            }
+            return objectMapper.readValue(some, new ListTypeReference());
         } catch (IOException e) {
             throw new ResourceException("Failed reading json by path " + basePath + mapPath, e);
         }

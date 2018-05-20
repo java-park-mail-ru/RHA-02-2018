@@ -34,8 +34,8 @@ public class ClientStepService {
     }
 
     public void pushClientStep(@NotNull GameSession gameSession, @NotNull ClientStep clientStep) {
-        Hex fromHex = gameSession.getMap().getMap().get(clientStep.getFrom());
-        Hex toHex = gameSession.getMap().getMap().get(clientStep.getTo());
+        Hex fromHex = gameSession.getMap().getMap().get(clientStep.getFrom().get(0)).get(clientStep.getFrom().get(1));
+        Hex toHex = gameSession.getMap().getMap().get(clientStep.getTo().get(0)).get(clientStep.getTo().get(1));
         List<Hex> changes = new ArrayList<>();
         if (fromHex.getOwner().equals(toHex.getOwner())) {
 
@@ -51,13 +51,13 @@ public class ClientStepService {
             Random rand = new Random();
             Double randomToken = rand.nextDouble() % 100;
             if (victoryProbability * 100 > randomToken) {
-                for (Integer retreatHex:toHex.getNeibours()) {
-                    if (gameSession.getMap().getMap().get(retreatHex)
+                for (List<Integer> retreatHex:toHex.getNeibours()) {
+                    if (gameSession.getMap().getMap().get(retreatHex.get(0)).get(retreatHex.get(1))
                             .getOwner().equals(toHex.getOwner())) {
-                        gameSession.getMap().getMap().get(retreatHex).setUnits(
-                                gameSession.getMap().getMap().get(retreatHex).getUnits()
+                        gameSession.getMap().getMap().get(retreatHex.get(0)).get(retreatHex.get(1)).setUnits(
+                                gameSession.getMap().getMap().get(retreatHex.get(0)).get(retreatHex.get(1)).getUnits()
                                         + (toHex.getUnits() * (rand.nextInt() % Config.RETREATED_LOST_TROOPS_MAX + 10) / 100));
-                        changes.add(gameSession.getMap().getMap().get(retreatHex));
+                        changes.add(gameSession.getMap().getMap().get(retreatHex.get(0)).get(retreatHex.get(1)));
                         break;
                     }
                 }
@@ -87,9 +87,11 @@ public class ClientStepService {
 
             }
         }
-        gameSession.getMap().getMap().set(clientStep.getTo(), toHex);
+        gameSession.getMap().getMap().get(clientStep.getTo().get(0)).
+                set(clientStep.getTo().get(1), toHex);
         changes.add(toHex);
-        gameSession.getMap().getMap().set(clientStep.getFrom(), fromHex);
+        gameSession.getMap().getMap().get(clientStep.getFrom().get(0)).
+                set(clientStep.getFrom().get(1), toHex);
         changes.add(fromHex);
         for (GameUser player : gameSession.getPlayers()) {
             final ServerStep stepMessage = createServerStepMessage(gameSession, changes);

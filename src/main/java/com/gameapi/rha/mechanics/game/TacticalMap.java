@@ -7,19 +7,19 @@ import java.util.List;
 
 public class TacticalMap extends GameObject {
 
-    private List<Hex> map = new ArrayList<>();
+    private List<List<Hex>> map;
 
     @JsonCreator
-    public TacticalMap(List<Hex> map) {
+    public TacticalMap(List<List<Hex>> map) {
         this.map = map;
 
     }
 
-    public List<Hex> getMap() {
+    public List<List<Hex>> getMap() {
         return map;
     }
 
-    public void setMap(List<Hex> map) {
+    public void setMap(List<List<Hex>> map) {
         this.map = map;
     }
 }
