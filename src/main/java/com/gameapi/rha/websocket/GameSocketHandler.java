@@ -1,7 +1,6 @@
 package com.gameapi.rha.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -49,8 +48,7 @@ public class GameSocketHandler extends TextWebSocketHandler {
             closeSessionSilently(webSocketSession, ACCESS_DENIED);
             return;
         }
-        final String userN = user;
-        remotePointService.registerUser(userN, webSocketSession);
+        remotePointService.registerUser(user, webSocketSession);
     }
 
     @Override

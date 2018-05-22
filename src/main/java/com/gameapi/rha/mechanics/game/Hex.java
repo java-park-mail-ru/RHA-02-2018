@@ -23,7 +23,7 @@ public class Hex extends GameObject {
     private Integer type;
 
     @NotNull
-    private List<List<Integer>> neibours = new ArrayList<>();
+    private List<List<Integer>> neighbours = new ArrayList<>();
 
     @JsonCreator
     public Hex(@JsonProperty("owner") @NotNull Integer owner, @JsonProperty("units") @NotNull Integer units,
@@ -34,24 +34,24 @@ public class Hex extends GameObject {
         this.type = type;
 
         if (coords.getY() - 1 >= 0) {
-            neibours.add(Arrays.asList(coords.getY() - 1, coords.getX()));
+            neighbours.add(Arrays.asList(coords.getY() - 1, coords.getX()));
         }
         if (coords.getX() - 1 >= 0) {
-            neibours.add(Arrays.asList(coords.getY(), coords.getX() - 1));
+            neighbours.add(Arrays.asList(coords.getY(), coords.getX() - 1));
         }
-        neibours.add(Arrays.asList(coords.getY(), coords.getX() + 1));
-        neibours.add(Arrays.asList(coords.getY() + 1, coords.getX()));
+        neighbours.add(Arrays.asList(coords.getY(), coords.getX() + 1));
+        neighbours.add(Arrays.asList(coords.getY() + 1, coords.getX()));
         if (coords.getX() % 2 == 1 && coords.getY() - 1 >= 0) {
             if (coords.getX() - 1 >= 0) {
-                neibours.add(Arrays.asList(coords.getY() - 1, coords.getX() - 1));
+                neighbours.add(Arrays.asList(coords.getY() - 1, coords.getX() - 1));
             }
-            neibours.add(Arrays.asList(coords.getY() - 1, coords.getX() + 1));
+            neighbours.add(Arrays.asList(coords.getY() - 1, coords.getX() + 1));
 
         } else {
             if (coords.getX() - 1 >= 0) {
-                neibours.add(Arrays.asList(coords.getY() + 1, coords.getX() - 1));
+                neighbours.add(Arrays.asList(coords.getY() + 1, coords.getX() - 1));
             }
-            neibours.add(Arrays.asList(coords.getY() + 1, coords.getX() + 1));
+            neighbours.add(Arrays.asList(coords.getY() + 1, coords.getX() + 1));
         }
     }
 
@@ -79,8 +79,8 @@ public class Hex extends GameObject {
         this.owner = owner;
     }
 
-    public List<List<Integer>> getNeibours() {
-        return neibours;
+    public List<List<Integer>> getNeighbours() {
+        return neighbours;
 
     }
 }

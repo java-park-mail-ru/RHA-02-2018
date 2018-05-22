@@ -58,10 +58,9 @@ public class GameSession {
 
     public boolean tryFinishGame() {
         Hex check = map.getMap().get(0).get(0);
-        for (List<Hex> ever:map.getMap()
-             ) {
-            for (Hex foR:ever) {
-            if (check.getOwner() != foR.getOwner()) {
+        for (List<Hex> ever:map.getMap()) {
+            for (Hex one:ever) {
+            if (check.getOwner() != one.getOwner()) {
                 return false;
             }
         }

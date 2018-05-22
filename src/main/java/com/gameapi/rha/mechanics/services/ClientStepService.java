@@ -40,21 +40,21 @@ public class ClientStepService {
         String type;
 
         if (fromHex.getOwner().equals(toHex.getOwner())) {
-            type="move";
+            type = "move";
             toHex.setUnits(toHex.getUnits()
                     + (int) (((double) fromHex.getUnits()) * Config.MOVING_UNITS_COEFF));
 
             fromHex.setUnits((int) (((double) fromHex.getUnits())
                     * (1 - Config.MOVING_UNITS_COEFF)));
         } else {
-            type="attack";
+            type = "attack";
             double victoryProbability = Math.atan((double) (fromHex.getUnits())
                     * Config.MOVING_UNITS_COEFF
                     / (double) toHex.getUnits() / Config.CASUALTIES_COEFF) /  Math.PI * 2;
             Random rand = new Random();
             Double randomToken = rand.nextDouble() % 100;
             if (victoryProbability * 100 > randomToken) {
-                for (List<Integer> retreatHex:toHex.getNeibours()) {
+                for (List<Integer> retreatHex:toHex.getNeighbours()) {
                     if (gameSession.getMap().getMap().get(retreatHex.get(0)).get(retreatHex.get(1))
                             .getOwner().equals(toHex.getOwner())) {
                         gameSession.getMap().getMap().get(retreatHex.get(0)).get(retreatHex.get(1)).setUnits(
@@ -97,7 +97,7 @@ public class ClientStepService {
                 .set(clientStep.getFrom().get(1), fromHex);
         changes.add(fromHex);
         for (GameUser player : gameSession.getPlayers()) {
-            final ServerStep stepMessage = createServerStepMessage(gameSession, changes,type);
+            final ServerStep stepMessage = createServerStepMessage(gameSession, changes, type);
             //noinspection OverlyBroadCatchBlock
             try {
                 remotePointService.sendMessageToUser(player.getUserNickname(), stepMessage);
