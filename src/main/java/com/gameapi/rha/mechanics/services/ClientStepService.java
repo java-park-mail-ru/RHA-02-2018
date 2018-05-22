@@ -109,7 +109,7 @@ public class ClientStepService {
         fromHex.setUnits((int) (((double) fromHex.getUnits())
                 * (1 - Config.MOVING_UNITS_COEFF)));
     }
-//TODO: Fix attackLost
+    //TODO: Fix attackLost
 
 
 
