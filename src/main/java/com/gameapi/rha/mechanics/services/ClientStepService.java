@@ -33,68 +33,44 @@ public class ClientStepService {
         this.remotePointService = remotePointService;
     }
 
+
+
     public void pushClientStep(@NotNull GameSession gameSession, @NotNull ClientStep clientStep) {
-        Hex fromHex = gameSession.getMap().getMap().get(clientStep.getFrom().get(0)).get(clientStep.getFrom().get(1));
-        Hex toHex = gameSession.getMap().getMap().get(clientStep.getTo().get(0)).get(clientStep.getTo().get(1));
+        Hex fromHex = gameSession.getMap()
+                .get(clientStep.getFrom().get(0), clientStep.getFrom().get(1));
+
+        Hex toHex = gameSession.getMap()
+                .get(clientStep.getTo().get(0), clientStep.getTo().get(1));
+
         List<Hex> changes = new ArrayList<>();
         String type;
 
         if (fromHex.getOwner().equals(toHex.getOwner())) {
             type = "move";
-            toHex.setUnits(toHex.getUnits()
-                    + (int) (((double) fromHex.getUnits()) * Config.MOVING_UNITS_COEFF));
-
-            fromHex.setUnits((int) (((double) fromHex.getUnits())
-                    * (1 - Config.MOVING_UNITS_COEFF)));
+            move(toHex, fromHex);
         } else {
             type = "attack";
+
             double victoryProbability = Math.atan((double) (fromHex.getUnits())
                     * Config.MOVING_UNITS_COEFF
                     / (double) toHex.getUnits() / Config.CASUALTIES_COEFF) /  Math.PI * 2;
-            Random rand = new Random();
-            Double randomToken = rand.nextDouble() % 100;
-            if (victoryProbability * 100 > randomToken) {
-                for (List<Integer> retreatHex:toHex.getNeighbours()) {
-                    if (gameSession.getMap().getMap().get(retreatHex.get(0)).get(retreatHex.get(1))
-                            .getOwner().equals(toHex.getOwner())) {
-                        gameSession.getMap().getMap().get(retreatHex.get(0)).get(retreatHex.get(1)).setUnits(
-                                gameSession.getMap().getMap().get(retreatHex.get(0)).get(retreatHex.get(1)).getUnits()
-                                        + (toHex.getUnits() * (rand.nextInt() % Config.RETREATED_LOST_TROOPS_MAX + 10) / 100));
-                        changes.add(gameSession.getMap().getMap().get(retreatHex.get(0)).get(retreatHex.get(1)));
-                        break;
-                    }
-                }
-                toHex.setOwner(fromHex.getOwner());
-                if (fromHex.getUnits() * Config.MOVING_UNITS_COEFF > toHex.getUnits() * Config.CASUALTIES_COEFF) {
-                    toHex.setUnits((int) (fromHex.getUnits() * Config.MOVING_UNITS_COEFF
-                            - toHex.getUnits() * Config.CASUALTIES_COEFF));
-                } else {
-                    toHex.setUnits(0);
-                }
-                toHex.setUnits((int) (toHex.getUnits() + ((fromHex.getUnits()
-                        * Config.MOVING_UNITS_COEFF) - toHex.getUnits())
-                        / 100 * (rand.nextInt() % Config.RETREATED_VICTORIOUS_TROOPS_MAX + 20)));
-                fromHex.setUnits((int) (fromHex.getUnits() * (1 - Config.MOVING_UNITS_COEFF)));
-            } else {
-                if (fromHex.getUnits() * Config.MOVING_UNITS_COEFF < toHex.getUnits() * Config.CASUALTIES_COEFF) {
-                    Integer fighRes = ((int) (toHex.getUnits() * Config.CASUALTIES_COEFF
-                            - fromHex.getUnits() * Config.MOVING_UNITS_COEFF));
-                    toHex.setUnits(fighRes + (toHex.getUnits() - fighRes)
-                            / 100 * (rand.nextInt() % Config.RETREATED_VICTORIOUS_TROOPS_MAX + 20));
-                } else {
-                    toHex.setUnits(toHex.getUnits() / 100 * (rand.nextInt()
-                            % Config.RETREATED_VICTORIOUS_TROOPS_MAX + 20));
-                }
-                fromHex.setUnits((int) (fromHex.getUnits() * (1 - Config.MOVING_UNITS_COEFF)
-                        + fromHex.getUnits() * Config.MOVING_UNITS_COEFF * (rand.nextInt() % Config.RETREATED_LOST_TROOPS_MAX + 10) / 100));
+            final Random rand = new Random();
+            final Double randomToken = rand.nextDouble() % 100;
 
+            if (victoryProbability * 100 > randomToken) {
+                attackV(toHex, fromHex, gameSession, changes, rand);
+
+            } else {
+                attackL(toHex, fromHex, rand);
             }
         }
+
         gameSession.getMap().getMap().get(clientStep.getTo().get(0))
                 .set(clientStep.getTo().get(1), toHex);
         changes.add(toHex);
         gameSession.getMap().getMap().get(clientStep.getFrom().get(0))
                 .set(clientStep.getFrom().get(1), fromHex);
+
         changes.add(fromHex);
         for (GameUser player : gameSession.getPlayers()) {
             final ServerStep stepMessage = createServerStepMessage(gameSession, changes, type);
@@ -110,10 +86,71 @@ public class ClientStepService {
         }
     }
 
+
+
+
     private ServerStep createServerStepMessage(@NotNull GameSession gameSession, List<Hex> changes, String type) {
         final ServerStep serverStepMessage = new ServerStep();
         serverStepMessage.setMap(changes);
         serverStepMessage.setType(type);
         return serverStepMessage;
+    }
+
+
+
+
+
+
+
+    private void move(Hex toHex, Hex fromHex) {
+        toHex.setUnits(toHex.getUnits()
+                + (int) (((double) fromHex.getUnits()) * Config.MOVING_UNITS_COEFF));
+
+        fromHex.setUnits((int) (((double) fromHex.getUnits())
+                * (1 - Config.MOVING_UNITS_COEFF)));
+    }
+
+
+
+
+    private void attackV(Hex toHex, Hex fromHex, GameSession gameSession,
+                         List<Hex> changes, Random rand) {
+        for (List<Integer> retreatHex:toHex.getNeighbours()) {
+            if (gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1))
+                    .getOwner().equals(toHex.getOwner())) {
+                gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).setUnits(
+                        gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).getUnits()
+                                + (toHex.getUnits() * (rand.nextInt() % Config.RETREATED_LOST_TROOPS_MAX + 10) / 100));
+                changes.add(gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)));
+                break;
+            }
+        }
+        toHex.setOwner(fromHex.getOwner());
+        if (fromHex.getUnits() * Config.MOVING_UNITS_COEFF > toHex.getUnits() * Config.CASUALTIES_COEFF) {
+            toHex.setUnits((int) (fromHex.getUnits() * Config.MOVING_UNITS_COEFF
+                    - toHex.getUnits() * Config.CASUALTIES_COEFF));
+        } else {
+            toHex.setUnits(0);
+        }
+        toHex.setUnits((int) (toHex.getUnits() + ((fromHex.getUnits()
+                * Config.MOVING_UNITS_COEFF) - toHex.getUnits())
+                / 100 * (rand.nextInt() % Config.RETREATED_VICTORIOUS_TROOPS_MAX + 20)));
+        fromHex.setUnits((int) (fromHex.getUnits() * (1 - Config.MOVING_UNITS_COEFF)));
+    }
+
+
+
+    private void attackL(Hex toHex, Hex fromHex, Random rand) {
+        if (fromHex.getUnits() * Config.MOVING_UNITS_COEFF < toHex.getUnits() * Config.CASUALTIES_COEFF) {
+            Integer fighRes = ((int) (toHex.getUnits() * Config.CASUALTIES_COEFF
+                    - fromHex.getUnits() * Config.MOVING_UNITS_COEFF));
+            toHex.setUnits(fighRes + (toHex.getUnits() - fighRes)
+                    / 100 * (rand.nextInt() % Config.RETREATED_VICTORIOUS_TROOPS_MAX + 20));
+        } else {
+            toHex.setUnits(toHex.getUnits() / 100 * (rand.nextInt()
+                    % Config.RETREATED_VICTORIOUS_TROOPS_MAX + 20));
+        }
+        fromHex.setUnits((int) (fromHex.getUnits() * (1 - Config.MOVING_UNITS_COEFF)
+                + fromHex.getUnits() * Config.MOVING_UNITS_COEFF * (rand.nextInt() % Config.RETREATED_LOST_TROOPS_MAX + 10) / 100));
     }
 }
