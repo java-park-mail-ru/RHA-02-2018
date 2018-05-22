@@ -59,7 +59,6 @@ public class GameSocketHandler extends TextWebSocketHandler {
             return;
         }
         final String user = (String) webSocketSession.getAttributes().get("user");
-        final User usN;
         if (user == null || userService.userInfo(user) == null) {
             closeSessionSilently(webSocketSession, ACCESS_DENIED);
             return;

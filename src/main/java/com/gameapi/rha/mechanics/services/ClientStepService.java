@@ -37,14 +37,17 @@ public class ClientStepService {
         Hex fromHex = gameSession.getMap().getMap().get(clientStep.getFrom().get(0)).get(clientStep.getFrom().get(1));
         Hex toHex = gameSession.getMap().getMap().get(clientStep.getTo().get(0)).get(clientStep.getTo().get(1));
         List<Hex> changes = new ArrayList<>();
-        if (fromHex.getOwner().equals(toHex.getOwner())) {
+        String type;
 
+        if (fromHex.getOwner().equals(toHex.getOwner())) {
+            type="move";
             toHex.setUnits(toHex.getUnits()
                     + (int) (((double) fromHex.getUnits()) * Config.MOVING_UNITS_COEFF));
 
             fromHex.setUnits((int) (((double) fromHex.getUnits())
                     * (1 - Config.MOVING_UNITS_COEFF)));
         } else {
+            type="attack";
             double victoryProbability = Math.atan((double) (fromHex.getUnits())
                     * Config.MOVING_UNITS_COEFF
                     / (double) toHex.getUnits() / Config.CASUALTIES_COEFF) /  Math.PI * 2;
@@ -91,10 +94,10 @@ public class ClientStepService {
                 .set(clientStep.getTo().get(1), toHex);
         changes.add(toHex);
         gameSession.getMap().getMap().get(clientStep.getFrom().get(0))
-                .set(clientStep.getFrom().get(1), toHex);
+                .set(clientStep.getFrom().get(1), fromHex);
         changes.add(fromHex);
         for (GameUser player : gameSession.getPlayers()) {
-            final ServerStep stepMessage = createServerStepMessage(gameSession, changes);
+            final ServerStep stepMessage = createServerStepMessage(gameSession, changes,type);
             //noinspection OverlyBroadCatchBlock
             try {
                 remotePointService.sendMessageToUser(player.getUserNickname(), stepMessage);
@@ -107,9 +110,10 @@ public class ClientStepService {
         }
     }
 
-    private ServerStep createServerStepMessage(@NotNull GameSession gameSession, List<Hex> changes) {
+    private ServerStep createServerStepMessage(@NotNull GameSession gameSession, List<Hex> changes, String type) {
         final ServerStep serverStepMessage = new ServerStep();
         serverStepMessage.setMap(changes);
+        serverStepMessage.setType(type);
         return serverStepMessage;
     }
 }

@@ -9,6 +9,9 @@ import java.util.List;
 public class ServerStep extends Message {
 
     @NotNull
+    private String type;
+
+    @NotNull
     private List<Hex> map;
 
     @NotNull
@@ -18,5 +21,13 @@ public class ServerStep extends Message {
 
     public void setMap(List<Hex> map) {
         this.map = map;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
