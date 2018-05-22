@@ -55,7 +55,7 @@ public class ClientStepService {
                     * Config.MOVING_UNITS_COEFF
                     / (double) toHex.getUnits() / Config.CASUALTIES_COEFF) /  Math.PI * 2;
             final Random rand = new Random();
-            final Double randomToken = rand.nextDouble() % 100;
+            final Double randomToken = Math.abs((double) rand.nextInt() % 100);
 
             if (victoryProbability * 100 > randomToken) {
                 attackV(toHex, fromHex, gameSession, changes, rand);
