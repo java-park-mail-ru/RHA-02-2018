@@ -54,30 +54,32 @@ public class ClientStepService {
             double victoryProbability = Math.atan((double) (fromHex.getUnits())
                     * Config.MOVING_UNITS_COEFF
                     / (double) toHex.getUnits() / Config.CASUALTIES_COEFF) /  Math.PI * 2;
-            switch (toHex.getType()){
+            switch (toHex.getType()) {
                 case 1:
                     break;
                 case 2:
-                    victoryProbability=victoryProbability/Config.DESERT_DEFENCE;
+                    victoryProbability = victoryProbability / Config.DESERT_DEFENCE;
                     break;
                 case 3:
-                    victoryProbability=victoryProbability/Config.FOREST_DEFENCE;
+                    victoryProbability = victoryProbability / Config.FOREST_DEFENCE;
                     break;
                 case 4:
-                    victoryProbability=victoryProbability/Config.HILL_DEFENCE;
+                    victoryProbability = victoryProbability / Config.HILL_DEFENCE;
                     break;
                 case 5:
-                    victoryProbability=victoryProbability/Config.FOREST_HILL_DEFENCE;
+                    victoryProbability = victoryProbability / Config.FOREST_HILL_DEFENCE;
                     break;
                 case 6:
-                    victoryProbability=victoryProbability/Config.DESERT_HILL_DEFENCE;
+                    victoryProbability = victoryProbability / Config.DESERT_HILL_DEFENCE;
                     break;
                 case 7:
-                    victoryProbability=victoryProbability/Config.CITY_DEFENCE;
+                    victoryProbability = victoryProbability / Config.CITY_DEFENCE;
                     break;
                 case 8:
-                    victoryProbability=victoryProbability/Config.MOUNTAIN_DEFENCE;
+                    victoryProbability = victoryProbability / Config.MOUNTAIN_DEFENCE;
                     break;
+                default:
+                        break;
             }
 
             final Random rand = new Random();
