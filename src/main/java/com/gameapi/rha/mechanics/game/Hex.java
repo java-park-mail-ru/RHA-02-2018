@@ -22,6 +22,17 @@ public class Hex extends GameObject {
     @NotNull
     private Integer type;
 
+    //Different types:
+    //0:water(no can simply walk into water(Vice city version))
+    //1:grass field(grain or other crops, the simplest terrain)
+    //2:sand desert(almost no reinforcements here, defending is harder)
+    //3:forest (easy to defend, less reinforcements)
+    //4:grass hills (easier to defend, normal reinforcements as well)
+    //5:foresty hills ( wery easy to defend, as much reinforcements as in forest)
+    //6:sand hills (a bit better then send)
+    //7:mountains(the best thing to defend, but no reinforcements)
+    //8:city(good thing to defend, and lots of reinforcements too)
+
     @NotNull
     private List<List<Integer>> neighbours = new ArrayList<>();
 

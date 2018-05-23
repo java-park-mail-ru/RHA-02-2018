@@ -89,7 +89,43 @@ public class GameSession {
         if (i + 1 < players.size()) {
             return (players.get(i + 1));
         } else {
+            mapTurn();
             return (players.get(0));
+        }
+    }
+
+    public void mapTurn() {
+        for (List<Hex> line: map.getMap()){
+            for (Hex hex: line){
+                switch (hex.getType()){
+                    case 0:
+                        break;
+                    case 1:
+                        hex.setUnits(hex.getUnits()+Config.FIELD_GROWTH);
+                        break;
+                    case 2:
+                        hex.setUnits(hex.getUnits()+Config.DESERT_GROWTH);
+                        break;
+                    case 3:
+                        hex.setUnits(hex.getUnits()+Config.FOREST_GROWTH);
+                        break;
+                    case 4:
+                        hex.setUnits(hex.getUnits()+Config.FIELD_GROWTH);
+                        break;
+                    case 5:
+                        hex.setUnits(hex.getUnits()+Config.FOREST_GROWTH);
+                        break;
+                    case 6:
+                        hex.setUnits(hex.getUnits()+Config.DESERT_GROWTH);
+                        break;
+                    case 7:
+                        hex.setUnits(hex.getUnits()+Config.MOUNTAIN_GROWTH);
+                        break;
+                    case 8:
+                        hex.setUnits(hex.getUnits()+Config.CITY_GROWTH);
+                        break;
+                }
+            }
         }
     }
 }
