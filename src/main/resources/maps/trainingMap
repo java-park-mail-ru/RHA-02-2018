@@ -24,9 +24,9 @@
         {"owner":0,"units":750,"type":1,"coords":{"y":3,"x":3}},
         {"owner":2,"units":2000,"type":1,"coords":{"y":3,"x":4}}],
 
-    [{"owner":1,"units":2000,"coords":{"type":1,"y":4,"x":0}},
-        {"owner":0,"units":750,"coords":{"type":1,"y":4,"x":1}},
-        {"owner":0,"units":750,"coords":{"type":1,"y":4,"x":2}},
-        {"owner":0,"units":750,"coords":{"type":1,"y":4,"x":3}},
-        {"owner":2,"units":2000,"coords":{"type":1,"y":4,"x":4}}]
+    [{"owner":1,"units":2000,"type":1,"coords":{"y":4,"x":0}},
+        {"owner":0,"units":750,"type":1,"coords":{"y":4,"x":1}},
+        {"owner":0,"units":750,"type":1,"coords":{"y":4,"x":2}},
+        {"owner":0,"units":750,"type":1,"coords":{"y":4,"x":3}},
+        {"owner":2,"units":2000,"type":1,"coords":{"y":4,"x":4}}]
   ]

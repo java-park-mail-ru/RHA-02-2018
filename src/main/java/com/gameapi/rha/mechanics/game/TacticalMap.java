@@ -14,7 +14,7 @@ public class TacticalMap extends GameObject {
 
     }
 
-    public Hex get(Integer y, Integer x) {
+    public Hex get(Integer x, Integer y) {
         return map.get(y).get(x);
     }
 
