@@ -5,9 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gameapi.rha.mechanics.base.Coords;
 
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class Hex extends GameObject {
 
@@ -33,9 +30,6 @@ public class Hex extends GameObject {
     //7:mountains(the best thing to defend, but no reinforcements)
     //8:city(good thing to defend, and lots of reinforcements too)
 
-    @NotNull
-    private List<List<Integer>> neighbours = new ArrayList<>();
-
     @JsonCreator
     public Hex(@JsonProperty("owner") @NotNull Integer owner, @JsonProperty("units") @NotNull Integer units,
                 @JsonProperty("type") @NotNull Integer type, @JsonProperty("coords") @NotNull Coords coords) {
@@ -44,26 +38,7 @@ public class Hex extends GameObject {
         this.coords = coords;
         this.type = type;
 
-        if (coords.getY() - 1 >= 0) {
-            neighbours.add(Arrays.asList(coords.getY() - 1, coords.getX()));
-        }
-        if (coords.getX() - 1 >= 0) {
-            neighbours.add(Arrays.asList(coords.getY(), coords.getX() - 1));
-        }
-        neighbours.add(Arrays.asList(coords.getY(), coords.getX() + 1));
-        neighbours.add(Arrays.asList(coords.getY() + 1, coords.getX()));
-        if (coords.getX() % 2 == 1 && coords.getY() - 1 >= 0) {
-            if (coords.getX() - 1 >= 0) {
-                neighbours.add(Arrays.asList(coords.getY() - 1, coords.getX() - 1));
-            }
-            neighbours.add(Arrays.asList(coords.getY() - 1, coords.getX() + 1));
 
-        } else {
-            if (coords.getX() - 1 >= 0) {
-                neighbours.add(Arrays.asList(coords.getY() + 1, coords.getX() - 1));
-            }
-            neighbours.add(Arrays.asList(coords.getY() + 1, coords.getX() + 1));
-        }
     }
 
     public Integer getType() {
@@ -90,10 +65,7 @@ public class Hex extends GameObject {
         this.owner = owner;
     }
 
-    public List<List<Integer>> getNeighbours() {
-        return neighbours;
 
-    }
 
     public Coords getCoords() {
         return coords;

@@ -1,10 +1,12 @@
 package com.gameapi.rha.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gameapi.rha.mechanics.services.GameSessionService;
 import com.gameapi.rha.services.UserService;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -16,11 +18,15 @@ import java.io.IOException;
 
 import static org.springframework.web.socket.CloseStatus.SERVER_ERROR;
 
+
+
 @Component
 public class GameSocketHandler extends TextWebSocketHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameSocketHandler.class);
     private static final CloseStatus ACCESS_DENIED = new CloseStatus(4500, "Not logged in. Access denied");
 
+    @Autowired
+    private GameSessionService game;
 
     private final  @NotNull UserService userService;
 
@@ -89,6 +95,8 @@ public class GameSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession webSocketSession, CloseStatus closeStatus) {
         final String user = (String) webSocketSession.getAttributes().get("user");
+        //TODO:  Переподключение
+        game.finishGame(game.getSessionForUser(user));
         if (user == null) {
             LOGGER.warn("User disconnected but his session was not found (closeStatus=" + closeStatus + ')');
             return;

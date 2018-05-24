@@ -86,10 +86,10 @@ public class ClientStepService {
             final Double randomToken = Math.abs((double) rand.nextInt() % 100);
 
             if (victoryProbability * 100 > randomToken) {
-                attackV(toHex, fromHex, gameSession, changes, rand);
+                attackWin(toHex, fromHex, gameSession, changes, rand);
 
             } else {
-                attackL(toHex, fromHex, rand);
+                attackLose(toHex, fromHex, rand);
             }
         }
 
@@ -141,9 +141,9 @@ public class ClientStepService {
 
 
 
-    private void attackV(Hex toHex, Hex fromHex, GameSession gameSession,
+    private void attackWin(Hex toHex, Hex fromHex, GameSession gameSession,
                          List<Hex> changes, Random rand) {
-        for (List<Integer> retreatHex:toHex.getNeighbours()) {
+        for (List<Integer> retreatHex:gameSession.getMap().getNeighbours(toHex)) {
             if (gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1))
                     .getOwner().equals(toHex.getOwner())) {
                 gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).setUnits(
@@ -168,7 +168,7 @@ public class ClientStepService {
 
 
 
-    private void attackL(Hex toHex, Hex fromHex, Random rand) {
+    private void attackLose(Hex toHex, Hex fromHex, Random rand) {
         if (fromHex.getUnits() * Config.MOVING_UNITS_COEFF < toHex.getUnits() * Config.CASUALTIES_COEFF) {
             Integer fighRes = ((int) (toHex.getUnits() * Config.CASUALTIES_COEFF
                     - fromHex.getUnits() * Config.MOVING_UNITS_COEFF));
