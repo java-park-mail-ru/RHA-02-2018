@@ -10,7 +10,7 @@ public interface GameMechanics {
 
     void step(@NotNull  String user, @NotNull ClientStep clientStep);
 
-    void addUser(@NotNull String user);
+    void addUser(@NotNull String user, @NotNull Integer players);
 
     void reset();
 

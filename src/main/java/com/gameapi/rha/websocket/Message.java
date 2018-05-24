@@ -13,7 +13,7 @@ import com.gameapi.rha.mechanics.messages.output.ServerStep;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "class")
 @JsonSubTypes(value = {
-        @JsonSubTypes.Type(JoinGame.Request.class),
+        @JsonSubTypes.Type(JoinGame.class),
         @JsonSubTypes.Type(InitGame.Request.class),
         @JsonSubTypes.Type(FinishGame.class),
         @JsonSubTypes.Type(ClientStep.class),

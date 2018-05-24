@@ -29,7 +29,7 @@ public class JoinGameHandler extends MessageHandler<JoinGame> {
 
       @Override
       public void handle(@NotNull JoinGame message, @NotNull String user) {
-          gameMechanics.addUser(user);
+          gameMechanics.addUser(user, message.getPlayers());
 
       }
 }

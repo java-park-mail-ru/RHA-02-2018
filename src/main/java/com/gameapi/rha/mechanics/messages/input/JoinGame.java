@@ -11,4 +11,8 @@ public class JoinGame extends Message {
             this.players = 2;
         }
     }
+
+    public Integer getPlayers() {
+        return players;
+    }
 }

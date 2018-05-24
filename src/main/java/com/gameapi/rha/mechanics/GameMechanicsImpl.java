@@ -75,7 +75,7 @@ public class GameMechanicsImpl implements GameMechanics {
     }
 
     @Override
-    public void addUser(@NotNull String user) {
+    public void addUser(@NotNull String user, Integer players) {
         if (gameSessionService.isPlaying(user) || isWaiting(user)) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(String.format("User %s is playing", user));
