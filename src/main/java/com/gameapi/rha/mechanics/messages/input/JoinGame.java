@@ -7,8 +7,8 @@ public class JoinGame extends Message {
 
     public JoinGame(Integer players) {
         this.players = players;
-        if (this.players == null){
-            this.players=2;
+        if (this.players == null) {
+            this.players = 2;
         }
     }
 }
