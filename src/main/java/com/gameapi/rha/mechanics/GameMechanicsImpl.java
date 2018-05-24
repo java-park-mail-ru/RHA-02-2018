@@ -43,7 +43,9 @@ public class GameMechanicsImpl implements GameMechanics {
 
 
     @NotNull
-    private ConcurrentLinkedQueue<String> waiters = new ConcurrentLinkedQueue<>();
+    private List<ConcurrentLinkedQueue<String>> waiters = new ArrayList<>();
+
+
 
     @NotNull
     private static final Logger LOGGER = LoggerFactory.getLogger(GameMechanicsImpl.class);
@@ -66,6 +68,10 @@ public class GameMechanicsImpl implements GameMechanics {
         this.remotePointService = remotePointService;
         this.gameSessionService = gameSessionService;
         this.resourceFactory = resourceFactory;
+        waiters.add(new ConcurrentLinkedQueue<String>());
+        waiters.add(new ConcurrentLinkedQueue<String>());
+        waiters.add(new ConcurrentLinkedQueue<String>());
+
     }
 
     @Override
@@ -82,35 +88,48 @@ public class GameMechanicsImpl implements GameMechanics {
             }
             return;
         }
-        waiters.add(user);
+        switch (players) {
+            case 2:
+                waiters.get(0).add(user);
+                break;
+            case 3:
+                waiters.get(1).add(user);
+                break;
+            case 4:
+                waiters.get(2).add(user);
+                break;
+            default:
+                waiters.get(0).add(user);
+                break;
+        }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(String.format("User %s added to the waiting list", user));
         }
-        tryStartGames();
+        tryStartGames(players);
     }
 
 
     private boolean isWaiting(@NotNull String user) {
-        return waiters.contains(user);
+        return (waiters.get(0).contains(user) || waiters.get(1).contains(user) || waiters.get(2).contains(user));
     }
 
-    private void tryStartGames() {
+    private void tryStartGames(Integer players) {
         final List<User> matchedPlayers = new ArrayList<>();
 
-        while (waiters.size() >= 2 || waiters.size() >= 1 && matchedPlayers.size() >= 1) {
-            final String candidate = waiters.poll();
+        while (waiters.get(players - 2).size() + matchedPlayers.size() >= players) {
+            final String candidate = waiters.get(players - 2).poll();
             // for sure not null, cause we the only one consumer
             //noinspection ConstantConditions
             if (!insureCandidate(candidate)) {
                 continue;
             }
             matchedPlayers.add(userService.userInfo(candidate));
-            if (matchedPlayers.size() >= 2) {
+            if (matchedPlayers.size() >= players) {
                 gameSessionService.startGame(matchedPlayers);
                 matchedPlayers.clear();
             }
         }
-        matchedPlayers.stream().map(User::getUsername).forEach(waiters::add);
+        matchedPlayers.stream().map(User::getUsername).forEach(waiters.get(players - 2)::add);
     }
 
     private boolean insureCandidate(@NotNull String candidate) {
@@ -127,5 +146,6 @@ public class GameMechanicsImpl implements GameMechanics {
     public void turn(@NotNull  String user, @NotNull ClientTurn clientTurn) {
         clientTurnService.turn(gameSessionService.getSessionForUser(user), user);
     }
+
 
 }
