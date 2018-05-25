@@ -107,7 +107,7 @@ public class GameSessionService {
     }
 
     public void finishGame(@NotNull GameSession gameSession) {
-        if(gameSession!=null) {
+        if (gameSession != null) {
             for (GameUser user : gameSession.getPlayers()) {
                 usersMap.remove(user.getUserNickname());
             }

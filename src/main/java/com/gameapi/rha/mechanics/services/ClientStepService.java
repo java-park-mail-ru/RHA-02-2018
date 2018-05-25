@@ -41,7 +41,7 @@ public class ClientStepService {
 
         Hex toHex = gameSession.getMap()
                 .get(clientStep.getTo().get(0), clientStep.getTo().get(1));
-        if(fromHex.getType() == 0 || toHex.getType() == 0){
+        if (fromHex.getType() == 0 || toHex.getType() == 0) {
             return;
         }
         List<Hex> changes = new ArrayList<>();
@@ -145,7 +145,7 @@ public class ClientStepService {
 
     private void attackWin(Hex toHex, Hex fromHex, GameSession gameSession,
                          List<Hex> changes, Random rand) {
-        //        if(toHex.getOwner()!=0) {
+            //        if(toHex.getOwner()!=0) {
             for (List<Integer> retreatHex : gameSession.getMap().getNeighbours(toHex)) {
                 if (gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1))
                         .getOwner().equals(toHex.getOwner())) {

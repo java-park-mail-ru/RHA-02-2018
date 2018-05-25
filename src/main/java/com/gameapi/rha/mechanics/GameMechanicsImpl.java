@@ -1,9 +1,7 @@
 package com.gameapi.rha.mechanics;
 
-import com.gameapi.rha.mechanics.game.GameUser;
 import com.gameapi.rha.mechanics.messages.input.ClientStep;
 import com.gameapi.rha.mechanics.messages.input.ClientTurn;
-import com.gameapi.rha.mechanics.messages.output.InitGame;
 import com.gameapi.rha.mechanics.services.*;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
@@ -11,10 +9,8 @@ import com.gameapi.rha.websocket.RemotePointService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.CloseStatus;
 
 import javax.validation.constraints.NotNull;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 

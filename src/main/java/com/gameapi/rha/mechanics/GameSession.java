@@ -8,7 +8,6 @@ import com.gameapi.rha.mechanics.services.ResourceFactory;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class GameSession {
@@ -31,21 +30,21 @@ public class GameSession {
 
         this.map = new TacticalMap(resourceFactory.readMap("maps/trainingMap"));
 
-//        Random rand = new Random();
-//        switch (players.size()) {
-//            case 2:
-//                this.map = new TacticalMap(resourceFactory.readMap("maps/2players/map" + (abs(rand.nextInt() % 5) + 1)));
-//                break;
-//            case 3:
-//                this.map = new TacticalMap(resourceFactory.readMap("maps/3players/map" + (rand.nextInt() % 5 + 1)));
-//                break;
-//            case 4:
-//                this.map = new TacticalMap(resourceFactory.readMap("maps/4players/map" + (rand.nextInt() % 5 + 1)));
-//                break;
-//            default:
-//                this.map = new TacticalMap(resourceFactory.readMap("maps/2players/map" + (rand.nextInt() % 5 + 1)));
-//                break;
-//        }
+        //        Random rand = new Random();
+        //        switch (players.size()) {
+        //            case 2:
+        //                this.map = new TacticalMap(resourceFactory.readMap("maps/2players/map" + (abs(rand.nextInt() % 5) + 1)));
+        //                break;
+        //            case 3:
+        //                this.map = new TacticalMap(resourceFactory.readMap("maps/3players/map" + (rand.nextInt() % 5 + 1)));
+        //                break;
+        //            case 4:
+        //                this.map = new TacticalMap(resourceFactory.readMap("maps/4players/map" + (rand.nextInt() % 5 + 1)));
+        //                break;
+        //            default:
+        //                this.map = new TacticalMap(resourceFactory.readMap("maps/2players/map" + (rand.nextInt() % 5 + 1)));
+        //                break;
+        //        }
 
     }
 

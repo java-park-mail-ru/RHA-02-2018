@@ -22,7 +22,7 @@ public class RemotePointService {
     }
 
     public void registerUser(@NotNull String user, @NotNull WebSocketSession webSocketSession) {
-        if(sessions.containsKey(user)){
+        if (sessions.containsKey(user)) {
             try {
                 webSocketSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(new  BreakMessage.Request())));
                 webSocketSession.close(new CloseStatus(403));
