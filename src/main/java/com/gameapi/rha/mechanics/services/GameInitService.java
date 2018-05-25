@@ -36,7 +36,7 @@ public class GameInitService {
 
         for (GameUser player : gameSession.getPlayers()) {
             final InitGame.Request initMessage = createInitMessageFor(gameSession);
-            final TurnInit.Request turnMessage = new TurnInit.Request(gameSession.getPlayers().get(1).getUserNickname());
+            final TurnInit.Request turnMessage = new TurnInit.Request(gameSession.getPlayers().get(0).getUserNickname());
             //noinspection OverlyBroadCatchBlock
             try {
                 remotePointService.sendMessageToUser(player.getUserNickname(), initMessage);

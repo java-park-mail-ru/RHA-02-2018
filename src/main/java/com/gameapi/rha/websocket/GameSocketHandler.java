@@ -96,7 +96,7 @@ public class GameSocketHandler extends TextWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession webSocketSession, CloseStatus closeStatus) {
         final String user = (String) webSocketSession.getAttributes().get("user");
         //TODO:  Переподключение
-        game.finishGame(game.getSessionForUser(user));
+        game.finishGame( game.getSessionForUser(user) );
         if (user == null) {
             LOGGER.warn("User disconnected but his session was not found (closeStatus=" + closeStatus + ')');
             return;

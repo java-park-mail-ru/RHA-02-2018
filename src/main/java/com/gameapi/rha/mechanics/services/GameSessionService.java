@@ -107,11 +107,12 @@ public class GameSessionService {
     }
 
     public void finishGame(@NotNull GameSession gameSession) {
-        for (GameUser user: gameSession.getPlayers()) {
-            usersMap.remove(user.getUserNickname());
+        if(gameSession!=null) {
+            for (GameUser user : gameSession.getPlayers()) {
+                usersMap.remove(user.getUserNickname());
+            }
+            gameSessions.remove(gameSession);
         }
-
-        gameSessions.remove(gameSession);
     }
 
     private static final class SwapTask extends GameTaskScheduler.GameSessionTask {

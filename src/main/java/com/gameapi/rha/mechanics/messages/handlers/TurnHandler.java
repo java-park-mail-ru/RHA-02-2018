@@ -4,10 +4,12 @@ import com.gameapi.rha.mechanics.GameMechanics;
 import com.gameapi.rha.mechanics.messages.input.ClientTurn;
 import com.gameapi.rha.websocket.MessageHandler;
 import com.gameapi.rha.websocket.MessageHandlerContainer;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
+@Component
 public class TurnHandler extends MessageHandler<ClientTurn> {
     private final @NotNull GameMechanics gameMechanics;
     private final @NotNull MessageHandlerContainer messageHandlerContainer;
