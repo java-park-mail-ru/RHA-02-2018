@@ -74,10 +74,10 @@ public class ClientStepService {
                 case 6:
                     victoryProbability = victoryProbability / Config.DESERT_HILL_DEFENCE;
                     break;
-                case 7:
+                case 8:
                     victoryProbability = victoryProbability / Config.CITY_DEFENCE;
                     break;
-                case 8:
+                case 7:
                     victoryProbability = victoryProbability / Config.MOUNTAIN_DEFENCE;
                     break;
                 default:
