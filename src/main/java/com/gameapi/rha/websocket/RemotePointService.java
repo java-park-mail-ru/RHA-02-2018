@@ -1,6 +1,7 @@
 package com.gameapi.rha.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gameapi.rha.mechanics.messages.output.BreakMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -21,6 +22,15 @@ public class RemotePointService {
     }
 
     public void registerUser(@NotNull String user, @NotNull WebSocketSession webSocketSession) {
+        if(sessions.containsKey(user)){
+            try {
+                webSocketSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(new  BreakMessage.Request())));
+                webSocketSession.close(new CloseStatus(403));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
         sessions.put(user, webSocketSession);
     }
 

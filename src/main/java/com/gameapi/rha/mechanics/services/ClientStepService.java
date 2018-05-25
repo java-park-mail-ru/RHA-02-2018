@@ -41,7 +41,9 @@ public class ClientStepService {
 
         Hex toHex = gameSession.getMap()
                 .get(clientStep.getTo().get(0), clientStep.getTo().get(1));
-
+        if(fromHex.getType() == 0 || toHex.getType() == 0){
+            return;
+        }
         List<Hex> changes = new ArrayList<>();
         String type;
 
@@ -93,11 +95,11 @@ public class ClientStepService {
             }
         }
 
-        gameSession.getMap().getMap().get(clientStep.getTo().get(0))
-                .set(clientStep.getTo().get(1), toHex);
+        gameSession.getMap().getMap().get(clientStep.getTo().get(1))
+                .set(clientStep.getTo().get(0), toHex);
         changes.add(toHex);
-        gameSession.getMap().getMap().get(clientStep.getFrom().get(0))
-                .set(clientStep.getFrom().get(1), fromHex);
+        gameSession.getMap().getMap().get(clientStep.getFrom().get(1))
+                .set(clientStep.getFrom().get(0), fromHex);
 
         changes.add(fromHex);
         for (GameUser player : gameSession.getPlayers()) {
@@ -143,16 +145,18 @@ public class ClientStepService {
 
     private void attackWin(Hex toHex, Hex fromHex, GameSession gameSession,
                          List<Hex> changes, Random rand) {
-        for (List<Integer> retreatHex:gameSession.getMap().getNeighbours(toHex)) {
-            if (gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1))
-                    .getOwner().equals(toHex.getOwner())) {
-                gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).setUnits(
-                        gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).getUnits()
-                                + (toHex.getUnits() * (rand.nextInt() % Config.RETREATED_LOST_TROOPS_MAX + 10) / 100));
-                changes.add(gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)));
-                break;
+        //        if(toHex.getOwner()!=0) {
+            for (List<Integer> retreatHex : gameSession.getMap().getNeighbours(toHex)) {
+                if (gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1))
+                        .getOwner().equals(toHex.getOwner())) {
+                    gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).setUnits(
+                            gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).getUnits()
+                                    + (toHex.getUnits() * (rand.nextInt() % Config.RETREATED_LOST_TROOPS_MAX + 10) / 100));
+                    changes.add(gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)));
+                    break;
+                }
             }
-        }
+        //        }
         toHex.setOwner(fromHex.getOwner());
         if (fromHex.getUnits() * Config.MOVING_UNITS_COEFF > toHex.getUnits() * Config.CASUALTIES_COEFF) {
             toHex.setUnits((int) (fromHex.getUnits() * Config.MOVING_UNITS_COEFF

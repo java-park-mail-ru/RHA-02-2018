@@ -34,6 +34,7 @@ public class ClientTurnService {
                 remotePointService.sendMessageToUser(player.getUserNickname(), turnMessage);
             } catch (IOException e) {
                 // TODO: Reentrance mechanism
+                gameSession.terminateSession();
                 gameSession.getPlayers().forEach(playerToCutOff -> remotePointService.cutDownConnection(playerToCutOff.getUserNickname(),
                         CloseStatus.SERVER_ERROR));
                 LOGGER.error("Unnable to continue a game", e);
