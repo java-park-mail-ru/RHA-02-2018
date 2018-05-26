@@ -26,7 +26,7 @@ public class ClientTurnService {
     }
 
     public void turn(@org.jetbrains.annotations.NotNull GameSession gameSession, String current) {
-
+        gameSession.tryFinishGame();
         String next = gameSession.getNext(current).getUserNickname();
         final TurnInit.Request turnMessage = new TurnInit.Request(next);
         if (next == gameSession.getPlayers().get(0).getUserNickname()) {
@@ -45,7 +45,5 @@ public class ClientTurnService {
                 LOGGER.error("Unnable to continue a game", e);
             }
         }
-
-        gameSession.tryFinishGame();
     }
 }

@@ -2,6 +2,7 @@ package com.gameapi.rha.mechanics.game;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.gameapi.rha.mechanics.Config;
 import com.gameapi.rha.mechanics.base.Coords;
 
 import javax.validation.constraints.NotNull;
@@ -65,7 +66,36 @@ public class Hex extends GameObject {
         this.owner = owner;
     }
 
+    public int getMax() {
+    switch (type) {
+        case 1:
+            return Config.FIELD_MAX;
+        case 2:
+            return Config.DESERT_MAX;
 
+        case 3:
+            return Config.FOREST_MAX;
+
+        case 4:
+            return Config.HILL_MAX;
+
+        case 5:
+            return Config.DESERT_HILL_MAX;
+
+        case 6:
+            return Config.FOREST_HILL_MAX;
+
+        case 7:
+            return Config.MOUNTAIN_MAX;
+
+        case 8:
+            return Config.CITY_MAX;
+
+        default:
+            break;
+    }
+    return 0;
+    }
 
     public Coords getCoords() {
         return coords;

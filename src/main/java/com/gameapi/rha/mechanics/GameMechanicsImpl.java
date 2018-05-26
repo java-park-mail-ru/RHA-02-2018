@@ -76,8 +76,14 @@ public class GameMechanicsImpl implements GameMechanics {
 
     @Override
     public void step(@NotNull String user, @NotNull ClientStep clientStep) {
+        GameSession session = gameSessionService.getSessionForUser(user);
 
-        clientStepService.pushClientStep(gameSessionService.getSessionForUser(user), clientStep);
+        if(session!=null) {
+            clientStepService.pushClientStep(session, clientStep);
+        }
+        else{
+            LOGGER.debug(String.format("User %s is not playing",user));
+        }
     }
 
     @Override

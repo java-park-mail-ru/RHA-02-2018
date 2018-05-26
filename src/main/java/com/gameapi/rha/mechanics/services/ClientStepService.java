@@ -56,32 +56,34 @@ public class ClientStepService {
             double victoryProbability = Math.atan((double) (fromHex.getUnits())
                     * Config.MOVING_UNITS_COEFF
                     / (double) toHex.getUnits() / Config.CASUALTIES_COEFF) /  Math.PI * 2;
-            switch (toHex.getType()) {
-                case 1:
-                    break;
-                case 2:
-                    victoryProbability = victoryProbability / Config.DESERT_DEFENCE;
-                    break;
-                case 3:
-                    victoryProbability = victoryProbability / Config.FOREST_DEFENCE;
-                    break;
-                case 4:
-                    victoryProbability = victoryProbability / Config.HILL_DEFENCE;
-                    break;
-                case 5:
-                    victoryProbability = victoryProbability / Config.FOREST_HILL_DEFENCE;
-                    break;
-                case 6:
-                    victoryProbability = victoryProbability / Config.DESERT_HILL_DEFENCE;
-                    break;
-                case 8:
-                    victoryProbability = victoryProbability / Config.CITY_DEFENCE;
-                    break;
-                case 7:
-                    victoryProbability = victoryProbability / Config.MOUNTAIN_DEFENCE;
-                    break;
-                default:
+            if (toHex.getOwner()!=0) {
+                switch (toHex.getType()) {
+                    case 1:
                         break;
+                    case 2:
+                        victoryProbability = victoryProbability / Config.DESERT_DEFENCE;
+                        break;
+                    case 3:
+                        victoryProbability = victoryProbability / Config.FOREST_DEFENCE;
+                        break;
+                    case 4:
+                        victoryProbability = victoryProbability / Config.HILL_DEFENCE;
+                        break;
+                    case 5:
+                        victoryProbability = victoryProbability / Config.FOREST_HILL_DEFENCE;
+                        break;
+                    case 6:
+                        victoryProbability = victoryProbability / Config.DESERT_HILL_DEFENCE;
+                        break;
+                    case 8:
+                        victoryProbability = victoryProbability / Config.CITY_DEFENCE;
+                        break;
+                    case 7:
+                        victoryProbability = victoryProbability / Config.MOUNTAIN_DEFENCE;
+                        break;
+                    default:
+                        break;
+                }
             }
 
             final Random rand = new Random();
@@ -138,6 +140,10 @@ public class ClientStepService {
 
         fromHex.setUnits((int) (((double) fromHex.getUnits())
                 * (1 - Config.MOVING_UNITS_COEFF)));
+        if (toHex.getUnits()>toHex.getMax()){
+            fromHex.setUnits(fromHex.getUnits()+toHex.getUnits()-toHex.getMax());
+            toHex.setUnits(toHex.getMax());
+        }
     }
     //TODO: Fix attackLost
 
@@ -152,6 +158,12 @@ public class ClientStepService {
                     gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).setUnits(
                             gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).getUnits()
                                     + (toHex.getUnits() * (rand.nextInt() % Config.RETREATED_LOST_TROOPS_MAX + 10) / 100));
+                    if(gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).getUnits() >
+                            gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).getMax()){
+                        gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).setUnits(
+                                gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).getMax()
+                        );
+                    }
                     changes.add(gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)));
                     break;
                 }
@@ -161,6 +173,7 @@ public class ClientStepService {
         if (fromHex.getUnits() * Config.MOVING_UNITS_COEFF > toHex.getUnits() * Config.CASUALTIES_COEFF) {
             toHex.setUnits((int) (fromHex.getUnits() * Config.MOVING_UNITS_COEFF
                     - toHex.getUnits() * Config.CASUALTIES_COEFF));
+
         } else {
             toHex.setUnits(0);
         }
@@ -168,6 +181,11 @@ public class ClientStepService {
                 * Config.MOVING_UNITS_COEFF) - toHex.getUnits())
                 / 100 * (rand.nextInt() % Config.RETREATED_VICTORIOUS_TROOPS_MAX + 20)));
         fromHex.setUnits((int) (fromHex.getUnits() * (1 - Config.MOVING_UNITS_COEFF)));
+        if (toHex.getUnits()>toHex.getMax()){
+            fromHex.setUnits(fromHex.getUnits()+toHex.getUnits()-toHex.getMax());
+            toHex.setUnits(toHex.getMax());
+
+        }
     }
 
 

@@ -7,6 +7,7 @@ import com.gameapi.rha.mechanics.services.GameSessionService;
 import com.gameapi.rha.mechanics.services.ResourceFactory;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -72,16 +73,20 @@ public class GameSession {
     }
 
     public boolean tryFinishGame() {
-        Hex check = map.getMap().get(0).get(0);
+        List<Integer> owners = new ArrayList<>();
         for (List<Hex> ever:map.getMap()) {
             for (Hex one:ever) {
-            if (check.getOwner() != one.getOwner()) {
-                return false;
+                if(!owners.contains(one.getOwner())) {
+                    owners.add(one.getOwner());
+                }
             }
         }
+        if(owners.size() < 3){
+            gameSessionService.finishGame(this);
+            return true;
+
         }
-        gameSessionService.finishGame(this);
-        return true;
+        return false;
     }
 
     public boolean isFinished() {
@@ -112,36 +117,63 @@ public class GameSession {
     public void mapTurn() {
         for (List<Hex> line: map.getMap()) {
             for (Hex hex: line) {
-                switch (hex.getType()) {
-                    case 0:
-                        break;
-                    case 1:
-                        hex.setUnits(hex.getUnits() + Config.FIELD_GROWTH);
-                        break;
-                    case 2:
-                        hex.setUnits(hex.getUnits() + Config.DESERT_GROWTH);
-                        break;
-                    case 3:
-                        hex.setUnits(hex.getUnits() + Config.FOREST_GROWTH);
-                        break;
-                    case 4:
-                        hex.setUnits(hex.getUnits() + Config.FIELD_GROWTH);
-                        break;
-                    case 5:
-                        hex.setUnits(hex.getUnits() + Config.FOREST_GROWTH);
-                        break;
-                    case 6:
-                        hex.setUnits(hex.getUnits() + Config.DESERT_GROWTH);
-                        break;
-                    case 7:
-                        hex.setUnits(hex.getUnits() + Config.MOUNTAIN_GROWTH);
-                        break;
-                    case 8:
-                        hex.setUnits(hex.getUnits() + Config.CITY_GROWTH);
-                        break;
-                    default:
-                        break;
+                if( hex.getOwner() != 0 ) {
+                    switch (hex.getType()) {
+                      case 0:
+                            break;
+                        case 1:
+                            hex.setUnits(hex.getUnits() + Config.FIELD_GROWTH);
+                            if(hex.getUnits()>hex.getMax()){
+                                hex.setUnits(hex.getMax());
+                            }
+                            break;
+                        case 2:
+                            hex.setUnits(hex.getUnits() + Config.DESERT_GROWTH);
+                            if(hex.getUnits()>hex.getMax()){
+                                hex.setUnits(hex.getMax());
+                            }
+                            break;
+                        case 3:
+                            hex.setUnits(hex.getUnits() + Config.FOREST_GROWTH);
+                            if(hex.getUnits()>hex.getMax()){
+                                hex.setUnits(hex.getMax());
+                            }
+                            break;
+                        case 4:
+                            hex.setUnits(hex.getUnits() + Config.FIELD_GROWTH);
+                            if(hex.getUnits()>hex.getMax()){
+                                hex.setUnits(hex.getMax());
+                            }
+                            break;
+                        case 5:
+                            hex.setUnits(hex.getUnits() + Config.FOREST_GROWTH);
+                            if(hex.getUnits()>hex.getMax()){
+                                hex.setUnits(hex.getMax());
+                            }
+                            break;
+                        case 6:
+                            hex.setUnits(hex.getUnits() + Config.DESERT_GROWTH);
+                            if(hex.getUnits()>hex.getMax()){
+                                hex.setUnits(hex.getMax());
+                            }
+                            break;
+                        case 7:
+                            hex.setUnits(hex.getUnits() + Config.MOUNTAIN_GROWTH);
+                            if(hex.getUnits()>hex.getMax()){
+                                hex.setUnits(hex.getMax());
+                            }
+                            break;
+                        case 8:
+                            hex.setUnits(hex.getUnits() + Config.CITY_GROWTH);
+                            if(hex.getUnits()>hex.getMax()){
+                                hex.setUnits(hex.getMax());
+                            }
+                            break;
+                        default:
+                         break;
+                    }
                 }
+
             }
         }
     }
