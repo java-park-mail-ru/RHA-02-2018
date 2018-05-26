@@ -34,7 +34,10 @@ public class GameSession {
                         Random rand = new Random();
                         switch (players.size()) {
                             case 2:
-                                this.map = new TacticalMap(resourceFactory.readMap("maps/2players/map" + (Math.abs(rand.nextInt() % 2) + 1)));
+                                this.map = new TacticalMap(
+                                        resourceFactory.readMap(
+                                       "maps/2players/map"
+                                        + (Math.abs(rand.nextInt() % 2) + 1)));
                                 break;
                             default:
                                 this.map = new TacticalMap(resourceFactory.readMap("maps/2players/map" + (rand.nextInt() % 5 + 1)));

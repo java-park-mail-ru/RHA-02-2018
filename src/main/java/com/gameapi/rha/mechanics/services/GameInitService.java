@@ -2,7 +2,6 @@ package com.gameapi.rha.mechanics.services;
 
 import com.gameapi.rha.mechanics.GameSession;
 import com.gameapi.rha.mechanics.game.GameUser;
-import com.gameapi.rha.mechanics.game.TacticalMap;
 import com.gameapi.rha.mechanics.messages.output.InitGame;
 import com.gameapi.rha.mechanics.messages.output.TurnInit;
 import com.gameapi.rha.websocket.RemotePointService;
