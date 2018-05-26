@@ -57,7 +57,6 @@ public class GameInitService {
         final List<String> names = new ArrayList<>();
 
 
-
         for (GameUser player : gameSession.getPlayers()) {
             names.add(player.getUserNickname());
         }

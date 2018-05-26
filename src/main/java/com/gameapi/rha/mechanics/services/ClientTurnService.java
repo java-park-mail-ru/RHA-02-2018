@@ -14,6 +14,7 @@ import org.springframework.web.socket.CloseStatus;
 import java.io.IOException;
 
 
+
 @Service
 public class ClientTurnService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerTurnService.class);
@@ -27,8 +28,12 @@ public class ClientTurnService {
     public void turn(@org.jetbrains.annotations.NotNull GameSession gameSession, String current) {
 
         String next = gameSession.getNext(current).getUserNickname();
+        final TurnInit.Request turnMessage = new TurnInit.Request(next);
+        if (next == gameSession.getPlayers().get(0).getUserNickname()) {
+            turnMessage.setCycle(true);
+        }
         for (GameUser player : gameSession.getPlayers()) {
-            final TurnInit.Request turnMessage = new TurnInit.Request(next);
+
             //noinspection OverlyBroadCatchBlock
             try {
                 remotePointService.sendMessageToUser(player.getUserNickname(), turnMessage);
