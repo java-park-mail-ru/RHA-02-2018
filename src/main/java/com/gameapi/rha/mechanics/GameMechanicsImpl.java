@@ -78,11 +78,10 @@ public class GameMechanicsImpl implements GameMechanics {
     public void step(@NotNull String user, @NotNull ClientStep clientStep) {
         GameSession session = gameSessionService.getSessionForUser(user);
 
-        if(session!=null) {
+        if (session != null) {
             clientStepService.pushClientStep(session, clientStep);
-        }
-        else{
-            LOGGER.debug(String.format("User %s is not playing",user));
+        } else {
+            LOGGER.debug(String.format("User %s is not playing", user));
         }
     }
 

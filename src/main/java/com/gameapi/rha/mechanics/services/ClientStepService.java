@@ -56,7 +56,7 @@ public class ClientStepService {
             double victoryProbability = Math.atan((double) (fromHex.getUnits())
                     * Config.MOVING_UNITS_COEFF
                     / (double) toHex.getUnits() / Config.CASUALTIES_COEFF) /  Math.PI * 2;
-            if (toHex.getOwner()!=0) {
+            if (toHex.getOwner() != 0) {
                 switch (toHex.getType()) {
                     case 1:
                         break;
@@ -140,8 +140,8 @@ public class ClientStepService {
 
         fromHex.setUnits((int) (((double) fromHex.getUnits())
                 * (1 - Config.MOVING_UNITS_COEFF)));
-        if (toHex.getUnits()>toHex.getMax()){
-            fromHex.setUnits(fromHex.getUnits()+toHex.getUnits()-toHex.getMax());
+        if (toHex.getUnits() > toHex.getMax()) {
+            fromHex.setUnits(fromHex.getUnits() + toHex.getUnits() - toHex.getMax());
             toHex.setUnits(toHex.getMax());
         }
     }
@@ -158,8 +158,10 @@ public class ClientStepService {
                     gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).setUnits(
                             gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).getUnits()
                                     + (toHex.getUnits() * (rand.nextInt() % Config.RETREATED_LOST_TROOPS_MAX + 10) / 100));
-                    if(gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).getUnits() >
-                            gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).getMax()){
+                    if (gameSession.getMap().get(
+                            retreatHex.get(0), retreatHex.get(1)).getUnits()
+                            > gameSession.getMap().get(
+                            retreatHex.get(0), retreatHex.get(1)).getMax()) {
                         gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).setUnits(
                                 gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).getMax()
                         );
@@ -181,8 +183,8 @@ public class ClientStepService {
                 * Config.MOVING_UNITS_COEFF) - toHex.getUnits())
                 / 100 * (rand.nextInt() % Config.RETREATED_VICTORIOUS_TROOPS_MAX + 20)));
         fromHex.setUnits((int) (fromHex.getUnits() * (1 - Config.MOVING_UNITS_COEFF)));
-        if (toHex.getUnits()>toHex.getMax()){
-            fromHex.setUnits(fromHex.getUnits()+toHex.getUnits()-toHex.getMax());
+        if (toHex.getUnits() > toHex.getMax()) {
+            fromHex.setUnits(fromHex.getUnits() + toHex.getUnits() - toHex.getMax());
             toHex.setUnits(toHex.getMax());
 
         }
