@@ -154,7 +154,7 @@ public class ClientStepService {
                          List<Hex> changes, Random rand) {
             //        if(toHex.getOwner()!=0) {
             for (List<Integer> retreatHex : gameSession.getMap().getNeighbours(toHex)) {
-                if (gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1))
+                if (gameSession.getMap().get(retreatHex.get(1), retreatHex.get(0))
                         .getOwner().equals(toHex.getOwner())) {
                     gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).setUnits(
                             gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).getUnits()
