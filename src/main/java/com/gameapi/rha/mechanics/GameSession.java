@@ -38,8 +38,8 @@ public class GameSession {
                                 this.map = new TacticalMap(
                                         resourceFactory.readMap(
                                        "maps/2players/map"
-                                                +3));
-//                                        + (Math.abs(rand.nextInt() % 2) + 1)));
+                                                 + 3));
+                                //   + (Math.abs(rand.nextInt() % 2) + 1)));
                                 break;
                             case 3:
                                 this.map = new TacticalMap(
