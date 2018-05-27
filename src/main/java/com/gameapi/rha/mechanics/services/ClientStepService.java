@@ -59,6 +59,7 @@ public class ClientStepService {
             if (toHex.getOwner() != 0) {
                 switch (toHex.getType()) {
                     case 1:
+                        victoryProbability = victoryProbability / Config.FIELD_DEFENCE;
                         break;
                     case 2:
                         victoryProbability = victoryProbability / Config.DESERT_DEFENCE;

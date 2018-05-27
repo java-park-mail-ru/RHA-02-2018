@@ -72,7 +72,7 @@ public class GameSession {
         this.map = map;
     }
 
-    public boolean tryFinishGame() {
+    public void tryFinishGame() {
         List<Integer> owners = new ArrayList<>();
         for (List<Hex> ever:map.getMap()) {
             for (Hex one:ever) {
@@ -81,12 +81,12 @@ public class GameSession {
                 }
             }
         }
-        if (owners.size() < 3) {
-            gameSessionService.finishGame(this);
-            return true;
-
+        if (owners.size() == 2) {
+            if (owners.get(1) != 0) {
+                gameSessionService.finishGame(this, owners.get(1));
+            }
+            gameSessionService.finishGame(this, owners.get(2));
         }
-        return false;
     }
 
     public boolean isFinished() {

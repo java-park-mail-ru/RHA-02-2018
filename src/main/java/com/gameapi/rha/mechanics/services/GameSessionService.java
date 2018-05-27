@@ -2,6 +2,7 @@ package com.gameapi.rha.mechanics.services;
 
 import com.gameapi.rha.mechanics.GameSession;
 import com.gameapi.rha.mechanics.game.GameUser;
+import com.gameapi.rha.mechanics.messages.output.FinishGame;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.websocket.RemotePointService;
 import org.jetbrains.annotations.Nullable;
@@ -12,6 +13,7 @@ import org.springframework.web.socket.CloseStatus;
 
 import javax.validation.constraints.NotNull;
 
+import java.io.IOException;
 import java.util.*;
 
 
@@ -106,10 +108,20 @@ public class GameSessionService {
         LOGGER.info("Game session " + gameSession.getSessionId() + " started. " + gameSession.toString());
     }
 
-    public void finishGame(@NotNull GameSession gameSession) {
+    public void finishGame(@NotNull GameSession gameSession, @NotNull Integer player) {
         if (gameSession != null) {
+            FinishGame msg = new FinishGame();
+            if (player != 0 ){
+                msg.setPlayer(player);
+            }
             for (GameUser user : gameSession.getPlayers()) {
                 usersMap.remove(user.getUserNickname());
+                try {
+                    remotePointService.sendMessageToUser(user.getUserNickname(), msg);
+                } catch (IOException exc) {
+                    LOGGER.warn("Cannot finish gameSession");
+                }
+
             }
             gameSessions.remove(gameSession);
         }
