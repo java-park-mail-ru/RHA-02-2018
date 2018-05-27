@@ -4,10 +4,12 @@ import com.gameapi.rha.mechanics.GameSession;
 import com.gameapi.rha.mechanics.game.GameUser;
 import com.gameapi.rha.mechanics.messages.output.FinishGame;
 import com.gameapi.rha.models.User;
+import com.gameapi.rha.services.UserService;
 import com.gameapi.rha.websocket.RemotePointService;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
 
@@ -20,6 +22,9 @@ import java.util.*;
 @Service
 public class GameSessionService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameSessionService.class);
+
+    @Autowired
+    private UserService us;
 
     private final @NotNull Map<String, GameSession> usersMap = new HashMap<>();
 
@@ -111,8 +116,9 @@ public class GameSessionService {
     public void finishGame(@NotNull GameSession gameSession, @NotNull Integer player) {
         if (gameSession != null) {
             FinishGame msg = new FinishGame();
-            if (player != 0 ){
+            if (player != 0) {
                 msg.setPlayer(player);
+                us.addRating(gameSession.getPlayers().get(player - 1).getUserNickname());
             }
             for (GameUser user : gameSession.getPlayers()) {
                 usersMap.remove(user.getUserNickname());

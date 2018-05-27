@@ -96,6 +96,12 @@ public class UserService {
   }
 
 
+  public void addRating(String user) {
+    String sql = "UPDATE \"users\" SET rating=rating+1 WHERE username=?";
+    jdbc.update(sql);
+  }
+
+
   /**
    * Authorisation check.
    * @param email user mail
