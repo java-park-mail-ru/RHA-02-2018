@@ -1,10 +1,8 @@
 
 [
-    [{"owner":1,"units":8000,"type":8,"coords":{"y":0,"x":0}},
-        {"owner":0,"units":0,"type":0,"coords":{"y":0,"x":1}}],
+    [{"owner":1,"units":8000,"type":8,"coords":{"y":0,"x":0}}],
 
-    [{"owner":0,"units":0,"type":0,"coords":{"y":1,"x":0}},
-        {"owner":2,"units":750,"type":1,"coords":{"y":1,"x":1}}]
+    [ {"owner":2,"units":750,"type":1,"coords":{"y":1,"x":0}}]
 
 
 ]
