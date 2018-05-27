@@ -26,10 +26,10 @@ public class TacticalMap extends GameObject {
         if (coords.getX() - 1 >= 0) {
             neighbours.add(Arrays.asList(coords.getY(), coords.getX() - 1));
         }
-        if(coords.getX() + 1 < map.get(0).size()) {
+        if (coords.getX() + 1 < map.get(0).size()) {
             neighbours.add(Arrays.asList(coords.getY(), coords.getX() + 1));
         }
-        if(coords.getY() + 1 < map.size()) {
+        if (coords.getY() + 1 < map.size()) {
             neighbours.add(Arrays.asList(coords.getY() + 1, coords.getX()));
         }
         if (coords.getX() % 2 == 1 && coords.getY() - 1 >= 0) {
@@ -40,11 +40,11 @@ public class TacticalMap extends GameObject {
 
         } else {
             if (coords.getX() - 1 >= 0) {
-                if(coords.getY() + 1 < map.size()) {
+                if (coords.getY() + 1 < map.size()) {
                     neighbours.add(Arrays.asList(coords.getY() + 1, coords.getX() - 1));
                 }
             }
-            if(coords.getX() + 1 < map.get(0).size() && coords.getY()+1 < map.size()) {
+            if (coords.getX() + 1 < map.get(0).size() && coords.getY() + 1 < map.size()) {
                 neighbours.add(Arrays.asList(coords.getY() + 1, coords.getX() + 1));
             }
         }
