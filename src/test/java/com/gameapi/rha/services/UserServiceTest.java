@@ -159,16 +159,4 @@ class UserServiceTest {
 
     }
 
-//    @Test
-//    @DisplayName("Wrong user changes")
-//    void changeUserW() {
-//        assertThrows(EmptyResultDataAccessException.class,()->{
-//            someService.changeUser(user1);
-//        });
-//        someService.createUser( user1 );
-//        user1.setUsername("Lenin");
-////        assertThrows(EmptyResultDataAccessException.class,()->{
-////            someService.changeUser(user1);
-////        });
-//            }
 }

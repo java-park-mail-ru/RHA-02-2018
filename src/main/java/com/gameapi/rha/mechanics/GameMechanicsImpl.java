@@ -88,9 +88,7 @@ public class GameMechanicsImpl implements GameMechanics {
     @Override
     public void addUser(@NotNull String user, Integer players) {
         if (isWaiting(user)) {
-            if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(String.format("User %s is playing", user));
-            }
             return;
         }
         switch (players) {
@@ -107,9 +105,8 @@ public class GameMechanicsImpl implements GameMechanics {
                 waiters.get(0).add(user);
                 break;
         }
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(String.format("User %s added to the waiting list", user));
-        }
+        LOGGER.debug(String.format("User %s added to the waiting list", user));
+
         tryStartGames(players);
     }
 

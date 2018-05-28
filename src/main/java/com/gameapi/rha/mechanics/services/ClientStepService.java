@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-//TODO: Допилить степ
+
 
 @Service
 public class ClientStepService {
@@ -146,13 +146,13 @@ public class ClientStepService {
             toHex.setUnits(toHex.getMax());
         }
     }
-    //TODO: Fix attackLost
+
 
 
 
     private void attackWin(Hex toHex, Hex fromHex, GameSession gameSession,
                          List<Hex> changes, Random rand) {
-            //        if(toHex.getOwner()!=0) {
+
             for (List<Integer> retreatHex : gameSession.getMap().getNeighbours(toHex)) {
                 if (gameSession.getMap().get(retreatHex.get(1), retreatHex.get(0))
                         .getOwner().equals(toHex.getOwner())) {
@@ -171,7 +171,6 @@ public class ClientStepService {
                     break;
                 }
             }
-        //        }
         toHex.setOwner(fromHex.getOwner());
         if (fromHex.getUnits() * Config.MOVING_UNITS_COEFF > toHex.getUnits() * Config.CASUALTIES_COEFF) {
             toHex.setUnits((int) (fromHex.getUnits() * Config.MOVING_UNITS_COEFF
