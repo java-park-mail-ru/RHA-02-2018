@@ -92,7 +92,7 @@ public class GameSession {
             if (owners.get(1) != 0) {
                 gameSessionService.finishGame(this, owners.get(1));
             }
-            gameSessionService.finishGame(this, owners.get(2));
+            gameSessionService.finishGame(this, owners.get(0));
         }
     }
 
