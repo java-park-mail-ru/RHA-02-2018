@@ -28,7 +28,8 @@ public class GameSession {
 
     private  final @NotNull ResourceFactory resourceFactory;
 
-    public GameSession(List<GameUser> players, GameSessionService gameSessionService, ResourceFactory resourceFactory, ClientTurnService turnService) {
+    public GameSession(List<GameUser> players, GameSessionService gameSessionService,
+                       ResourceFactory resourceFactory, ClientTurnService turnService) {
         this.players = players;
         this.gameSessionService = gameSessionService;
         this.resourceFactory = resourceFactory;
@@ -49,8 +50,9 @@ public class GameSession {
                                 this.map = new TacticalMap(
                                         resourceFactory.readMap(
                                                 "maps/3players/map" + 1
-                                //   + (Math.abs(rand.nextInt() % 2) + 1)
+
                                         ));
+                                //   + (Math.abs(rand.nextInt() % 2) + 1)
                                 break;
                             default:
                                 this.map = new TacticalMap(resourceFactory.readMap("maps/2players/map" + (rand.nextInt() % 5 + 1)));

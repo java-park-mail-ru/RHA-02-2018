@@ -32,7 +32,7 @@ public class TurnTimerService implements Runnable {
         }
     }
 
-    public void interrupt(){
+    public void interrupt() {
         Thread.interrupted();
     }
 

@@ -74,7 +74,7 @@ public class GameMechanicsImpl implements GameMechanics {
         GameSession session = gameSessionService.getSessionForUser(user);
 
         if (session != null) {
-            if(session.getPlaying().equals(user)) {
+            if (session.getPlaying().equals(user)) {
                 clientStepService.pushClientStep(session, clientStep);
             }
         } else {
@@ -144,7 +144,7 @@ public class GameMechanicsImpl implements GameMechanics {
     @Override
     public void turn(@NotNull  String user, @NotNull ClientTurn clientTurn) {
         GameSession session = gameSessionService.getSessionForUser(user);
-        if(session.getPlaying().equals(user)) {
+        if (session.getPlaying().equals(user)) {
             clientTurnService.turn(session);
             session.getTimerService().interrupt();
 
