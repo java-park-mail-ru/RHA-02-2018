@@ -102,7 +102,7 @@ public class GameSessionService {
             gamers.add(new GameUser(player, timeService));
         }
 
-        final GameSession gameSession = new GameSession(gamers, this, resourceFactory);
+        final GameSession gameSession = new GameSession(gamers, this, resourceFactory,clientTurnService);
 
 
         gameSessions.add(gameSession);

@@ -17,7 +17,7 @@ import java.util.*;
 
 @Service
 public class GameInitService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServerTurnService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientTurnService.class);
 
     @NotNull
     private final RemotePointService remotePointService;
@@ -47,6 +47,7 @@ public class GameInitService {
                 LOGGER.error("Unnable to start a game", e);
             }
         }
+        gameSession.getTimerService().run();
 
     }
 
