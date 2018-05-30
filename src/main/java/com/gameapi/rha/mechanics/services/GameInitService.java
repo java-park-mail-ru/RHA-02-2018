@@ -47,7 +47,6 @@ public class GameInitService {
                 LOGGER.error("Unnable to start a game", e);
             }
         }
-        gameSession.getTimerService().run();
 
     }
 

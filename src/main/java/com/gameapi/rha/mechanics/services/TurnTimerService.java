@@ -15,11 +15,14 @@ public class TurnTimerService implements Runnable {
 
     private Boolean shouldRun;
 
+    private Thread thread;
 
     public TurnTimerService(ClientTurnService clientTurnService, GameSession game) {
         this.clientTurnService = clientTurnService;
         this.game = game;
         this.shouldRun = true;
+        thread = new Thread(this, "Поток-таймер");
+        thread.start();
     }
 
     @Override
@@ -27,20 +30,21 @@ public class TurnTimerService implements Runnable {
         while (shouldRun) {
             try {
                 Thread.sleep(30000);
+                clientTurnService.turn(game);
             } catch (InterruptedException e) {
                 System.out.println("Turn interrupted !!");
-                break;
             }
-            clientTurnService.turn(game);
+
         }
     }
 
     public void interrupt() {
-        Thread.interrupted();
+        thread.interrupt();
     }
 
     public void stop() {
         shouldRun = false;
+        thread.stop();
     }
 
 }
