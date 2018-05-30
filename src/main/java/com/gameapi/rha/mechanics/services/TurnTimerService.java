@@ -13,15 +13,18 @@ public class TurnTimerService implements Runnable {
 
     private GameSession game;
 
+    private Boolean shouldRun;
+
 
     public TurnTimerService(ClientTurnService clientTurnService, GameSession game) {
         this.clientTurnService = clientTurnService;
         this.game = game;
+        this.shouldRun = true;
     }
 
     @Override
     public void run() {
-        while (true) {
+        while (shouldRun) {
             try {
                 Thread.sleep(30000);
             } catch (InterruptedException e) {
@@ -34,6 +37,10 @@ public class TurnTimerService implements Runnable {
 
     public void interrupt() {
         Thread.interrupted();
+    }
+
+    public void stop() {
+        shouldRun = false;
     }
 
 }

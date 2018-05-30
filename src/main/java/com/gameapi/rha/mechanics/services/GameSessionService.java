@@ -120,6 +120,8 @@ public class GameSessionService {
                 msg.setPlayer(player);
                 us.addRating(gameSession.getPlayers().get(player - 1).getUserNickname());
             }
+            gameSession.getTimerService().stop();
+            gameSession.getTimerService().interrupt();
             for (GameUser user : gameSession.getPlayers()) {
                 usersMap.remove(user.getUserNickname());
                 try {
