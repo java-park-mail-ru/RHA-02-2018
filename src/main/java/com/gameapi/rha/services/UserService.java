@@ -2,6 +2,7 @@ package com.gameapi.rha.services;
 
 import com.gameapi.rha.models.User;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -11,18 +12,17 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
 
-//import com.gameapi.rha.models.User;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
 
 
 /**
@@ -35,8 +35,9 @@ public class UserService {
   public static final String PATH_AVATARS_FOLDER = Paths.get("uploads")
           .toAbsolutePath().toString() + '/';
   private static JdbcTemplate jdbc;
-  private static RatingMapper RATING_MAPPER = new RatingMapper();
-  private static UserMapper USER_MAPPER = new UserMapper();
+  private static final RatingMapper RATING_MAPPER = new RatingMapper();
+  private static final UserMapper USER_MAPPER = new UserMapper();
+
   /**
   * UserService default constructor specialized.
   */
@@ -53,8 +54,8 @@ public class UserService {
    */
 
   public User createUser(User user) {
-    String SQL = "INSERT INTO \"users\" (username,rating,email,password) VALUES (? ,? ,? ,?);";
-    jdbc.update(SQL,user.getUsername(),user.getRating(),user.getEmail(),user.getPassword());
+    final String sQl = "INSERT INTO \"users\" (username,rating,email,password) VALUES (?, ?, ?, ?);";
+    jdbc.update(sQl, user.getUsername(), user.getRating(), user.getEmail(), user.getPassword());
     return user;
   }
 
@@ -69,24 +70,35 @@ public class UserService {
 
 
   public List<List<Map<String, Integer>>> rating(Integer page, String user) {
-    String SQL = "SELECT username,rating FROM \"users\" WHERE username!=? "
+    String sql = "SELECT username,rating FROM \"users\" WHERE username!=? "
             + "ORDER BY rating DESC "
             + "OFFSET ? Rows LIMIT ?;";
 
     List<List<Map<String, Integer>>> res = new LinkedList<>();
-    res.add(jdbc.query(SQL, RATING_MAPPER, user,page * 5, 5));
+    res.add(jdbc.query(sql, RATING_MAPPER, user, page * 5, 5));
     if (res.get(0).isEmpty()) {
       return null;
     }
-    SQL = "SELECT username,rating FROM \"users\" WHERE username=?::citext LIMIT 1;";
-    res.add(jdbc.query(SQL, RATING_MAPPER, user));
-    SQL = "SELECT count(*) FROM users;";
+    sql = "SELECT username,rating FROM \"users\" WHERE username=?::citext LIMIT 1;";
+    res.add(jdbc.query(sql, RATING_MAPPER, user));
+    sql = "SELECT count(*) FROM users;";
     final Map<String, Integer> map = new HashMap<>();
-    map.put("pages", (jdbc.queryForObject(SQL, Integer.class) - 1) / 5);
-    List<Map<String,Integer>> lst = new LinkedList<>();
+    int pages = jdbc.queryForObject(sql, Integer.class) - 1;
+    if (pages % 5 == 0) {
+      map.put("pages", pages / 5);
+    } else {
+      map.put("pages", pages / 5 + 1);
+    }
+    List<Map<String, Integer>> lst = new LinkedList<>();
     lst.add(map);
     res.add(lst);
     return (res);
+  }
+
+
+  public void addRating(String user) {
+    String sql = "UPDATE \"users\" SET rating=rating+1 WHERE username=? ;";
+    jdbc.update(sql, user);
   }
 
 
@@ -97,8 +109,8 @@ public class UserService {
    * @return user
    */
   public @Nullable User check(String email, String password)  {
-    final String SQL = "SELECT * FROM \"users\" WHERE email=?;";
-    final User authed = jdbc.queryForObject(SQL,USER_MAPPER,email);
+    final String sql = "SELECT * FROM \"users\" WHERE email=?;";
+    final User authed = jdbc.queryForObject(sql, USER_MAPPER, email);
     if (authed.checkPassword(password)) {
       return authed;
     } else {
@@ -108,8 +120,8 @@ public class UserService {
 
 
   public User userInfo(String nick) {
-    String SQL = "SELECT * FROM \"users\" WHERE username=?;";
-    return jdbc.queryForObject(SQL,USER_MAPPER,nick);
+    String sql = "SELECT * FROM \"users\" WHERE username=?;";
+    return jdbc.queryForObject(sql, USER_MAPPER, nick);
   }
 
 
@@ -117,30 +129,30 @@ public class UserService {
    * Change user is function to change current user in session.
    * @param user is new user to change
    */
-  public void changeUser (User user) {
+  public void changeUser(User user) {
 
     final List<Object> lst = new ArrayList<>();
-    String SQL = "UPDATE \"users\" SET";
+    String sql = "UPDATE \"users\" SET";
 
     if (user.getEmail() != null) {
-      SQL += " email = ?, ";
+      sql += " email = ?, ";
       lst.add(user.getEmail());
     }
     if (user.getPassword() != null) {
-      SQL += "password = ?, ";
+      sql += "password = ?, ";
       lst.add(user.getPassword());
     }
     if (user.getRating() != null) {
-      SQL += "rating = ? ";
+      sql += "rating = ? ";
       lst.add(user.getRating());
     }
-    SQL += " WHERE username=?;";
+    sql += " WHERE username=?;";
     lst.add(user.getUsername());
-    jdbc.update(SQL,lst.toArray());
+    jdbc.update(sql, lst.toArray());
   }
 
   /**
-   * Function to save image on PC and db
+   * Function to save image on PC and db.
    * @param file image to save
    * @param user user to avatar
    * @throws IOException if there is error(Handled in controller)
@@ -148,32 +160,33 @@ public class UserService {
   public void store(MultipartFile file, String user) throws IOException {
    File tosave = new File(PATH_AVATARS_FOLDER + user + "a.jpg");
     file.transferTo(tosave);
-    String SQL = "UPDATE \"users\" SET avatar=? WHERE username=(?)::citext;";
-    jdbc.update(SQL,user+"a.jpg",user);
+    String sql = "UPDATE \"users\" SET avatar=? WHERE username=(?)::citext;";
+    jdbc.update(sql, user + "a.jpg", user);
   }
 
 
   /**
-   * load
-   * @param user
-   * @return
+   * load.
+   * @param user is username
+   * @return avatar
    */
-  public Resource loadAvatar(String user) {
+
+  public BufferedImage loadAvatar(String user) throws IOException {
     String image = jdbc.queryForObject(
             "SELECT avatar FROM \"users\" "
                     + "WHERE username = ? LIMIT 1;",
             String.class, user
     );
-    Resource avatar = new FileSystemResource(PATH_AVATARS_FOLDER+image);
+    BufferedImage avatar = ImageIO.read(new File(PATH_AVATARS_FOLDER + image));
     return avatar;
   }
 
 
-  public static final class RatingMapper implements RowMapper<Map<String,Integer>> {
+  public static final class RatingMapper implements RowMapper<Map<String, Integer>> {
     @Override
-    public @NotNull Map<String,Integer> mapRow(ResultSet rs, int rowNum) throws SQLException {
-      final Map<String,Integer> th = new HashMap<>();
-      th.put(rs.getString("username"),rs.getInt("rating"));
+    public @NotNull Map<String, Integer> mapRow(ResultSet rs, int rowNum) throws SQLException {
+      final Map<String, Integer> th = new HashMap<>();
+      th.put(rs.getString("username"), rs.getInt("rating"));
       return th;
 
     }
@@ -184,7 +197,7 @@ public class UserService {
     @Override
     public @NotNull User mapRow(ResultSet rs, int rowNum) throws SQLException {
       return new User(rs.getString("username"),
-              rs.getString("password"),rs.getString("email"),
+              rs.getString("password"), rs.getString("email"),
               rs.getInt("rating"));
     }
 

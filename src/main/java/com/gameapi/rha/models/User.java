@@ -2,8 +2,6 @@ package com.gameapi.rha.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import javafx.application.Application;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -21,6 +19,7 @@ public class User {
    * @param password password(Later Hashed and Salted)
    * @param email email
    */
+
   @JsonCreator
   public User(
 
@@ -39,7 +38,7 @@ public class User {
     }
   }
 
-  public User(){}
+  public User() { }
 
   public void setUsername(String username) {
     this.username = username;

@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS "users" (
   email CITEXT NOT NULL UNIQUE ,
   password TEXT NOT NULL,
   rating INTEGER DEFAULT 0,
-  avatar TEXT DEFAULT 'def.png'
+  avatar TEXT DEFAULT 'def.jpg'
 );
 
 CREATE TABLE IF NOT EXISTS SPRING_SESSION (

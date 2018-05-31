@@ -3,11 +3,9 @@ package com.gameapi.rha.services;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.gameapi.rha.models.User;
-import org.junit.Rule;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.rules.ExpectedException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,8 +40,6 @@ class UserServiceTest {
     private  User user4=new User("","somep",
             "ThisWontwork@Either.nope",null);
 
-    @Rule
-    public ExpectedException expected = ExpectedException.none();
 
     @org.junit.jupiter.api.BeforeEach
     void setUp() {
@@ -163,16 +159,4 @@ class UserServiceTest {
 
     }
 
-//    @Test
-//    @DisplayName("Wrong user changes")
-//    void changeUserW() {
-//        assertThrows(EmptyResultDataAccessException.class,()->{
-//            someService.changeUser(user1);
-//        });
-//        someService.createUser( user1 );
-//        user1.setUsername("Lenin");
-////        assertThrows(EmptyResultDataAccessException.class,()->{
-////            someService.changeUser(user1);
-////        });
-//            }
 }

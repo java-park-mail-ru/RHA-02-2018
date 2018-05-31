@@ -4,16 +4,16 @@ import com.gameapi.rha.models.Message;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -26,7 +26,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
-@CrossOrigin(origins = {"https://rha-staging-deploy.herokuapp.com", "https://bf-balance.herokuapp.com", "http://localhost:3000"}, allowCredentials = "true")
+@CrossOrigin(origins = {"https://rha-staging-deploy.herokuapp.com", "https://bf-balance.herokuapp.com", "http://localhost:3000",
+        "https://rha-wargame.ru"
+}, allowCredentials = "true")
 @RequestMapping("/users")
 @EnableJdbcHttpSession
 
@@ -39,7 +41,7 @@ public class UserController {
 
    */
   @Autowired
-  protected UserService userService;
+  private UserService userService;
 
   @SuppressWarnings("CheckStyle")
   private enum UserStatus {
@@ -70,9 +72,9 @@ public class UserController {
 
     if (session.getAttribute("user") != null) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-              new Message(UserStatus.ALREADY_AUTHENTICATED,user.getUsername()));
+              new Message(UserStatus.ALREADY_AUTHENTICATED, user.getUsername()));
     }
-    if (user.getPassword() == null || user.getEmail() == null || user.getUsername()==null) {
+    if (user.getPassword() == null || user.getEmail() == null || user.getUsername() == null) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
               new Message(UserStatus.WRONG_CREDENTIALS));
     }
@@ -86,7 +88,7 @@ public class UserController {
     }
     sessionAuth(session, user);
     return ResponseEntity.status(HttpStatus.CREATED).body(
-            new Message(UserStatus.SUCCESSFULLY_REGISTERED,user.getUsername()));
+            new Message(UserStatus.SUCCESSFULLY_REGISTERED, user.getUsername()));
 
 
   }
@@ -110,19 +112,12 @@ public class UserController {
 
 
     // Если неверные учетные данные
-      try {
+    try {
           user = userService.check(user.getEmail(), user.getPassword());
-      } catch (DataAccessException exc) {
+    } catch (DataAccessException exc) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 new Message(UserStatus.WRONG_CREDENTIALS));
-      }
-
-// catch (IncorrectResultSizeDataAccessException Exc){
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-//              new Message(UserStatus.WRONG_CREDENTIALS));
-//
-//    }
-    catch (RuntimeException exc) {
+    } catch (RuntimeException exc) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 new Message(UserStatus.UNEXPECTED_ERROR));
     }
@@ -158,15 +153,13 @@ public class UserController {
   /**
    * This function gets paginated rating.
    * @param page page of rating to show
-   * @param request request to respone
    * @param session session to check authentification
-   * @param response response of rating
    * @return rating
    */
   @GetMapping(path = "/rating/{page}")
   public ResponseEntity rating(@PathVariable("page") Integer page,
-                               HttpServletRequest request, HttpSession session,
-                               HttpServletResponse response) {
+                                HttpSession session) {
+
 
     if (page == null) {
       page = 1;
@@ -183,21 +176,15 @@ public class UserController {
     }
 
     try {
-      resp = userService.rating(page,session.getAttribute("user").toString());
+      resp = userService.rating(page, session.getAttribute("user").toString());
     }    catch (DataAccessException exc) {
       return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
-              new Message(UserStatus.UNEXPECTED_ERROR,"Что-то на сервере."));
+              new Message(UserStatus.UNEXPECTED_ERROR, "Что-то на сервере."));
 
     }
-
-// catch (DataIntegrityViolationException exc) {
-//        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-//                new Message("Перебрал ты страниц... Мдааа..."));
-//
-//    }
     if (resp == null) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-               new Message(UserStatus.NOT_FOUND,"Перебрал ты страниц... Мдааа..."));
+               new Message(UserStatus.NOT_FOUND, "Перебрал ты страниц... Мдааа..."));
     }
 
     return ResponseEntity.status(HttpStatus.OK).body(resp);
@@ -229,7 +216,7 @@ public class UserController {
               new Message(UserStatus.UNEXPECTED_ERROR));
     } catch (DataAccessException exc) {
       return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
-              new Message(UserStatus.UNEXPECTED_ERROR,"Что-то на сервере."));
+              new Message(UserStatus.UNEXPECTED_ERROR, "Что-то на сервере."));
     }
 
     result.setPassword("You are not gonna steal data this way, you little piece of shit.");
@@ -252,7 +239,7 @@ public class UserController {
       session.invalidate();
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message(UserStatus.ACCESS_ERROR));
     }
-    if( user.getEmail() == null) {
+    if (user.getEmail() == null) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message(UserStatus.WRONG_CREDENTIALS));
 
     }
@@ -323,21 +310,21 @@ public class UserController {
                   new Message(UserStatus.NOT_FOUND));
       }
       try {
-        userService.store(file,session.getAttribute("user").toString());
+        userService.store(file, session.getAttribute("user").toString());
       } catch (IOException except) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 new Message(UserStatus.UNEXPECTED_ERROR));
       }
       return ResponseEntity.status(HttpStatus.OK).body(
-              new Message(UserStatus.SUCCESSFULLY_AUTHED));
+              new Message(UserStatus.SUCCESSFULLY_CHANGED));
 
   }
 
-  /**
-   * Function to get avatar.
-   * @param session session to check
-   * @return response(image)
-   */
+    /**
+     * Function to get avatar.
+     * @param session session to check
+     * @return response(image)
+    */
     @GetMapping("/gava")
     public ResponseEntity getAva(HttpSession session) {
         if (session.getAttribute("user") == null) {
@@ -345,19 +332,17 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
                     new Message(UserStatus.NOT_FOUND));
         }
-        final Resource file;
+      ByteArrayOutputStream bao = new ByteArrayOutputStream();
+        final BufferedImage file;
         try {
-             file = userService.loadAvatar(session.getAttribute("user").toString());
-        } catch (DataAccessException except) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
-                    new Message(UserStatus.UNEXPECTED_ERROR));
-        }
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(file.getFile());
+          //          file = userService.loadAvatar("Kostyan");
+          file = userService.loadAvatar(session.getAttribute("user").toString());
+          ImageIO.write(file, "jpg", bao);
         } catch (IOException exc) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    UserStatus.UNEXPECTED_ERROR);
+          return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+                  new Message(UserStatus.UNEXPECTED_ERROR));
         }
+            return ResponseEntity.ok(bao.toByteArray());
     }
 
   }
