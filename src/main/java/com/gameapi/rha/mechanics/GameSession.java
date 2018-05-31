@@ -6,7 +6,6 @@ import com.gameapi.rha.mechanics.game.TacticalMap;
 import com.gameapi.rha.mechanics.services.ClientTurnService;
 import com.gameapi.rha.mechanics.services.GameSessionService;
 import com.gameapi.rha.mechanics.services.ResourceFactory;
-import com.gameapi.rha.mechanics.services.TurnTimerService;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -20,10 +19,10 @@ public class GameSession {
     private String playing;
 
 
+
+
     private Long lastTurn;
 
-    //TODO
-    //    private TurnTimerService timerService;
 
 
 
@@ -187,13 +186,6 @@ public class GameSession {
         this.playing = playing;
     }
 
-//    public TurnTimerService getTimerService() {
-//        return timerService;
-//    }
-//
-//    public void setTimerService(TurnTimerService timerService) {
-//        this.timerService = timerService;
-//    }
 
     public Long getLastTurn() {
         return lastTurn;

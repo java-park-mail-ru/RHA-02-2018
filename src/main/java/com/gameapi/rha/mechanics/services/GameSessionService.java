@@ -30,7 +30,7 @@ public class GameSessionService {
 
     private final @NotNull Set<GameSession> gameSessions = new LinkedHashSet<>();
 
-    private final static int TURN_TIME = 30000;
+    private final int turnTime = 30000;
 
     private final @NotNull RemotePointService remotePointService;
 
@@ -99,9 +99,9 @@ public class GameSessionService {
     }
 
 
-    public void tryEndTurn(){
+    public void tryEndTurn() {
         for (GameSession session : gameSessions) {
-            if(System.currentTimeMillis() - session.getLastTurn() > TURN_TIME){
+            if (System.currentTimeMillis() - session.getLastTurn() > turnTime) {
                 clientTurnService.turn(session);
             }
         }
