@@ -30,6 +30,7 @@ public class GameSessionService {
 
     private final @NotNull Set<GameSession> gameSessions = new LinkedHashSet<>();
 
+    private final static int TURN_TIME = 30000;
 
     private final @NotNull RemotePointService remotePointService;
 
@@ -50,6 +51,8 @@ public class GameSessionService {
     private final ResourceFactory resourceFactory;
 
 
+    private final TurnTimerService timerService;
+
     public GameSessionService(@NotNull RemotePointService remotePointService,
                               @NotNull MechanicsTimeService timeService,
                               @NotNull GameInitService gameInitService,
@@ -62,6 +65,7 @@ public class GameSessionService {
         this.gameTaskScheduler = gameTaskScheduler;
         this.clientTurnService = clientTurnService;
         this.resourceFactory = resourceFactory;
+        timerService = new TurnTimerService(this);
     }
 
     public Set<GameSession> getSessions() {
@@ -95,6 +99,13 @@ public class GameSessionService {
     }
 
 
+    public void tryEndTurn(){
+        for (GameSession session : gameSessions) {
+            if(System.currentTimeMillis() - session.getLastTurn() > TURN_TIME){
+                clientTurnService.turn(session);
+            }
+        }
+    }
 
     public void startGame(@NotNull List<User> players) {
         List<GameUser> gamers = new ArrayList<>();
@@ -120,8 +131,8 @@ public class GameSessionService {
                 msg.setPlayer(player);
                 us.addRating(gameSession.getPlayers().get(player - 1).getUserNickname());
             }
-            gameSession.getTimerService().stop();
-            gameSession.getTimerService().interrupt();
+            //            gameSession.getTimerService().stop();
+            //            gameSession.getTimerService().interrupt();
             for (GameUser user : gameSession.getPlayers()) {
                 usersMap.remove(user.getUserNickname());
                 try {
@@ -150,6 +161,8 @@ public class GameSessionService {
         public void operate() {
         }
     }
+
+
 
 }
 

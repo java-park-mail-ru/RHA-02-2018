@@ -27,6 +27,7 @@ public class ClientTurnService {
 
     public void turn(@org.jetbrains.annotations.NotNull GameSession gameSession) {
         gameSession.tryFinishGame();
+        gameSession.updateLastTurn();
         String next = gameSession.getNext(gameSession.getPlaying()).getUserNickname();
         gameSession.setPlaying(next);
         final TurnInit.Request turnMessage = new TurnInit.Request(next);

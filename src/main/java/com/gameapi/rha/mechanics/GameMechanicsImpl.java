@@ -146,7 +146,7 @@ public class GameMechanicsImpl implements GameMechanics {
         GameSession session = gameSessionService.getSessionForUser(user);
         if (session.getPlaying().equals(user)) {
             clientTurnService.turn(session);
-            session.getTimerService().interrupt();
+            //            session.getTimerService().interrupt();
 
         }
     }

@@ -18,7 +18,14 @@ public class GameSession {
     private static final AtomicLong ID_GENERATOR = new AtomicLong(0);
     private boolean isFinished;
     private String playing;
-    private TurnTimerService timerService;
+
+
+    private Long lastTurn;
+
+    //TODO
+    //    private TurnTimerService timerService;
+
+
 
     private @NotNull Long  sessionId;
     private @NotNull List<GameUser> players;
@@ -58,8 +65,8 @@ public class GameSession {
                                 this.map = new TacticalMap(resourceFactory.readMap("maps/2players/map" + (rand.nextInt() % 5 + 1)));
                                 break;
                         }
-                        timerService = new TurnTimerService(turnService, this);
-
+                        //                        timerService = new TurnTimerService(turnService, this);
+                        lastTurn =  System.currentTimeMillis();
     }
 
 
@@ -180,11 +187,19 @@ public class GameSession {
         this.playing = playing;
     }
 
-    public TurnTimerService getTimerService() {
-        return timerService;
+//    public TurnTimerService getTimerService() {
+//        return timerService;
+//    }
+//
+//    public void setTimerService(TurnTimerService timerService) {
+//        this.timerService = timerService;
+//    }
+
+    public Long getLastTurn() {
+        return lastTurn;
     }
 
-    public void setTimerService(TurnTimerService timerService) {
-        this.timerService = timerService;
+    public void updateLastTurn() {
+        this.lastTurn =  System.currentTimeMillis();
     }
 }

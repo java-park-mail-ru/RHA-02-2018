@@ -9,17 +9,14 @@ import javax.validation.constraints.NotNull;
 public class TurnTimerService implements Runnable {
 
     @NotNull
-    private ClientTurnService clientTurnService;
-
-    private GameSession game;
+    private GameSessionService gameSessionService;
 
     private Boolean shouldRun;
 
     private Thread thread;
 
-    public TurnTimerService(ClientTurnService clientTurnService, GameSession game) {
-        this.clientTurnService = clientTurnService;
-        this.game = game;
+    public TurnTimerService(GameSessionService gameSessionService) {
+        this.gameSessionService = gameSessionService;
         this.shouldRun = true;
         thread = new Thread(this, "Поток-таймер");
         thread.start();
@@ -29,8 +26,8 @@ public class TurnTimerService implements Runnable {
     public void run() {
         while (shouldRun) {
             try {
-                Thread.sleep(30000);
-                clientTurnService.turn(game);
+                gameSessionService.tryEndTurn();
+                Thread.sleep(300);
             } catch (InterruptedException e) {
                 System.out.println("Turn interrupted !!");
             }
