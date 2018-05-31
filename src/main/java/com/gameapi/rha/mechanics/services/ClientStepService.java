@@ -33,8 +33,6 @@ public class ClientStepService {
         this.remotePointService = remotePointService;
     }
 
-
-
     public void pushClientStep(@NotNull GameSession gameSession, @NotNull ClientStep clientStep) {
         Hex fromHex = gameSession.getMap()
                 .get(clientStep.getFrom().get(0), clientStep.getFrom().get(1));
@@ -119,21 +117,12 @@ public class ClientStepService {
         }
     }
 
-
-
-
     private ServerStep createServerStepMessage(@NotNull GameSession gameSession, List<Hex> changes, String type) {
         final ServerStep serverStepMessage = new ServerStep();
         serverStepMessage.setMap(changes);
         serverStepMessage.setType(type);
         return serverStepMessage;
     }
-
-
-
-
-
-
 
     private void move(Hex toHex, Hex fromHex) {
         toHex.setUnits(toHex.getUnits()
@@ -146,9 +135,6 @@ public class ClientStepService {
             toHex.setUnits(toHex.getMax());
         }
     }
-
-
-
 
     private void attackWin(Hex toHex, Hex fromHex, GameSession gameSession,
                          List<Hex> changes, Random rand) {
@@ -189,8 +175,6 @@ public class ClientStepService {
 
         }
     }
-
-
 
     private void attackLose(Hex toHex, Hex fromHex, Random rand) {
         if (fromHex.getUnits() * Config.MOVING_UNITS_COEFF < toHex.getUnits() * Config.CASUALTIES_COEFF) {
