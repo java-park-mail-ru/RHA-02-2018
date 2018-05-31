@@ -17,7 +17,7 @@ import java.util.*;
 
 @Service
 public class GameInitService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServerTurnService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientTurnService.class);
 
     @NotNull
     private final RemotePointService remotePointService;
