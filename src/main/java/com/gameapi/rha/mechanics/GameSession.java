@@ -49,16 +49,14 @@ public class GameSession {
                                 this.map = new TacticalMap(
                                         resourceFactory.readMap(
                                        "maps/2players/map"
-                                                 + 3));
-                                //   + (Math.abs(rand.nextInt() % 2) + 1)));
+                                   + (Math.abs(rand.nextInt() % 5) + 1)));
                                 break;
                             case 3:
                                 this.map = new TacticalMap(
                                         resourceFactory.readMap(
-                                                "maps/3players/map" + 1
-
-                                        ));
-                                //   + (Math.abs(rand.nextInt() % 2) + 1)
+                                                "maps/3players/map"
+                                   + (Math.abs(rand.nextInt() % 2) + 1)
+                                                                                        ));
                                 break;
                             default:
                                 this.map = new TacticalMap(resourceFactory.readMap("maps/2players/map" + (rand.nextInt() % 5 + 1)));
@@ -81,8 +79,13 @@ public class GameSession {
         return sessionId;
     }
 
-    public Object getEnemy(@org.jetbrains.annotations.NotNull String userN) {
-        return userN;
+    public GameUser getPlayer(@org.jetbrains.annotations.NotNull String userN) {
+        for (GameUser us: players) {
+            if (us.getUserNickname() == userN) {
+                return  us;
+            }
+        }
+        return null;
     }
 
     public TacticalMap getMap() {

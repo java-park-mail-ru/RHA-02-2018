@@ -16,6 +16,7 @@ public class TurnTimerService implements Runnable {
         this.gameSessionService = gameSessionService;
         this.shouldRun = true;
         thread = new Thread(this, "Поток-таймер");
+        thread.setDaemon(true);
         thread.start();
     }
 

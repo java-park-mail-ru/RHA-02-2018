@@ -109,8 +109,10 @@ public class GameSessionService {
 
     public void startGame(@NotNull List<User> players) {
         List<GameUser> gamers = new ArrayList<>();
+        int i = 1;
         for (User player:players) {
-            gamers.add(new GameUser(player, timeService));
+            gamers.add(new GameUser(player, timeService, i));
+            i++;
         }
 
         final GameSession gameSession = new GameSession(gamers, this, resourceFactory, clientTurnService);
@@ -126,9 +128,10 @@ public class GameSessionService {
 
     public void finishGame(@NotNull GameSession gameSession, @NotNull Integer player) {
         if (gameSession != null) {
+
             FinishGame msg = new FinishGame();
             if (player != 0) {
-                msg.setPlayer(player);
+                msg.setPlayer(gameSession.getPlayers().get(player - 1).getTag());
                 us.addRating(gameSession.getPlayers().get(player - 1).getUserNickname());
             }
             //            gameSession.getTimerService().stop();
@@ -137,6 +140,7 @@ public class GameSessionService {
                 usersMap.remove(user.getUserNickname());
                 try {
                     remotePointService.sendMessageToUser(user.getUserNickname(), msg);
+                    remotePointService.removeUser(user.getUserNickname());
                 } catch (IOException exc) {
                     LOGGER.warn("Cannot finish gameSession");
                 }
@@ -144,6 +148,24 @@ public class GameSessionService {
             }
             gameSessions.remove(gameSession);
         }
+    }
+
+    public void dropPlayer(@Nullable GameSession sessionForUser, String user) {
+            usersMap.remove(user);
+            if (sessionForUser != null) {
+                if (sessionForUser.getPlayers().size() - 1 > 1) {
+                    sessionForUser.getPlayers().remove(sessionForUser.getPlayer(user));
+                } else {
+                    if (sessionForUser.getPlayers().get(0).getUserNickname().equals(user)) {
+                        sessionForUser.getPlayers().remove(sessionForUser.getPlayers().get(0));
+                        finishGame(sessionForUser, 1);
+
+                    } else {
+                        sessionForUser.getPlayers().remove(sessionForUser.getPlayers().get(1));
+                        finishGame(sessionForUser, 1);
+                    }
+                }
+            }
     }
 
     private static final class SwapTask extends GameTaskScheduler.GameSessionTask {

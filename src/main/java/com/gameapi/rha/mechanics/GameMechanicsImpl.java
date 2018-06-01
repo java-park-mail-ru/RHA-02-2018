@@ -114,7 +114,6 @@ public class GameMechanicsImpl implements GameMechanics {
 
     private void tryStartGames(Integer players) {
         final List<User> matchedPlayers = new ArrayList<>();
-
         while (waiters.get(players - 2).size() + matchedPlayers.size() >= players) {
             final String candidate = waiters.get(players - 2).poll();
             // for sure not null, cause we the only one consumer
