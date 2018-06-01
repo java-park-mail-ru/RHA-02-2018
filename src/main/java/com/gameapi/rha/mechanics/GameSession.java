@@ -81,7 +81,7 @@ public class GameSession {
 
     public GameUser getPlayer(@org.jetbrains.annotations.NotNull String userN) {
         for (GameUser us: players) {
-            if (us.getUserNickname() == userN) {
+            if (us.getUserNickname().equals(userN)) {
                 return  us;
             }
         }

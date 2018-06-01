@@ -3,6 +3,7 @@ package com.gameapi.rha.mechanics.services;
 import com.gameapi.rha.mechanics.GameSession;
 import com.gameapi.rha.mechanics.game.GameUser;
 import com.gameapi.rha.mechanics.messages.output.FinishGame;
+import com.gameapi.rha.mechanics.messages.output.TurnInit;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
 import com.gameapi.rha.websocket.RemotePointService;
@@ -151,10 +152,36 @@ public class GameSessionService {
     }
 
     public void dropPlayer(@Nullable GameSession sessionForUser, String user) {
-            usersMap.remove(user);
+
             if (sessionForUser != null) {
                 if (sessionForUser.getPlayers().size() - 1 > 1) {
-                    sessionForUser.getPlayers().remove(sessionForUser.getPlayer(user));
+                    if( sessionForUser.getPlaying().equals(user)){
+
+                        sessionForUser.updateLastTurn();
+                        String next = sessionForUser.getNext(sessionForUser.getPlaying()).getUserNickname();
+                        sessionForUser.setPlaying(next);
+                        sessionForUser.getPlayers().remove(sessionForUser.getPlayer(user));
+                        final TurnInit.Request turnMessage = new TurnInit.Request(next);
+                        if (next == sessionForUser.getPlayers().get(0).getUserNickname()) {
+                            turnMessage.setCycle(true);
+                        }
+                        for (GameUser player : sessionForUser.getPlayers()) {
+
+                            //noinspection OverlyBroadCatchBlock
+                            try {
+                                remotePointService.sendMessageToUser(player.getUserNickname(), turnMessage);
+                            } catch (IOException e) {
+                                // TODO: Reentrance mechanism
+                                sessionForUser.terminateSession();
+                                sessionForUser.getPlayers().forEach(playerToCutOff -> remotePointService.cutDownConnection(playerToCutOff.getUserNickname(),
+                                        CloseStatus.SERVER_ERROR));
+                                LOGGER.error("Unnable to continue a game", e);
+                            }
+                        }
+                        usersMap.remove(user);
+                    }
+
+
                 } else {
                     if (sessionForUser.getPlayers().get(0).getUserNickname().equals(user)) {
                         sessionForUser.getPlayers().remove(sessionForUser.getPlayers().get(0));
