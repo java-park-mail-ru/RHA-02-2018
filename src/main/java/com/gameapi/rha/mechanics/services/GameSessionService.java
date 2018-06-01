@@ -155,7 +155,7 @@ public class GameSessionService {
 
             if (sessionForUser != null) {
                 if (sessionForUser.getPlayers().size() - 1 > 1) {
-                    if( sessionForUser.getPlaying().equals(user)){
+                    if (sessionForUser.getPlaying().equals(user)) {
 
                         sessionForUser.updateLastTurn();
                         String next = sessionForUser.getNext(sessionForUser.getPlaying()).getUserNickname();
@@ -173,7 +173,8 @@ public class GameSessionService {
                             } catch (IOException e) {
                                 // TODO: Reentrance mechanism
                                 sessionForUser.terminateSession();
-                                sessionForUser.getPlayers().forEach(playerToCutOff -> remotePointService.cutDownConnection(playerToCutOff.getUserNickname(),
+                                sessionForUser.getPlayers().forEach(playerToCutOff ->
+                                        remotePointService.cutDownConnection(playerToCutOff.getUserNickname(),
                                         CloseStatus.SERVER_ERROR));
                                 LOGGER.error("Unnable to continue a game", e);
                             }
