@@ -7,10 +7,12 @@ import javax.validation.constraints.NotNull;
 
 public class GameUser extends GameObject {
 
+    private int tag;
 
     private final @NotNull User userProfile;
 
-    public GameUser(@NotNull User userProfile, @NotNull MechanicsTimeService timeService) {
+    public GameUser(@NotNull User userProfile, @NotNull MechanicsTimeService timeService, int it) {
+        tag = it;
         this.userProfile = userProfile;
     }
 
@@ -29,5 +31,13 @@ public class GameUser extends GameObject {
         return "GameUser{"
                 + "userProfile=" + userProfile
                 + '}';
+    }
+
+    public int getTag() {
+        return tag;
+    }
+
+    public void setTag(int tag) {
+        this.tag = tag;
     }
 }

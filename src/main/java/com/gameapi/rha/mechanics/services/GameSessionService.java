@@ -3,6 +3,7 @@ package com.gameapi.rha.mechanics.services;
 import com.gameapi.rha.mechanics.GameSession;
 import com.gameapi.rha.mechanics.game.GameUser;
 import com.gameapi.rha.mechanics.messages.output.FinishGame;
+import com.gameapi.rha.mechanics.messages.output.TurnInit;
 import com.gameapi.rha.models.User;
 import com.gameapi.rha.services.UserService;
 import com.gameapi.rha.websocket.RemotePointService;
@@ -30,6 +31,7 @@ public class GameSessionService {
 
     private final @NotNull Set<GameSession> gameSessions = new LinkedHashSet<>();
 
+    private final int turnTime = 30000;
 
     private final @NotNull RemotePointService remotePointService;
 
@@ -50,6 +52,8 @@ public class GameSessionService {
     private final ResourceFactory resourceFactory;
 
 
+    private final TurnTimerService timerService;
+
     public GameSessionService(@NotNull RemotePointService remotePointService,
                               @NotNull MechanicsTimeService timeService,
                               @NotNull GameInitService gameInitService,
@@ -62,6 +66,7 @@ public class GameSessionService {
         this.gameTaskScheduler = gameTaskScheduler;
         this.clientTurnService = clientTurnService;
         this.resourceFactory = resourceFactory;
+        timerService = new TurnTimerService(this);
     }
 
     public Set<GameSession> getSessions() {
@@ -95,14 +100,23 @@ public class GameSessionService {
     }
 
 
+    public void tryEndTurn() {
+        for (GameSession session : gameSessions) {
+            if (System.currentTimeMillis() - session.getLastTurn() > turnTime) {
+                clientTurnService.turn(session);
+            }
+        }
+    }
 
     public void startGame(@NotNull List<User> players) {
         List<GameUser> gamers = new ArrayList<>();
+        int i = 1;
         for (User player:players) {
-            gamers.add(new GameUser(player, timeService));
+            gamers.add(new GameUser(player, timeService, i));
+            i++;
         }
 
-        final GameSession gameSession = new GameSession(gamers, this, resourceFactory);
+        final GameSession gameSession = new GameSession(gamers, this, resourceFactory, clientTurnService);
 
 
         gameSessions.add(gameSession);
@@ -115,15 +129,19 @@ public class GameSessionService {
 
     public void finishGame(@NotNull GameSession gameSession, @NotNull Integer player) {
         if (gameSession != null) {
+
             FinishGame msg = new FinishGame();
             if (player != 0) {
-                msg.setPlayer(player);
+                msg.setPlayer(gameSession.getPlayers().get(player - 1).getTag());
                 us.addRating(gameSession.getPlayers().get(player - 1).getUserNickname());
             }
+            //            gameSession.getTimerService().stop();
+            //            gameSession.getTimerService().interrupt();
             for (GameUser user : gameSession.getPlayers()) {
                 usersMap.remove(user.getUserNickname());
                 try {
                     remotePointService.sendMessageToUser(user.getUserNickname(), msg);
+                    remotePointService.removeUser(user.getUserNickname());
                 } catch (IOException exc) {
                     LOGGER.warn("Cannot finish gameSession");
                 }
@@ -131,6 +149,51 @@ public class GameSessionService {
             }
             gameSessions.remove(gameSession);
         }
+    }
+
+    public void dropPlayer(@Nullable GameSession sessionForUser, String user) {
+
+            if (sessionForUser != null) {
+                if (sessionForUser.getPlayers().size() - 1 > 1) {
+                    if (sessionForUser.getPlaying().equals(user)) {
+
+                        sessionForUser.updateLastTurn();
+                        String next = sessionForUser.getNext(sessionForUser.getPlaying()).getUserNickname();
+                        sessionForUser.setPlaying(next);
+                        sessionForUser.getPlayers().remove(sessionForUser.getPlayer(user));
+                        final TurnInit.Request turnMessage = new TurnInit.Request(next);
+                        if (next == sessionForUser.getPlayers().get(0).getUserNickname()) {
+                            turnMessage.setCycle(true);
+                        }
+                        for (GameUser player : sessionForUser.getPlayers()) {
+
+                            //noinspection OverlyBroadCatchBlock
+                            try {
+                                remotePointService.sendMessageToUser(player.getUserNickname(), turnMessage);
+                            } catch (IOException e) {
+                                // TODO: Reentrance mechanism
+                                sessionForUser.terminateSession();
+                                sessionForUser.getPlayers().forEach(playerToCutOff ->
+                                        remotePointService.cutDownConnection(playerToCutOff.getUserNickname(),
+                                        CloseStatus.SERVER_ERROR));
+                                LOGGER.error("Unnable to continue a game", e);
+                            }
+                        }
+                        usersMap.remove(user);
+                    }
+
+
+                } else {
+                    if (sessionForUser.getPlayers().get(0).getUserNickname().equals(user)) {
+                        sessionForUser.getPlayers().remove(sessionForUser.getPlayers().get(0));
+                        finishGame(sessionForUser, 1);
+
+                    } else {
+                        sessionForUser.getPlayers().remove(sessionForUser.getPlayers().get(1));
+                        finishGame(sessionForUser, 1);
+                    }
+                }
+            }
     }
 
     private static final class SwapTask extends GameTaskScheduler.GameSessionTask {
@@ -148,6 +211,8 @@ public class GameSessionService {
         public void operate() {
         }
     }
+
+
 
 }
 

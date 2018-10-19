@@ -3,6 +3,7 @@ package com.gameapi.rha.mechanics;
 import com.gameapi.rha.mechanics.game.GameUser;
 import com.gameapi.rha.mechanics.game.Hex;
 import com.gameapi.rha.mechanics.game.TacticalMap;
+import com.gameapi.rha.mechanics.services.ClientTurnService;
 import com.gameapi.rha.mechanics.services.GameSessionService;
 import com.gameapi.rha.mechanics.services.ResourceFactory;
 
@@ -15,6 +16,15 @@ import java.util.concurrent.atomic.AtomicLong;
 public class GameSession {
     private static final AtomicLong ID_GENERATOR = new AtomicLong(0);
     private boolean isFinished;
+    private String playing;
+
+
+
+
+    private Long lastTurn;
+
+
+
 
     private @NotNull Long  sessionId;
     private @NotNull List<GameUser> players;
@@ -24,12 +34,13 @@ public class GameSession {
 
     private  final @NotNull ResourceFactory resourceFactory;
 
-    public GameSession(List<GameUser> players, GameSessionService gameSessionService, ResourceFactory resourceFactory) {
+    public GameSession(List<GameUser> players, GameSessionService gameSessionService,
+                       ResourceFactory resourceFactory, ClientTurnService turnService) {
         this.players = players;
         this.gameSessionService = gameSessionService;
         this.resourceFactory = resourceFactory;
         this.sessionId = ID_GENERATOR.getAndIncrement();
-
+        this.playing = players.get(0).getUserNickname();
         this.map = new TacticalMap(resourceFactory.readMap("maps/trainingMap"));
 
                         Random rand = new Random();
@@ -38,21 +49,21 @@ public class GameSession {
                                 this.map = new TacticalMap(
                                         resourceFactory.readMap(
                                        "maps/2players/map"
-                                                 + 3));
-                                //   + (Math.abs(rand.nextInt() % 2) + 1)));
+                                   + (Math.abs(rand.nextInt() % 5) + 1)));
                                 break;
                             case 3:
                                 this.map = new TacticalMap(
                                         resourceFactory.readMap(
-                                                "maps/3players/map" + 1
-                                        ));
-                                //   + (Math.abs(rand.nextInt() % 2) + 1)
+                                                "maps/3players/map"
+                                   + (Math.abs(rand.nextInt() % 2) + 1)
+                                                                                        ));
                                 break;
                             default:
                                 this.map = new TacticalMap(resourceFactory.readMap("maps/2players/map" + (rand.nextInt() % 5 + 1)));
                                 break;
                         }
-
+                        //                        timerService = new TurnTimerService(turnService, this);
+                        lastTurn =  System.currentTimeMillis();
     }
 
 
@@ -68,8 +79,13 @@ public class GameSession {
         return sessionId;
     }
 
-    public Object getEnemy(@org.jetbrains.annotations.NotNull String userN) {
-        return userN;
+    public GameUser getPlayer(@org.jetbrains.annotations.NotNull String userN) {
+        for (GameUser us: players) {
+            if (us.getUserNickname().equals(userN)) {
+                return  us;
+            }
+        }
+        return null;
     }
 
     public TacticalMap getMap() {
@@ -163,5 +179,22 @@ public class GameSession {
 
             }
         }
+    }
+
+    public String getPlaying() {
+        return playing;
+    }
+
+    public void setPlaying(String playing) {
+        this.playing = playing;
+    }
+
+
+    public Long getLastTurn() {
+        return lastTurn;
+    }
+
+    public void updateLastTurn() {
+        this.lastTurn =  System.currentTimeMillis();
     }
 }

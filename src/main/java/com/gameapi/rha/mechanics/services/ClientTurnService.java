@@ -17,7 +17,7 @@ import java.io.IOException;
 
 @Service
 public class ClientTurnService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServerTurnService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientTurnService.class);
     @org.jetbrains.annotations.NotNull
     private final RemotePointService remotePointService;
 
@@ -25,9 +25,11 @@ public class ClientTurnService {
         this.remotePointService = remotePointService;
     }
 
-    public void turn(@org.jetbrains.annotations.NotNull GameSession gameSession, String current) {
+    public void turn(@org.jetbrains.annotations.NotNull GameSession gameSession) {
         gameSession.tryFinishGame();
-        String next = gameSession.getNext(current).getUserNickname();
+        gameSession.updateLastTurn();
+        String next = gameSession.getNext(gameSession.getPlaying()).getUserNickname();
+        gameSession.setPlaying(next);
         final TurnInit.Request turnMessage = new TurnInit.Request(next);
         if (next == gameSession.getPlayers().get(0).getUserNickname()) {
             turnMessage.setCycle(true);

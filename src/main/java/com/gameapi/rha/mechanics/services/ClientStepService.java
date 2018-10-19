@@ -24,7 +24,7 @@ import java.util.Random;
 
 @Service
 public class ClientStepService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServerTurnService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientTurnService.class);
 
     @NotNull
     private final RemotePointService remotePointService;
@@ -142,18 +142,18 @@ public class ClientStepService {
             for (List<Integer> retreatHex : gameSession.getMap().getNeighbours(toHex)) {
                 if (gameSession.getMap().get(retreatHex.get(1), retreatHex.get(0))
                         .getOwner().equals(toHex.getOwner())) {
-                    gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).setUnits(
-                            gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).getUnits()
+                    gameSession.getMap().get(retreatHex.get(1), retreatHex.get(0)).setUnits(
+                            gameSession.getMap().get(retreatHex.get(1), retreatHex.get(0)).getUnits()
                                     + (toHex.getUnits() * (rand.nextInt() % Config.RETREATED_LOST_TROOPS_MAX + 10) / 100));
                     if (gameSession.getMap().get(
-                            retreatHex.get(0), retreatHex.get(1)).getUnits()
+                            retreatHex.get(1), retreatHex.get(0)).getUnits()
                             > gameSession.getMap().get(
-                            retreatHex.get(0), retreatHex.get(1)).getMax()) {
-                        gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).setUnits(
-                                gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)).getMax()
+                            retreatHex.get(1), retreatHex.get(0)).getMax()) {
+                        gameSession.getMap().get(retreatHex.get(1), retreatHex.get(0)).setUnits(
+                                gameSession.getMap().get(retreatHex.get(1), retreatHex.get(0)).getMax()
                         );
                     }
-                    changes.add(gameSession.getMap().get(retreatHex.get(0), retreatHex.get(1)));
+                    changes.add(gameSession.getMap().get(retreatHex.get(1), retreatHex.get(0)));
                     break;
                 }
             }

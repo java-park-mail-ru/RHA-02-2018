@@ -2,6 +2,7 @@ package com.gameapi.rha.websocket;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.gameapi.rha.mechanics.messages.input.Break;
 import com.gameapi.rha.mechanics.messages.input.ClientStep;
 import com.gameapi.rha.mechanics.messages.input.ClientTurn;
 import com.gameapi.rha.mechanics.messages.input.JoinGame;
@@ -18,6 +19,7 @@ import com.gameapi.rha.mechanics.messages.output.ServerStep;
         @JsonSubTypes.Type(ClientStep.class),
         @JsonSubTypes.Type(ServerStep.class),
         @JsonSubTypes.Type(ClientTurn.class),
+        @JsonSubTypes.Type(Break.class),
 })
 public abstract class Message {
 }

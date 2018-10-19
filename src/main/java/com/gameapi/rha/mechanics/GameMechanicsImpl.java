@@ -33,9 +33,6 @@ public class GameMechanicsImpl implements GameMechanics {
     private final RemotePointService remotePointService;
 
     @NotNull
-    private final ServerTurnService serverTurnService;
-
-    @NotNull
     private final GameSessionService gameSessionService;
 
     @NotNull
@@ -57,14 +54,12 @@ public class GameMechanicsImpl implements GameMechanics {
                              @NotNull ClientTurnService clientTurnService,
                              @NotNull ClientStepService clientStepService,
                              @NotNull RemotePointService remotePointService,
-                             @NotNull ServerTurnService serverTurnService,
                              @NotNull GameSessionService gameSessionService,
                              @NotNull ResourceFactory resourceFactory) {
         this.userService = userService;
         this.clientStepService = clientStepService;
         this.gameInitService = gameInitService;
         this.clientTurnService = clientTurnService;
-        this.serverTurnService = serverTurnService;
         this.remotePointService = remotePointService;
         this.gameSessionService = gameSessionService;
         this.resourceFactory = resourceFactory;
@@ -79,7 +74,9 @@ public class GameMechanicsImpl implements GameMechanics {
         GameSession session = gameSessionService.getSessionForUser(user);
 
         if (session != null) {
-            clientStepService.pushClientStep(session, clientStep);
+            if (session.getPlaying().equals(user)) {
+                clientStepService.pushClientStep(session, clientStep);
+            }
         } else {
             LOGGER.debug(String.format("User %s is not playing", user));
         }
@@ -117,7 +114,6 @@ public class GameMechanicsImpl implements GameMechanics {
 
     private void tryStartGames(Integer players) {
         final List<User> matchedPlayers = new ArrayList<>();
-
         while (waiters.get(players - 2).size() + matchedPlayers.size() >= players) {
             final String candidate = waiters.get(players - 2).poll();
             // for sure not null, cause we the only one consumer
@@ -146,7 +142,12 @@ public class GameMechanicsImpl implements GameMechanics {
 
     @Override
     public void turn(@NotNull  String user, @NotNull ClientTurn clientTurn) {
-        clientTurnService.turn(gameSessionService.getSessionForUser(user), user);
+        GameSession session = gameSessionService.getSessionForUser(user);
+        if (session.getPlaying().equals(user)) {
+            clientTurnService.turn(session);
+            //            session.getTimerService().interrupt();
+
+        }
     }
 
 

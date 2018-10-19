@@ -20,8 +20,8 @@ public class Config {
     public static final  Double HILL_DEFENCE = 1.0;
     public static final  Double DESERT_HILL_DEFENCE = 0.8;
     public static final  Double FOREST_HILL_DEFENCE = 1.3;
-    public static final  Double CITY_DEFENCE = 1.5;
-    public static final  Double MOUNTAIN_DEFENCE = 1.7;
+    public static final  Double CITY_DEFENCE = 1.2;
+    public static final  Double MOUNTAIN_DEFENCE = 1.5;
 
     public static final  Integer FIELD_MAX = 7000;
     public static final  Integer FOREST_MAX = 6000;

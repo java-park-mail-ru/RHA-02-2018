@@ -32,7 +32,7 @@ public class TacticalMap extends GameObject {
         if (coords.getY() + 1 < map.size()) {
             neighbours.add(Arrays.asList(coords.getY() + 1, coords.getX()));
         }
-        if (coords.getX() % 2 == 1 && coords.getY() - 1 >= 0) {
+        if (coords.getX() % 2 == 0 && coords.getY() - 1 >= 0) {
             if (coords.getX() - 1 >= 0) {
                 neighbours.add(Arrays.asList(coords.getY() - 1, coords.getX() - 1));
             }
